@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fine-tuning with CSV Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"], input[type="file"], select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            display: none;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Fine-tuning with CSV Upload</h1>
+    
+    <form id="finetuneForm" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="dataset_file">CSV File:</label>
+            <input type="file" id="dataset_file" name="dataset_file" accept=".csv" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="model_name_or_path">Model Name or Path:</label>
+            <input type="text" id="model_name_or_path" name="model_name_or_path" value="meta-llama/Meta-Llama-3-8B-Instruct" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="template">Template:</label>
+            <input type="text" id="template" name="template" value="llama3" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="output_dir">Output Directory:</label>
+            <input type="text" id="output_dir" name="output_dir" value="llama3_lora_qa_human_hybrid" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="finetuning_type">Fine-tuning Type:</label>
+            <input type="text" id="finetuning_type" name="finetuning_type" value="lora">
+        </div>
+        
+        <div class="form-group">
+            <label for="lora_target">LoRA Target:</label>
+            <input type="text" id="lora_target" name="lora_target" value="all">
+        </div>
+        
+        <div class="form-group">
+            <label for="per_device_train_batch_size">Per Device Train Batch Size:</label>
+            <input type="number" id="per_device_train_batch_size" name="per_device_train_batch_size" value="2">
+        </div>
+        
+        <div class="form-group">
+            <label for="gradient_accumulation_steps">Gradient Accumulation Steps:</label>
+            <input type="number" id="gradient_accumulation_steps" name="gradient_accumulation_steps" value="4">
+        </div>
+        
+        <div class="form-group">
+            <label for="lr_scheduler_type">LR Scheduler Type:</label>
+            <input type="text" id="lr_scheduler_type" name="lr_scheduler_type" value="cosine">
+        </div>
+        
+        <div class="form-group">
+            <label for="logging_steps">Logging Steps:</label>
+            <input type="number" id="logging_steps" name="logging_steps" value="5">
+        </div>
+        
+        <div class="form-group">
+            <label for="warmup_ratio">Warmup Ratio:</label>
+            <input type="number" id="warmup_ratio" name="warmup_ratio" value="0.1" step="0.01">
+        </div>
+        
+        <div class="form-group">
+            <label for="save_steps">Save Steps:</label>
+            <input type="number" id="save_steps" name="save_steps" value="1000">
+        </div>
+        
+        <div class="form-group">
+            <label for="learning_rate">Learning Rate:</label>
+            <input type="number" id="learning_rate" name="learning_rate" value="0.00005" step="0.00001">
+        </div>
+        
+        <div class="form-group">
+            <label for="num_train_epochs">Number of Train Epochs:</label>
+            <input type="number" id="num_train_epochs" name="num_train_epochs" value="3.0" step="0.1">
+        </div>
+        
+        <div class="form-group">
+            <label for="max_samples">Max Samples:</label>
+            <input type="number" id="max_samples" name="max_samples" value="500">
+        </div>
+        
+        <div class="form-group">
+            <label for="max_grad_norm">Max Gradient Norm:</label>
+            <input type="number" id="max_grad_norm" name="max_grad_norm" value="1.0" step="0.1">
+        </div>
+        
+        <div class="form-group">
+            <label for="loraplus_lr_ratio">LoRA+ LR Ratio:</label>
+            <input type="number" id="loraplus_lr_ratio" name="loraplus_lr_ratio" value="16.0" step="0.1">
+        </div>
+        
+        <div class="form-group">
+            <label for="fp16">FP16:</label>
+            <input type="checkbox" id="fp16" name="fp16" checked>
+        </div>
+        
+        <div class="form-group">
+            <label for="report_to">Report To:</label>
+            <input type="text" id="report_to" name="report_to" value="none">
+        </div>
+        
+        <button type="submit">Start Fine-tuning</button>
+    </form>
+    
+    <div id="result" class="result">
+        <h3>Result:</h3>
+        <pre id="resultContent"></pre>
+    </div>
+    
+    <div id="error" class="error"></div>
+    
+    <script>
+        document.getElementById('finetuneForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            // Handle checkbox values
+            const fp16Checkbox = document.getElementById('fp16');
+            formData.set('fp16', fp16Checkbox.checked);
+            
+            try {
+                document.getElementById('error').textContent = '';
+                document.getElementById('result').style.display = 'none';
+                
+                const response = await fetch('http://localhost:5000/api/finetune', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                document.getElementById('resultContent').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('result').style.display = 'block';
+                
+                if (!data.success) {
+                    document.getElementById('error').textContent = data.message || 'An error occurred';
+                }
+            } catch (error) {
+                document.getElementById('error').textContent = 'Error: ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
