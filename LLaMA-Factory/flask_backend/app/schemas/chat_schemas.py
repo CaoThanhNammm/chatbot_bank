@@ -15,6 +15,11 @@ class ChatSchema(Schema):
     messages = fields.List(fields.Nested(MessageSchema), required=True)
     system = fields.String(missing=None)
 
+class StreamChatSchema(Schema):
+    """Schema for streaming chat requests."""
+    message = fields.String(required=True)
+    model_id = fields.String(required=True)
+
 class ConversationSchema(Schema):
     """Schema for conversation operations."""
     title = fields.String(missing="New Conversation")

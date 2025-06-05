@@ -39,4 +39,8 @@ class ModelUpdateActiveSchema(Schema):
     model_id = fields.String(required=True)
     is_active = fields.Boolean(required=True)
 
+class ChooseModelSchema(Schema):
+    """Schema for choosing a model by ID."""
+    model_id = fields.String(required=True)
+
 # Legacy schemas have been removed

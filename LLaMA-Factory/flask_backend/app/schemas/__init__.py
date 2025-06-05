@@ -16,13 +16,15 @@ from .model_schemas import (
     FinetuningSchema,
     ModelLoadSchema,
     ModelUnloadSchema,
-    ModelUpdateActiveSchema
+    ModelUpdateActiveSchema,
+    ChooseModelSchema
 )
 
 # Import chat schemas
 from .chat_schemas import (
     MessageSchema,
     ChatSchema,
+    StreamChatSchema,
     ConversationSchema,
     validate_request
 )
@@ -41,10 +43,12 @@ __all__ = [
     'ModelLoadSchema',
     'ModelUnloadSchema',
     'ModelUpdateActiveSchema',
+    'ChooseModelSchema',
     
     # Chat schemas
     'MessageSchema',
     'ChatSchema',
+    'StreamChatSchema',
     'ConversationSchema',
     'validate_request'
 ]

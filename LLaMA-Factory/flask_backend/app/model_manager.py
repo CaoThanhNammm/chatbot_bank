@@ -13,8 +13,8 @@ from llamafactory.hparams import get_infer_args
 from llamafactory.extras.misc import torch_gc
 
 from .database import db
-from .models.model import ModelConfig
 from .models.finetune import FinetuningTask
+from .models.model import ModelConfig
 
 class ModelManager:
     """
@@ -89,7 +89,7 @@ class ModelManager:
                 "adapter_name_or_path": adapter_name_or_path,
                 "template": template,
                 "finetuning_type": "lora",
-                "infer_backend": "hf"  # Use Huggingface backend
+                "infer_backend": "huggingface"  # Use Huggingface backend
             }
             
             try:
@@ -147,7 +147,7 @@ class ModelManager:
                 "adapter_name_or_path": adapter_name_or_path,
                 "template": template,
                 "finetuning_type": "lora",
-                "infer_backend": "hf"  # Use Huggingface backend
+                "infer_backend": "huggingface"  # Use Huggingface backend
             }
             
             try:
@@ -307,11 +307,28 @@ class ModelManager:
                 # Activate new model
                 model_info = self.loaded_models[model_key]
                 try:
+                        # Force CPU usage for this activation
+                    print("Forcing model to load on CPU")
+                    
+                    # Save original CUDA_VISIBLE_DEVICES value
+                    original_cuda_devices = os.environ.get("CUDA_VISIBLE_DEVICES", "")
+                    
+                    # Set environment variable to use CPU
+                    os.environ["CUDA_VISIBLE_DEVICES"] = ""
+                    
+                    # Prepare model args
+                    args = model_info["args"].copy()
+                    
+                    # Add low CPU memory usage flag
+                    args["low_cpu_mem_usage"] = True
+                    
+                    
                     # Actually load the model now
-                    chat_model = ChatModel(model_info["args"])
+                    chat_model = ChatModel(args)
                     
                     # Update model info and active model in memory
                     model_info["chat_model"] = chat_model
+                    model_info["args"] = args  # Save the updated args
                     self.loaded_models[model_key] = model_info
                     self.active_model = model_key
                     self.active_chat_model = chat_model
@@ -321,7 +338,11 @@ class ModelManager:
                     model_config.last_activated_at = datetime.datetime.utcnow()
                     db.session.commit()
                     
-                    return True, f"Model activated successfully: {model_key}"
+                    # Restore original CUDA_VISIBLE_DEVICES value
+                    os.environ["CUDA_VISIBLE_DEVICES"] = original_cuda_devices
+                    
+                    # Return success with device info
+                    return True, f"Model activated successfully on CPU: {model_key}"
                 except Exception as e:
                     return False, f"Error activating model: {str(e)}"
             # If deactivating
@@ -406,6 +427,43 @@ class ModelManager:
                 result["id"] = model_config.id
             
             return result
+    
+    def choose_model(self, model_id: str) -> Tuple[bool, str, Optional[Dict[str, Any]]]:
+        """
+        Choose a model by ID and return its configuration for chat.
+        
+        Args:
+            model_id: ID of the model configuration
+            
+        Returns:
+            Tuple of (success, message, model_args)
+        """
+        with self.lock:
+            # Find the model configuration
+            model_config = db.session.query(ModelConfig).filter_by(id=model_id).first()
+            if not model_config:
+                return False, f"Model configuration not found with ID: {model_id}", None
+            
+            # Check if model is active
+            if not model_config.is_active:
+                return False, f"Model is not active. Please activate it first.", None
+            
+            # Force CPU usage for model inference
+            # Return model configuration with CPU settings
+            model_args = {
+                "model_name_or_path": model_config.model_name_or_path,
+                "adapter_name_or_path": model_config.adapter_name_or_path,
+                "template": model_config.template,
+                "finetuning_type": "lora",
+                "infer_backend": "huggingface",  # Use Huggingface backend
+                "low_cpu_mem_usage": True
+            }
+            
+            # Temporarily set environment variable to use CPU
+            # Note: This affects only the current request
+            os.environ["CUDA_VISIBLE_DEVICES"] = ""
+            
+            return True, "Model configuration retrieved successfully", model_args
     
     def chat(self, messages: List[Dict[str, str]], system: Optional[str] = None) -> Tuple[bool, str, Optional[str]]:
         """

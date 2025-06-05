@@ -2,25 +2,24 @@
 API routes for the Flask backend.
 """
 
-from flask import Blueprint, request, jsonify
-from typing import Dict, Any, List, Optional
+from flask import Blueprint, request, jsonify, Response
 import os
-import uuid
 import shutil
+import json
 import pandas as pd
 from marshmallow import ValidationError
 
 from .database import db
 from .model_manager import model_manager
 from .finetune_manager import finetune_manager
-from .conversation_manager import conversation_manager
 from .models.finetune import FinetuningTask
-from .models.model import ModelConfig
 from .schemas import (
     FinetuningSchema,
     ModelLoadSchema,
     ModelUnloadSchema,
     ModelUpdateActiveSchema,
+    ChooseModelSchema,
+    StreamChatSchema,
     ChatSchema,
     validate_request
 )
@@ -387,6 +386,104 @@ def auto_finetune():
         return jsonify({"success": False, "message": f"Error starting fine-tuning: {str(e)}"}), 500
 
 # Chat routes
+@api_bp.route('/choose-model', methods=['POST'])
+def choose_model():
+    """Choose a model by ID and return its configuration for chat."""
+    data = request.json
+    if not data:
+        return jsonify({"success": False, "message": "No data provided"}), 400
+    
+    try:
+        # Validate request data
+        validated_data = validate_request(data, ChooseModelSchema)
+        
+        # Get model configuration
+        success, message, model_args = model_manager.choose_model(
+            model_id=validated_data["model_id"]
+        )
+        
+        if success:
+            return jsonify({
+                "success": True,
+                "message": message,
+                "model_args": model_args
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "message": message
+            }), 400
+    except ValidationError as e:
+        return jsonify({
+            "success": False,
+            "message": "Validation error",
+            "errors": e.messages
+        }), 400
+
+@api_bp.route('/stream-chat', methods=['POST'])
+def stream_chat():
+    """Stream chat with a model."""
+    data = request.json
+    if not data:
+        return jsonify({"success": False, "message": "No data provided"}), 400
+    
+    try:
+        # Validate request data
+        validated_data = validate_request(data, StreamChatSchema)
+        
+        # Get model ID and message
+        model_id = validated_data["model_id"]
+        message = validated_data["message"]
+        
+        # Get model configuration
+        success, model_message, model_args = model_manager.choose_model(model_id)
+        if not success:
+            return jsonify({
+                "success": False,
+                "message": model_message
+            }), 400
+        
+        def generate():
+            # Initialize ChatModel with the model args
+            from llamafactory.chat import ChatModel
+            from llamafactory.extras.misc import torch_gc
+            
+            chat_model = ChatModel(model_args)
+            
+            # Initialize messages list
+            messages = [{"role": "user", "content": message}]
+            
+            # Stream response
+            response = ""
+            yield "data: " + json.dumps({"type": "start"}) + "\n\n"
+            
+            for new_text in chat_model.stream_chat(messages):
+                chunk = {"type": "chunk", "content": new_text}
+                yield "data: " + json.dumps(chunk) + "\n\n"
+                response += new_text
+            
+            # Add final message
+            messages.append({"role": "assistant", "content": response})
+            
+            # Clean up
+            torch_gc()
+            
+            # Send complete response
+            yield "data: " + json.dumps({"type": "end", "content": response}) + "\n\n"
+        
+        return Response(generate(), mimetype='text/event-stream')
+    except ValidationError as e:
+        return jsonify({
+            "success": False,
+            "message": "Validation error",
+            "errors": e.messages
+        }), 400
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": f"Error in stream chat: {str(e)}"
+        }), 500
+
 @api_bp.route('/chat', methods=['POST'])
 def chat():
     """Generate a response using the active model."""
