@@ -243,39 +243,155 @@ class ModelService:
                 "adapter_name_or_path": model.adapter_name_or_path,
                 "template": model.template
             }
-    
-    def chat(self, messages: List[Dict[str, str]], system: Optional[str] = None) -> Tuple[bool, str, Optional[Dict[str, Any]]]:
+            
+    def get_active_models(self) -> List[Dict[str, Any]]:
         """
-        Generate a response using the active model.
+        Get information about all currently active models.
+        
+        Returns:
+            List of dictionaries with model information
+        """
+        with self.lock:
+            # Get all active models from database
+            active_models = []
+            model_configs = ModelConfig.query.filter_by(is_active=True).all()
+            
+            for config in model_configs:
+                if config.model_key in self.loaded_models:
+                    model = self.loaded_models[config.model_key]
+                    model_info = {
+                        "id": config.id,
+                        "model_name_or_path": model.model_name_or_path,
+                        "adapter_name_or_path": model.adapter_name_or_path,
+                        "template": model.template,
+                        "model_key": config.model_key,
+                        "is_primary": config.model_key == self.active_model
+                    }
+                    active_models.append(model_info)
+            
+            return active_models
+    
+    def chat(self, messages: List[Dict[str, str]], system: Optional[str] = None, model_id: Optional[str] = None) -> Tuple[bool, str, Optional[Dict[str, Any]]]:
+        """
+        Generate a response using the specified model or active model.
         
         Args:
             messages: List of message dictionaries with 'role' and 'content'
             system: Optional system message
+            model_id: Optional model ID to use for chat (if not provided, uses active model)
             
         Returns:
             Tuple of (success, message, response)
         """
         with self.lock:
-            if self.active_model is None or self.active_chat_model is None:
-                return False, "No active model for chat", None
+            chat_model = None
+            model_key = None
             
+            # If model_id is provided, try to use that specific model
+            if model_id:
+                try:
+                    # Get model config from database
+                    model_config = ModelConfig.query.filter_by(id=model_id).first()
+                    if not model_config:
+                        return False, f"Model with ID {model_id} not found", None
+                    
+                    model_key = model_config.model_key
+                    
+                    # Check if model is loaded
+                    if model_key in self.loaded_models:
+                        model = self.loaded_models[model_key]
+                        
+                        # If model is not activated yet, activate it temporarily
+                        if model.chat_model is None:
+                            try:
+                                chat_model = ChatModel(model.args)
+                                model.chat_model = chat_model
+                            except Exception as e:
+                                return False, f"Error activating model: {str(e)}", None
+                        else:
+                            chat_model = model.chat_model
+                    else:
+                        # Try to load and activate the model
+                        try:
+                            # Create model instance
+                            model = Model(
+                                model_key=model_key,
+                                model_name_or_path=model_config.model_name_or_path,
+                                adapter_name_or_path=model_config.adapter_name_or_path,
+                                template=model_config.template
+                            )
+                            
+                            # Load the model
+                            chat_model = ChatModel(model.args)
+                            model.chat_model = chat_model
+                            
+                            # Store model in memory
+                            self.loaded_models[model_key] = model
+                        except Exception as e:
+                            return False, f"Error loading model: {str(e)}", None
+                except Exception as e:
+                    return False, f"Error finding or activating model: {str(e)}", None
+            else:
+                # Use active model if no model_id is provided
+                if self.active_model is None or self.active_chat_model is None:
+                    return False, "No active model for chat", None
+                
+                chat_model = self.active_chat_model
+                model_key = self.active_model
+            
+            # Generate response
             try:
-                responses = self.active_chat_model.chat(messages=messages, system=system)
+                # Use chat() instead of stream_chat() to get a list of responses
+                responses = chat_model.chat(messages=messages)
+                
+                # Log debug info
+                print(f"Model: {model_key}")
+                print(f"Messages: {messages}")
+                print(f"Responses: {responses}")
+                
+                # Create log entry with timestamp
+                log_entry = {
+                    "timestamp": datetime.datetime.utcnow().isoformat(),
+                    "model_key": model_key,
+                    "model_id": model_id,
+                    "system": system,
+                    "messages": messages,
+                    "responses": [r.response_text for r in responses] if responses else []
+                }
+                
+                # Log to file
+                with open("chat_logs.json", "a") as f:
+                    f.write(json.dumps(log_entry) + "\n")
+                
                 if responses and len(responses) > 0:
                     response_data = {
-                        "text": responses[0].content,
-                        "generated_text": responses[0].content,
+                        "text": responses[0].response_text,
+                        "generated_text": responses[0].response_text,
                         "usage": {
-                            "prompt_tokens": responses[0].usage.prompt_tokens if hasattr(responses[0], 'usage') else 0,
-                            "completion_tokens": responses[0].usage.completion_tokens if hasattr(responses[0], 'usage') else 0,
-                            "total_tokens": responses[0].usage.total_tokens if hasattr(responses[0], 'usage') else 0
+                            "prompt_tokens": responses[0].prompt_length if hasattr(responses[0], 'prompt_length') else 0,
+                            "completion_tokens": responses[0].response_length if hasattr(responses[0], 'response_length') else 0,
+                            "total_tokens": (responses[0].prompt_length + responses[0].response_length) if hasattr(responses[0], 'prompt_length') and hasattr(responses[0], 'response_length') else 0
                         }
                     }
                     return True, "Response generated successfully", response_data
                 else:
                     return False, "No response generated", None
             except Exception as e:
-                return False, f"Error generating response: {str(e)}", None
+                error_msg = f"Error generating response: {str(e)}"
+                print(error_msg)
+                
+                # Log error
+                log_entry = {
+                    "timestamp": datetime.datetime.utcnow().isoformat(),
+                    "model_key": model_key,
+                    "model_id": model_id,
+                    "error": error_msg
+                }
+                
+                with open("chat_error_logs.json", "a") as f:
+                    f.write(json.dumps(log_entry) + "\n")
+                
+                return False, error_msg, None
 
 # Create a singleton instance
 model_service = ModelService()

@@ -258,10 +258,26 @@ def get_active_model():
             "message": "No active model"
         }), 404
 
+@api_bp.route('/models/active/all', methods=['GET'])
+def get_all_active_models():
+    """Get all currently active models."""
+    models = model_service.get_active_models()
+    
+    if models:
+        return jsonify({
+            "success": True,
+            "models": models
+        }), 200
+    else:
+        return jsonify({
+            "success": False,
+            "message": "No active models found"
+        }), 404
+
 # Chat routes
 @api_bp.route('/chat', methods=['POST'])
 def chat():
-    """Generate a response using the active model."""
+    """Generate a response using the specified model or active model."""
     data = request.json
     if not data:
         return jsonify({"success": False, "message": "No data provided"}), 400
@@ -273,7 +289,8 @@ def chat():
         # Generate response
         success, message, response = model_service.chat(
             messages=validated_data["messages"],
-            system=validated_data.get("system")
+            system=validated_data.get("system"),
+            model_id=validated_data.get("model_id")
         )
         
         if success:

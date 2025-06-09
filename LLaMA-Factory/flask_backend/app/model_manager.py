@@ -24,8 +24,9 @@ class ModelManager:
     def __init__(self):
         """Initialize the model manager."""
         self.loaded_models: Dict[str, Dict[str, Any]] = {}  # Maps model_key to model info
-        self.active_model: Optional[str] = None  # Key of the active model
-        self.active_chat_model: Optional[ChatModel] = None  # Active ChatModel instance
+        self.active_models: Dict[str, ChatModel] = {}  # Maps model_key to active ChatModel instances
+        self.active_model: Optional[str] = None  # Key of the primary active model (for backward compatibility)
+        self.active_chat_model: Optional[ChatModel] = None  # Primary active ChatModel instance (for backward compatibility)
         self.lock = threading.Lock()  # Lock for thread safety
     
     def _get_model_key(self, model_name_or_path: str, adapter_name_or_path: str, template: str) -> str:
@@ -282,7 +283,7 @@ class ModelManager:
             # If activating
             if is_active:
                 # Check if model is already active
-                if self.active_model == model_key and self.active_chat_model is not None:
+                if model_key in self.active_models:
                     # Update database anyway
                     if not model_config.is_active:
                         model_config.is_active = True
@@ -290,25 +291,18 @@ class ModelManager:
                         db.session.commit()
                     return True, f"Model already active: {model_key}"
                 
-                # Deactivate all other models in database
-                other_active_models = db.session.query(ModelConfig).filter(
-                    ModelConfig.is_active == True,
-                    ModelConfig.id != model_id
-                ).all()
-                for other_model in other_active_models:
-                    other_model.is_active = False
-                    db.session.add(other_model)
+                # Update database to mark this model as active
+                model_config.is_active = True
+                model_config.last_activated_at = datetime.datetime.utcnow()
+                db.session.commit()
                 
-                # Deactivate current model in memory if any
-                if self.active_model is not None and self.active_chat_model is not None:
-                    self.active_chat_model = None
-                    torch_gc()  # Clean up GPU memory
+                # No need to deactivate other models - we support multiple active models now
                 
                 # Activate new model
                 model_info = self.loaded_models[model_key]
                 try:
-                        # Force CPU usage for this activation
-                    print("Forcing model to load on CPU")
+                    # Force CPU usage for this activation
+                    print(f"Activating model {model_key} on CPU")
                     
                     # Save original CUDA_VISIBLE_DEVICES value
                     original_cuda_devices = os.environ.get("CUDA_VISIBLE_DEVICES", "")
@@ -322,21 +316,21 @@ class ModelManager:
                     # Add low CPU memory usage flag
                     args["low_cpu_mem_usage"] = True
                     
-                    
                     # Actually load the model now
                     chat_model = ChatModel(args)
                     
-                    # Update model info and active model in memory
+                    # Update model info in loaded_models
                     model_info["chat_model"] = chat_model
                     model_info["args"] = args  # Save the updated args
                     self.loaded_models[model_key] = model_info
-                    self.active_model = model_key
-                    self.active_chat_model = chat_model
                     
-                    # Update database
-                    model_config.is_active = True
-                    model_config.last_activated_at = datetime.datetime.utcnow()
-                    db.session.commit()
+                    # Add to active models dictionary
+                    self.active_models[model_key] = chat_model
+                    
+                    # Also update the legacy active model variables if this is the first active model
+                    if self.active_model is None:
+                        self.active_model = model_key
+                        self.active_chat_model = chat_model
                     
                     # Restore original CUDA_VISIBLE_DEVICES value
                     os.environ["CUDA_VISIBLE_DEVICES"] = original_cuda_devices
@@ -348,17 +342,31 @@ class ModelManager:
             # If deactivating
             else:
                 # Check if model is active
-                if self.active_model != model_key or self.active_chat_model is None:
+                if model_key not in self.active_models:
                     # Update database anyway
                     if model_config.is_active:
                         model_config.is_active = False
                         db.session.commit()
                     return True, f"Model already inactive: {model_key}"
                 
-                # Deactivate model in memory
-                self.active_chat_model = None
-                self.active_model = None
-                torch_gc()  # Clean up GPU memory
+                # Remove from active models dictionary
+                if model_key in self.active_models:
+                    del self.active_models[model_key]
+                
+                # If this was the legacy active model, update those variables
+                if self.active_model == model_key:
+                    self.active_chat_model = None
+                    self.active_model = None
+                    
+                    # If there are other active models, set one as the legacy active model
+                    if self.active_models:
+                        # Get the first active model
+                        first_key = next(iter(self.active_models))
+                        self.active_model = first_key
+                        self.active_chat_model = self.active_models[first_key]
+                
+                # Clean up GPU memory
+                torch_gc()
                 
                 # Update database
                 model_config.is_active = False
@@ -402,29 +410,71 @@ class ModelManager:
             
             return result
     
-    def get_active_model(self) -> Optional[Dict[str, str]]:
+    def get_active_model(self) -> Optional[Dict[str, Any]]:
         """
         Get information about the currently active model.
+        For backward compatibility, returns the primary active model.
+        Use get_active_models() to get all active models.
         
         Returns:
             Dictionary with model information or None if no model is active
         """
         with self.lock:
             if self.active_model is None:
-                return None
+                if not self.active_models:
+                    return None
+                # Use the first active model
+                model_key = next(iter(self.active_models))
+            else:
+                model_key = self.active_model
             
-            info = self.loaded_models[self.active_model]
+            info = self.loaded_models[model_key]
             result = {
                 "model_name_or_path": info["model_name_or_path"],
                 "adapter_name_or_path": info["adapter_name_or_path"],
                 "template": info["template"],
-                "model_key": self.active_model
+                "model_key": model_key
             }
             
             # Get model ID from database if available
-            model_config = db.session.query(ModelConfig).filter_by(model_key=self.active_model).first()
+            model_config = db.session.query(ModelConfig).filter_by(model_key=model_key).first()
             if model_config:
                 result["id"] = model_config.id
+            
+            return result
+            
+    def get_active_models(self) -> List[Dict[str, Any]]:
+        """
+        Get information about all currently active models.
+        
+        Returns:
+            List of dictionaries with model information
+        """
+        with self.lock:
+            if not self.active_models:
+                return []
+            
+            result = []
+            
+            # Get all model IDs from database
+            model_configs = db.session.query(ModelConfig).all()
+            model_key_to_id = {config.model_key: config.id for config in model_configs}
+            
+            for model_key in self.active_models:
+                info = self.loaded_models[model_key]
+                model_info = {
+                    "model_name_or_path": info["model_name_or_path"],
+                    "adapter_name_or_path": info["adapter_name_or_path"],
+                    "template": info["template"],
+                    "model_key": model_key,
+                    "is_primary": model_key == self.active_model
+                }
+                
+                # Add model_id if available
+                if model_key in model_key_to_id:
+                    model_info["id"] = model_key_to_id[model_key]
+                
+                result.append(model_info)
             
             return result
     
@@ -465,25 +515,73 @@ class ModelManager:
             
             return True, "Model configuration retrieved successfully", model_args
     
-    def chat(self, messages: List[Dict[str, str]], system: Optional[str] = None) -> Tuple[bool, str, Optional[str]]:
+    def chat(self, messages: List[Dict[str, str]], system: Optional[str] = None, model_id: Optional[str] = None) -> Tuple[bool, str, Optional[str]]:
         """
-        Generate a response using the active model.
+        Generate a response using the specified model or active model.
         
         Args:
             messages: List of message dictionaries with 'role' and 'content'
             system: Optional system message
+            model_id: Optional model ID to use for chat (if not provided, uses active model)
             
         Returns:
             Tuple of (success, message, response)
         """
         with self.lock:
-            if self.active_model is None or self.active_chat_model is None:
-                return False, "No active model for chat", None
+            chat_model = None
+            model_key = None
+            
+            # If model_id is provided, try to use that specific model
+            if model_id:
+                try:
+                    # Get model config from database
+                    model_config = ModelConfig.query.filter_by(id=model_id).first()
+                    if not model_config:
+                        return False, f"Model with ID {model_id} not found", None
+                    
+                    model_key = model_config.model_key
+                    
+                    # Check if model is active
+                    if model_key in self.active_models:
+                        chat_model = self.active_models[model_key]
+                    else:
+                        return False, f"Model {model_key} is not active. Please activate it first.", None
+                except Exception as e:
+                    return False, f"Error finding model: {str(e)}", None
+            else:
+                # Use active model if no model_id is provided
+                if self.active_model is None or self.active_chat_model is None:
+                    if not self.active_models:
+                        return False, "No active model for chat", None
+                    else:
+                        # Use the first active model
+                        model_key = next(iter(self.active_models))
+                        chat_model = self.active_models[model_key]
+                else:
+                    chat_model = self.active_chat_model
+                    model_key = self.active_model
             
             try:
-                responses = self.active_chat_model.chat(messages=messages, system=system)
+                # Use chat() instead of stream_chat() to get a list of responses
+                responses = chat_model.chat(messages=messages)
+                
+                # Log responses for debugging
+                print(f"Using model: {model_key}")
+                print(f"Messages: {messages}")
+                print(f"Responses: {responses}")
+                
                 if responses and len(responses) > 0:
-                    return True, "Response generated successfully", responses[0].content
+                    # Create response data
+                    response_data = {
+                        "text": responses[0].response_text,
+                        "generated_text": responses[0].response_text,
+                        "usage": {
+                            "prompt_tokens": responses[0].prompt_length if hasattr(responses[0], 'prompt_length') else 0,
+                            "completion_tokens": responses[0].response_length if hasattr(responses[0], 'response_length') else 0,
+                            "total_tokens": (responses[0].prompt_length + responses[0].response_length) if hasattr(responses[0], 'prompt_length') and hasattr(responses[0], 'response_length') else 0
+                        }
+                    }
+                    return True, "Response generated successfully", response_data
                 else:
                     return False, "No response generated", None
             except Exception as e:

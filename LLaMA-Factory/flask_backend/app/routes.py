@@ -498,7 +498,8 @@ def chat():
         # Generate response
         success, message, response = model_manager.chat(
             messages=validated_data["messages"],
-            system=validated_data.get("system")
+            system=validated_data.get("system"),
+            model_id=validated_data.get("model_id")
         )
         
         if success:
