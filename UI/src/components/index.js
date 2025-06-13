@@ -12,3 +12,6 @@ export * from './Chat';
 
 // Common/Shared Components
 export * from './common';
+
+// System Status Component
+export { default as SystemStatus } from './SystemStatus';
