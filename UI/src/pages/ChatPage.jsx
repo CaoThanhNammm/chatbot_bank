@@ -4,13 +4,17 @@ import { Button, ChatHeader, ChatWindow, ChatInput, SidePanel, SettingsModal, Ch
 import { mockMessages } from '../data/mockData';
 import { saveConversationToHistory } from '../utils/chatHistory';
 import { conversationManager } from '../utils/conversationManager';
+import useBankChatbot from '../utils/useBankChatbot';
 
 const ChatPage = () => {
   const [messages, setMessages] = useState(mockMessages);
   const [isTyping, setIsTyping] = useState(false);
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);  const [currentConversationId, setCurrentConversationId] = useState(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [currentConversationId, setCurrentConversationId] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [defaultAccountId, setDefaultAccountId] = useState('VB123456789');
   
   // Banking-specific fallback responses
   const getBankingResponse = (message) => {
@@ -152,7 +156,7 @@ const ChatPage = () => {
       />
       
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0">        {/* Header */}        
+      <div className="flex flex-col flex-1 min-w-0">        {/* Header */}        
         <div className="relative">
           <ChatHeader 
             onSettingsClick={() => setIsSettingsOpen(true)}
@@ -164,7 +168,7 @@ const ChatPage = () => {
             variant="ghost"
             size="sm"
             onClick={() => setIsSidePanelOpen(!isSidePanelOpen)}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 lg:hidden"
+            className="absolute p-2 transform -translate-y-1/2 left-4 top-1/2 lg:hidden"
             aria-label="Toggle menu"
           >
             {isSidePanelOpen ? (
