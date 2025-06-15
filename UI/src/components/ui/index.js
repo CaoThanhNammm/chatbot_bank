@@ -8,3 +8,4 @@ export { default as ChatHistoryModal } from './ChatHistoryModal';
 export { default as UserModal } from './UserModal';
 export { default as RoleSwitcher } from './RoleSwitcher';
 export { default as CreateModelModal } from './CreateModelModal';
+export { default as UserProfile } from './UserProfile';

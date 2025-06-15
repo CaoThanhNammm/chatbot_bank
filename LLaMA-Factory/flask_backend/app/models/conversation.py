@@ -5,15 +5,15 @@ Conversation models for chat functionality.
 import datetime
 import uuid
 from typing import List, Dict, Any, Optional
-from sqlalchemy.dialects.mysql import CHAR
+# from sqlalchemy.dialects.mysql import CHAR
 from ..database import db
 
 class Message(db.Model):
     """Message model for conversations."""
     __tablename__ = 'messages'
     
-    id = db.Column(CHAR(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    conversation_id = db.Column(CHAR(36), db.ForeignKey('conversations.id'), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    conversation_id = db.Column(db.String(36), db.ForeignKey('conversations.id'), nullable=False)
     role = db.Column(db.String(20), nullable=False)  # 'user', 'assistant', or 'system'
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
@@ -35,8 +35,8 @@ class Conversation(db.Model):
     """Conversation model for chat."""
     __tablename__ = 'conversations'
     
-    id = db.Column(CHAR(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = db.Column(CHAR(36), db.ForeignKey('users.id'), nullable=True)  # Optional user association
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=True)  # Optional user association
     title = db.Column(db.String(255), nullable=False, default="New Conversation")
     system_message = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
@@ -64,9 +64,9 @@ class Conversation(db.Model):
         self.system_message = content
         self.updated_at = datetime.datetime.utcnow()
     
-    def get_messages(self) -> List[Dict[str, str]]:
+    def get_messages(self) -> List[Dict[str, Any]]:
         """Get all messages in the conversation."""
-        return [{"role": msg.role, "content": msg.content} for msg in self.messages]
+        return [msg.to_dict() for msg in self.messages]
     
     def clear_messages(self) -> None:
         """Clear all messages in the conversation."""

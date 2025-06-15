@@ -12,7 +12,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask import current_app
 
 from ..database import db
-from ..models.user import User, PasswordResetToken
+from ..auth_models import User, PasswordResetToken
 
 class AuthService:
     """

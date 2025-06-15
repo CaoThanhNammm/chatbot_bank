@@ -3,113 +3,95 @@ import { IoTimeOutline, IoTrashOutline, IoSearchOutline, IoCalendarOutline } fro
 import Modal from './Modal';
 import Button from './Button';
 
-const ChatHistoryModal = ({ isOpen, onClose, onSelectConversation }) => {
-  const [chatHistory, setChatHistory] = useState([]);
+const ChatHistoryModal = ({ 
+  isOpen, 
+  onClose, 
+  onSelectConversation, 
+  conversations = [],
+  onDeleteConversation 
+}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredHistory, setFilteredHistory] = useState([]);
 
-  // Load chat history from localStorage
+  // Update filtered history when conversations change
   useEffect(() => {
-    const loadChatHistory = () => {
-      try {
-        const savedHistory = localStorage.getItem('vietbank_chat_history');
-        if (savedHistory) {
-          const parsed = JSON.parse(savedHistory);
-          setChatHistory(parsed);
-          setFilteredHistory(parsed);
-        }
-      } catch (error) {
-        console.error('Error loading chat history:', error);
-      }
-    };
-
-    if (isOpen) {
-      loadChatHistory();
-    }
-  }, [isOpen]);
+    setFilteredHistory(conversations);
+  }, [conversations]);
 
   // Filter history based on search query
   useEffect(() => {
     if (!searchQuery) {
-      setFilteredHistory(chatHistory);
+      setFilteredHistory(conversations);
     } else {
-      const filtered = chatHistory.filter(conversation =>
-        conversation.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        conversation.messages.some(msg => 
-          msg.text.toLowerCase().includes(searchQuery.toLowerCase())
-        )
+      const filtered = conversations.filter(conversation =>
+        conversation.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredHistory(filtered);
     }
-  }, [searchQuery, chatHistory]);
+  }, [searchQuery, conversations]);
 
-  const formatDate = (timestamp) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const isToday = date.toDateString() === now.toDateString();
-    const isYesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000).toDateString() === date.toDateString();
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      const now = new Date();
+      const isToday = date.toDateString() === now.toDateString();
+      const isYesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000).toDateString() === date.toDateString();
 
-    if (isToday) {
-      return `Hôm nay ${date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
-    } else if (isYesterday) {
-      return `Hôm qua ${date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
-    } else {
-      return date.toLocaleDateString('vi-VN', { 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      if (isToday) {
+        return `Hôm nay ${date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
+      } else if (isYesterday) {
+        return `Hôm qua ${date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
+      } else {
+        return date.toLocaleDateString('vi-VN', { 
+          day: '2-digit', 
+          month: '2-digit', 
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      }
+    } catch {
+      return '';
     }
   };
 
-  const getConversationPreview = (messages) => {
-    if (messages.length === 0) return 'Cuộc trò chuyện trống';
-    
-    const lastUserMessage = messages
-      .filter(msg => !msg.isBot)
-      .slice(-1)[0];
-    
-    if (lastUserMessage) {
-      return lastUserMessage.text.length > 60 
-        ? `${lastUserMessage.text.substring(0, 60)}...`
-        : lastUserMessage.text;
-    }
-    
-    return 'Chưa có tin nhắn từ người dùng';
+  const getConversationPreview = (conversation) => {
+    // For API conversations, we use the title as preview since we don't have messages loaded
+    return conversation.title.length > 60 
+      ? `${conversation.title.substring(0, 60)}...`
+      : conversation.title;
   };
 
-  const deleteConversation = (conversationId, e) => {
+  const deleteConversation = async (conversationId, e) => {
     e.stopPropagation(); // Prevent triggering the conversation selection
     
-    const updatedHistory = chatHistory.filter(conv => conv.id !== conversationId);
-    setChatHistory(updatedHistory);
-    setFilteredHistory(updatedHistory.filter(conversation =>
-      !searchQuery || 
-      conversation.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      conversation.messages.some(msg => 
-        msg.text.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    ));
-    
-    // Update localStorage
     try {
-      localStorage.setItem('vietbank_chat_history', JSON.stringify(updatedHistory));
+      if (onDeleteConversation) {
+        await onDeleteConversation(conversationId);
+      }
     } catch (error) {
-      console.error('Error saving chat history:', error);
+      console.error('Error deleting conversation from history modal:', error);
     }
   };
 
   const clearAllHistory = () => {
-    setChatHistory([]);
-    setFilteredHistory([]);
-    localStorage.removeItem('vietbank_chat_history');
+    // This would need to be implemented to delete all conversations via API
+    // For now, we'll just close the modal
+    onClose();
   };
 
-  const handleSelectConversation = (conversation) => {
-    onSelectConversation(conversation);
-    onClose();
+  const handleSelectConversation = async (conversation) => {
+    try {
+      // Close modal first for better UX
+      onClose();
+      
+      // Then select conversation (this will load messages)
+      if (onSelectConversation) {
+        await onSelectConversation(conversation);
+      }
+    } catch (error) {
+      console.error('Error selecting conversation from history:', error);
+    }
   };
 
   return (
@@ -169,21 +151,25 @@ const ChatHistoryModal = ({ isOpen, onClose, onSelectConversation }) => {
                         </h3>
                       </div>
                       <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                        {getConversationPreview(conversation.messages)}
+                        {getConversationPreview(conversation)}
                       </p>
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-gray-500">
-                          {formatDate(conversation.createdAt)}
+                          {formatDate(conversation.created_at)}
                         </span>
                         <span className="text-xs text-blue-600">
-                          {conversation.messages.length} tin nhắn
+                          Cuộc trò chuyện
                         </span>
                       </div>
                     </div>
                     <button
                       onClick={(e) => deleteConversation(conversation.id, e)}
-                      className="ml-3 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full opacity-0 group-hover:opacity-100 transition-all"
+                      className="ml-3 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200"
                       title="Xóa cuộc trò chuyện"
+                      style={{ 
+                        pointerEvents: 'auto',
+                        zIndex: 10
+                      }}
                     >
                       <IoTrashOutline size={16} />
                     </button>
@@ -195,21 +181,12 @@ const ChatHistoryModal = ({ isOpen, onClose, onSelectConversation }) => {
         </div>
 
         {/* Footer */}
-        {chatHistory.length > 0 && (
+        {conversations.length > 0 && (
           <div className="pt-4 border-t border-gray-200 bg-gray-50 -mx-6 -mb-6 px-6 py-4">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">
-                Tổng cộng: {chatHistory.length} cuộc trò chuyện
+                Tổng cộng: {conversations.length} cuộc trò chuyện
               </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={clearAllHistory}
-                className="text-red-600 border-red-300 hover:bg-red-50"
-              >
-                <IoTrashOutline size={16} className="mr-2" />
-                Xóa tất cả
-              </Button>
             </div>
           </div>
         )}

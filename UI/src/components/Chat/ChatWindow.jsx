@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
 
-const ChatWindow = ({ messages, isTyping }) => {
+const ChatWindow = ({ messages, isTyping, loading = false }) => {
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -15,8 +15,23 @@ const ChatWindow = ({ messages, isTyping }) => {
 
   return (    <div className="flex-1 overflow-y-auto px-4 py-6 bg-gradient-to-b from-neutral-50 to-white">
       <div className="max-w-4xl mx-auto">
-        {/* Welcome message when no messages */}
-        {messages.length === 0 && (
+        {/* Loading state */}
+        {loading && messages.length === 0 && (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-gradient-to-r from-sage-100 to-ocean-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+            <h2 className="text-xl font-playfair font-semibold text-neutral-800 mb-2">
+              Đang tải tin nhắn...
+            </h2>
+            <p className="text-neutral-600 max-w-md mx-auto">
+              Vui lòng chờ trong giây lát
+            </p>
+          </div>
+        )}
+
+        {/* Welcome message when no messages and not loading */}
+        {!loading && messages.length === 0 && (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gradient-to-r from-sage-100 to-ocean-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl">🏦</span>

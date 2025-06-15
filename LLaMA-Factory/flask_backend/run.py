@@ -37,10 +37,10 @@ if __name__ == "__main__":
     port = 5000
     
     # Setup ngrok tunnel
-    ngrok_success = run_with_ngrok(app, port)
-    if not ngrok_success:
-        print("Failed to setup ngrok tunnel. Check your auth token.")
-        print("Running without ngrok...")
+    # ngrok_success = run_with_ngrok(app, port)
+    # if not ngrok_success:
+    #     print("Failed to setup ngrok tunnel. Check your auth token.")
+    #     print("Running without ngrok...")
     
     # Run the Flask app
     app.run(host="0.0.0.0", port=port, debug=True)

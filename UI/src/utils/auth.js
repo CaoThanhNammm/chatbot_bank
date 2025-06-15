@@ -1,4 +1,5 @@
 import api from './api';
+import { STORAGE_KEYS } from '../constants/api';
 
 // Admin and Staff role constants
 export const USER_ROLES = {
@@ -16,9 +17,7 @@ export const PERMISSIONS = {
 
 export const ROLE_PERMISSIONS = {
   [USER_ROLES.USER]: [],
-  [USER_ROLES.STAFF]: [
-    PERMISSIONS.UPLOAD_TRAINING_FILES
-  ],
+  [USER_ROLES.STAFF]: [],
   [USER_ROLES.ADMIN]: [
     PERMISSIONS.MANAGE_USERS,
     PERMISSIONS.MANAGE_FINE_TUNING,
@@ -63,25 +62,31 @@ export const setUserRole = (role) => {
 export const DEMO_ACCOUNTS = {
   admin: {
     email: 'admin@vietbank.com',
-    password: 'admin123',
+    password: 'admin123456',
     role: USER_ROLES.ADMIN,
     name: 'Admin VietBank',
+    first_name: 'Admin',
+    last_name: 'VietBank',
     phone: '0123456789',
     department: 'IT Administration'
   },
   staff: {
     email: 'staff@vietbank.com', 
-    password: 'staff123',
+    password: 'staff123456',
     role: USER_ROLES.STAFF,
     name: 'Nhân viên VietBank',
+    first_name: 'Nhân viên',
+    last_name: 'VietBank',
     phone: '0987654321',
     department: 'Training Department'
   },
   user: {
     email: 'user@gmail.com',
-    password: 'user123', 
+    password: 'user123456', 
     role: USER_ROLES.USER,
     name: 'Khách hàng VietBank',
+    first_name: 'Khách hàng',
+    last_name: 'VietBank',
     phone: '0999888777',
     department: null
   }
@@ -97,14 +102,24 @@ export const validateLogin = (email, password) => {
 };
 
 // Login function - now using real API
-export const login = async (email, password) => {
+export const login = async (email, password, rememberMe = false) => {
   try {
-    const response = await api.auth.login({ email, password });
+    const response = await api.auth.login({ 
+      username_or_email: email, 
+      password: password,
+      remember_me: rememberMe ? "true" : "false"
+    });
     
-    if (response.success) {
-      // Set authentication state
-      localStorage.setItem('isAuthenticated', 'true');
-      return response.data.user;
+    if (response.success && response.data && response.data.data) {
+      // Set authentication state and user data
+      const userData = response.data.data.user;
+      const token = response.data.data.token;
+      
+      localStorage.setItem(STORAGE_KEYS.IS_AUTHENTICATED, 'true');
+      localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userData));
+      localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+      
+      return userData;
     } else {
       return null;
     }
@@ -122,6 +137,8 @@ export const loginDemo = (email, password) => {
     const userData = {
       id: Date.now(),
       name: account.name,
+      first_name: account.first_name,
+      last_name: account.last_name,
       email: account.email,
       phone: account.phone,
       role: account.role,
@@ -131,8 +148,8 @@ export const loginDemo = (email, password) => {
       loginTime: new Date().toISOString()
     };
     
-    localStorage.setItem('userData', JSON.stringify(userData));
-    localStorage.setItem('isAuthenticated', 'true');
+    localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userData));
+    localStorage.setItem(STORAGE_KEYS.IS_AUTHENTICATED, 'true');
     return userData;
   }
   return null;
@@ -141,18 +158,61 @@ export const loginDemo = (email, password) => {
 // Register function
 export const register = async (userData) => {
   try {
+    console.log('Sending registration request with data:', userData); // Debug log
     const response = await api.auth.register(userData);
+    console.log('API Response:', response); // Debug log
+    console.log('Response success:', response.success); // Debug log
+    console.log('Response data:', response.data); // Debug log
     
-    if (response.success) {
-      // Auto-login after successful registration
-      localStorage.setItem('isAuthenticated', 'true');
-      return response.data.user;
+    // Check if the API call was successful
+    // Your API returns { success: true, message: "...", user: {...} }
+    // Our ApiResponse wraps it as { success: boolean, data: {...}, error: null }
+    if (response.success && response.data && response.data.success) {
+      // Registration successful - don't auto-login, just return user data
+      if (response.data.user) {
+        return response.data.user;
+      }
+      
+      return response.data;
+    } else if (response.success && response.data) {
+      // Fallback: if our wrapper says success but no nested success
+      if (response.data.user) {
+        return response.data.user;
+      }
+      
+      return response.data;
     } else {
-      return null;
+      // Handle error cases
+      let errorMessage = response.error || 
+                        (response.data && response.data.message) || 
+                        'Registration failed';
+      
+      // If there are detailed validation errors, format them
+      if (response.data && response.data.errors) {
+        const validationErrors = response.data.errors;
+        const errorDetails = [];
+        
+        // Format validation errors into readable messages
+        for (const [field, messages] of Object.entries(validationErrors)) {
+          if (Array.isArray(messages)) {
+            errorDetails.push(`${field}: ${messages.join(', ')}`);
+          } else {
+            errorDetails.push(`${field}: ${messages}`);
+          }
+        }
+        
+        if (errorDetails.length > 0) {
+          errorMessage = `Validation error: ${errorDetails.join('; ')}`;
+        }
+      }
+      
+      console.error('Registration failed:', errorMessage);
+      console.error('Full response:', response);
+      throw new Error(errorMessage);
     }
   } catch (error) {
     console.error('Registration error:', error);
-    return null;
+    throw error;
   }
 };
 
@@ -165,24 +225,30 @@ export const logout = async () => {
   }
   
   // Clear local storage
-  localStorage.removeItem('token');
-  localStorage.removeItem('userData');
-  localStorage.removeItem('isAuthenticated');
+  localStorage.removeItem(STORAGE_KEYS.TOKEN);
+  localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+  localStorage.removeItem(STORAGE_KEYS.IS_AUTHENTICATED);
 };
 
 // Get current user profile
 export const getCurrentUser = async () => {
   try {
     const response = await api.auth.getProfile();
-    if (response.success) {
-      return response.data;
+    
+    if (response.success && response.data) {
+      // API returns { success: true, user: {...} }
+      const userData = response.data.user || response.data;
+      
+      // Update localStorage with fresh data
+      localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userData));
+      return userData;
     }
   } catch (error) {
     console.error('Error getting current user:', error);
   }
   
   // Fallback to localStorage
-  const userData = localStorage.getItem('userData');
+  const userData = localStorage.getItem(STORAGE_KEYS.USER_DATA);
   return userData ? JSON.parse(userData) : null;
 };
 
@@ -204,7 +270,7 @@ export const updateProfile = async (profileData) => {
 
 // Check if user is authenticated
 export const isAuthenticated = () => {
-  const token = localStorage.getItem('token');
-  const authState = localStorage.getItem('isAuthenticated');
+  const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
+  const authState = localStorage.getItem(STORAGE_KEYS.IS_AUTHENTICATED);
   return !!(token || authState === 'true');
 };

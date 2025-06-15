@@ -3,7 +3,7 @@ import { IoSearch, IoAdd, IoEllipsisVertical, IoPerson, IoMail, IoCalendar, IoCh
 import { ChatHeader } from '../components';
 import { Button, UserModal } from '../components';
 import { mockUsers, STATUS_COLORS } from '../data/adminData';
-import { getCurrentUserRole, USER_ROLES, hasPermission, PERMISSIONS } from '../utils/auth';
+import { useAuth } from '../contexts/AuthContext';
 import api from '../utils/api';
 
 const AdminUsersPage = () => {
@@ -19,14 +19,9 @@ const AdminUsersPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const currentUserRole = getCurrentUserRole();
+  const { user } = useAuth();
 
-  // Redirect if user doesn't have permission
-  useEffect(() => {
-    if (!hasPermission(currentUserRole, PERMISSIONS.MANAGE_USERS)) {
-      window.location.href = '/chat';
-    }
-  }, [currentUserRole]);
+  // This component is already protected by AdminRoute, so no need for additional permission check
 
   // Load users from API
   useEffect(() => {

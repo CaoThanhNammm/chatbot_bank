@@ -210,6 +210,7 @@ const GuestChatPage = () => {
         {/* Header with Login Button */}
         <div className="relative">
           <ChatHeader 
+            variant="chat"
             onSettingsClick={() => setIsSettingsOpen(true)}
             isGuestMode={true}
             rightElement={

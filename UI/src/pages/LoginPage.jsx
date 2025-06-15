@@ -1,44 +1,99 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { IoEye, IoEyeOff, IoMail, IoLockClosed } from 'react-icons/io5';
 import { AuthLayout, Button, Input } from '../components';
 import { login, loginDemo, DEMO_ACCOUNTS } from '../utils/auth';
+import { useAuth } from '../contexts/AuthContext';
 
 const LoginPage = () => {
-  const navigate = useNavigate();  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login: authLogin } = useAuth();
+  const [formData, setFormData] = useState({
+    usernameOrEmail: '',
+    password: '',
+    rememberMe: false
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [loginError, setLoginError] = useState('');  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const [loginError, setLoginError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errors, setErrors] = useState({});
+
+  // Handle success message from registration
+  useEffect(() => {
+    if (location.state?.message) {
+      setSuccessMessage(location.state.message);
+      if (location.state?.email) {
+        setFormData(prev => ({ ...prev, usernameOrEmail: location.state.email }));
+      }
+      // Clear the state to prevent showing message on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
-    // Clear error when user starts typing
+    // Clear error and success message when user starts typing
     if (loginError) {
       setLoginError('');
     }
-  };  const handleSubmit = async (e) => {
+    if (successMessage) {
+      setSuccessMessage('');
+    }
+    // Clear field-specific errors
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.usernameOrEmail.trim()) {
+      newErrors.usernameOrEmail = 'Tên đăng nhập hoặc email không được để trống';
+    }
+
+    if (!formData.password) {
+      newErrors.password = 'Mật khẩu không được để trống';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Mật khẩu phải có ít nhất 8 ký tự';
+    }
+
+    return newErrors;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    const newErrors = validateForm();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     setIsLoading(true);
     setLoginError('');
+    setErrors({});
     
     try {
       // Try API login first
-      const userData = await login(formData.email, formData.password);
+      const userData = await login(formData.usernameOrEmail, formData.password, formData.rememberMe);
       
       if (userData) {
-        navigate('/chat');
+        await authLogin(userData);
+        navigate('/');
       } else {
         // Fallback to demo login for development
-        const demoUser = loginDemo(formData.email, formData.password);
+        const demoUser = loginDemo(formData.usernameOrEmail, formData.password);
         if (demoUser) {
-          navigate('/chat');
+          await authLogin(demoUser);
+          navigate('/');
         } else {
-          setLoginError('Email hoặc mật khẩu không chính xác!');
+          setLoginError('Tên đăng nhập/Email hoặc mật khẩu không chính xác!');
         }
       }
     } catch (error) {
@@ -55,24 +110,26 @@ const LoginPage = () => {
       subtitle="Đăng nhập vào tài khoản VietBank AI của bạn"
     >
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Email */}
+        {/* Username or Email */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-            Email
+          <label htmlFor="usernameOrEmail" className="block text-sm font-medium text-gray-700 mb-2">
+            Tên đăng nhập hoặc Email
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <IoMail className="h-5 w-5 text-gray-400" />
             </div>
             <input
-              id="email"
-              name="email"
-              type="email"
+              id="usernameOrEmail"
+              name="usernameOrEmail"
+              type="text"
               required
-              value={formData.email}
+              value={formData.usernameOrEmail}
               onChange={handleInputChange}
-              className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
-              placeholder="Nhập email của bạn"
+              className={`pl-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent ${
+                errors.usernameOrEmail ? 'border-red-300' : 'border-gray-200'
+              }`}
+              placeholder="Nhập tên đăng nhập hoặc email"
             />
           </div>
         </div>
@@ -114,7 +171,10 @@ const LoginPage = () => {
         <div className="flex items-center justify-between">
           <label className="flex items-center">
             <input
+              name="rememberMe"
               type="checkbox"
+              checked={formData.rememberMe}
+              onChange={handleInputChange}
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
             <span className="ml-2 text-sm text-gray-700">Ghi nhớ đăng nhập</span>
@@ -125,7 +185,16 @@ const LoginPage = () => {
           >
             Quên mật khẩu?
           </Link>
-        </div>        {/* Error Message */}
+        </div>
+
+        {/* Success Message */}
+        {successMessage && (
+          <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-green-800 text-sm">{successMessage}</p>
+          </div>
+        )}
+
+        {/* Error Message */}
         {loginError && (
           <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-red-800 text-sm">{loginError}</p>
@@ -161,7 +230,7 @@ const LoginPage = () => {
               <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded">ADMIN</span>
               <button
                 type="button"
-                onClick={() => setFormData({email: DEMO_ACCOUNTS.admin.email, password: DEMO_ACCOUNTS.admin.password})}
+                onClick={() => setFormData({usernameOrEmail: DEMO_ACCOUNTS.admin.email, password: DEMO_ACCOUNTS.admin.password})}
                 className="text-xs text-blue-600 hover:text-blue-800"
               >
                 Sử dụng
@@ -178,7 +247,7 @@ const LoginPage = () => {
               <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded">STAFF</span>
               <button
                 type="button"
-                onClick={() => setFormData({email: DEMO_ACCOUNTS.staff.email, password: DEMO_ACCOUNTS.staff.password})}
+                onClick={() => setFormData({usernameOrEmail: DEMO_ACCOUNTS.staff.email, password: DEMO_ACCOUNTS.staff.password})}
                 className="text-xs text-blue-600 hover:text-blue-800"
               >
                 Sử dụng
@@ -195,7 +264,7 @@ const LoginPage = () => {
               <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded">USER</span>
               <button
                 type="button"
-                onClick={() => setFormData({email: DEMO_ACCOUNTS.user.email, password: DEMO_ACCOUNTS.user.password})}
+                onClick={() => setFormData({usernameOrEmail: DEMO_ACCOUNTS.user.email, password: DEMO_ACCOUNTS.user.password})}
                 className="text-xs text-blue-600 hover:text-blue-800"
               >
                 Sử dụng

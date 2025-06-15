@@ -19,7 +19,7 @@ class ConversationService:
         """Initialize the conversation service."""
         self.lock = threading.Lock()
     
-    def create_conversation(self, title: str = "New Conversation", user_id: Optional[str] = None) -> Tuple[bool, str, str]:
+    def create_conversation(self, title: str = "New Conversation", user_id: Optional[int] = None) -> Tuple[bool, str, str]:
         """
         Create a new conversation.
         
@@ -78,7 +78,7 @@ class ConversationService:
         if role not in ["user", "assistant", "system"]:
             return False, f"Invalid role: {role}"
         
-        conversation = Conversation.query.filter_by(id=conversation_id).first()
+        conversation = Conversation.query.filter_by(conversation_uuid=conversation_id).first()
         
         if not conversation:
             return False, f"Conversation not found: {conversation_id}"
@@ -103,7 +103,7 @@ class ConversationService:
         Returns:
             Tuple of (success, message)
         """
-        conversation = Conversation.query.filter_by(id=conversation_id).first()
+        conversation = Conversation.query.filter_by(conversation_uuid=conversation_id).first()
         
         if not conversation:
             return False, f"Conversation not found: {conversation_id}"
@@ -116,7 +116,7 @@ class ConversationService:
             db.session.rollback()
             return False, f"Failed to set system message: {str(e)}"
     
-    def get_messages(self, conversation_id: str) -> Tuple[bool, str, Optional[List[Dict[str, Any]]]]:
+    def get_messages(self, conversation_id: str) -> Tuple[bool, str, Optional[List[Dict[str, str]]]]:
         """
         Get all messages in a conversation.
         
@@ -126,7 +126,7 @@ class ConversationService:
         Returns:
             Tuple of (success, message, messages)
         """
-        conversation = Conversation.query.filter_by(id=conversation_id).first()
+        conversation = Conversation.query.filter_by(conversation_uuid=conversation_id).first()
         
         if not conversation:
             return False, f"Conversation not found: {conversation_id}", None
@@ -143,7 +143,7 @@ class ConversationService:
         Returns:
             Tuple of (success, message)
         """
-        conversation = Conversation.query.filter_by(id=conversation_id).first()
+        conversation = Conversation.query.filter_by(conversation_uuid=conversation_id).first()
         
         if not conversation:
             return False, f"Conversation not found: {conversation_id}"
@@ -166,7 +166,7 @@ class ConversationService:
         Returns:
             Tuple of (success, message)
         """
-        conversation = Conversation.query.filter_by(id=conversation_id).first()
+        conversation = Conversation.query.filter_by(conversation_uuid=conversation_id).first()
         
         if not conversation:
             return False, f"Conversation not found: {conversation_id}"
@@ -179,7 +179,7 @@ class ConversationService:
             db.session.rollback()
             return False, f"Failed to delete conversation: {str(e)}"
     
-    def get_all_conversations(self, user_id: Optional[str] = None) -> List[Dict[str, Any]]:
+    def get_all_conversations(self, user_id: Optional[int] = None) -> List[Dict[str, Any]]:
         """
         Get all conversations, optionally filtered by user.
         

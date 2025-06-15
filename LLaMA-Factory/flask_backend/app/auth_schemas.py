@@ -6,18 +6,50 @@ from marshmallow import Schema, fields, validate, validates, validates_schema, V
 
 class RegisterSchema(Schema):
     """Schema for user registration requests."""
-    username = fields.String(required=True, validate=validate.Length(min=3, max=50))
-    email = fields.Email(required=True)
-    password = fields.String(required=True, validate=validate.Length(min=8))
-    confirm_password = fields.String(required=True)
-    first_name = fields.String(validate=validate.Length(max=50))
-    last_name = fields.String(validate=validate.Length(max=50))
+    username = fields.String(
+        required=True, 
+        validate=validate.Length(min=3, max=50),
+        error_messages={
+            'required': 'Tên đăng nhập là bắt buộc',
+            'invalid': 'Tên đăng nhập không hợp lệ'
+        }
+    )
+    email = fields.Email(
+        required=True,
+        error_messages={
+            'required': 'Email là bắt buộc',
+            'invalid': 'Email không hợp lệ'
+        }
+    )
+    password = fields.String(
+        required=True, 
+        validate=validate.Length(min=8),
+        error_messages={
+            'required': 'Mật khẩu là bắt buộc',
+            'invalid': 'Mật khẩu không hợp lệ'
+        }
+    )
+    confirm_password = fields.String(
+        required=True,
+        error_messages={
+            'required': 'Xác nhận mật khẩu là bắt buộc',
+            'invalid': 'Xác nhận mật khẩu không hợp lệ'
+        }
+    )
+    first_name = fields.String(
+        validate=validate.Length(max=50),
+        error_messages={'invalid': 'Tên không hợp lệ'}
+    )
+    last_name = fields.String(
+        validate=validate.Length(max=50),
+        error_messages={'invalid': 'Họ không hợp lệ'}
+    )
     
     @validates_schema
     def validate_passwords_match(self, data, **kwargs):
         """Validate that passwords match."""
         if data.get('password') != data.get('confirm_password'):
-            raise ValidationError('Passwords do not match', 'confirm_password')
+            raise ValidationError('Mật khẩu xác nhận không khớp', 'confirm_password')
 
 class LoginSchema(Schema):
     """Schema for user login requests."""

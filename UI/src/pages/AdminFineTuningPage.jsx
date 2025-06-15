@@ -3,7 +3,7 @@ import { IoSearch, IoAdd, IoPlay, IoStop, IoDownload, IoEye, IoSettings, IoTrend
 import { ChatHeader } from '../components';
 import { Button, CreateModelModal } from '../components';
 import { mockFineTuningModels, TRAINING_DOMAINS, STATUS_COLORS } from '../data/adminData';
-import { getCurrentUserRole, USER_ROLES, hasPermission, PERMISSIONS } from '../utils/auth';
+import { useAuth } from '../contexts/AuthContext';
 import api from '../utils/api';
 
 const AdminFineTuningPage = () => {
@@ -17,14 +17,9 @@ const AdminFineTuningPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const currentUserRole = getCurrentUserRole();
+  const { user } = useAuth();
 
-  // Redirect if user doesn't have permission
-  useEffect(() => {
-    if (!hasPermission(currentUserRole, PERMISSIONS.MANAGE_FINE_TUNING)) {
-      window.location.href = '/chat';
-    }
-  }, [currentUserRole]);
+  // This component is already protected by AdminRoute, so no need for additional permission check
 
   // Load fine-tuning jobs from API
   useEffect(() => {

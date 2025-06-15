@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { IoEye, IoEyeOff, IoMail, IoLockClosed, IoPersonOutline, IoCallOutline } from 'react-icons/io5';
+import { IoEye, IoEyeOff, IoMail, IoLockClosed, IoPersonOutline } from 'react-icons/io5';
 import { AuthLayout, Button } from '../components';
 import { USER_ROLES, register } from '../utils/auth';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    fullName: '',
+    username: '',
     email: '',
-    phone: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    firstName: '',
+    lastName: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -37,9 +38,11 @@ const RegisterPage = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = 'Họ tên không được để trống';
+    if (!formData.username.trim()) {
+      newErrors.username = 'Tên đăng nhập không được để trống';
     }
+
+    // Họ tên không bắt buộc - bỏ validation
 
     if (!formData.email.trim()) {
       newErrors.email = 'Email không được để trống';
@@ -47,16 +50,10 @@ const RegisterPage = () => {
       newErrors.email = 'Email không hợp lệ';
     }
 
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Số điện thoại không được để trống';
-    } else if (!/^[0-9]{10,11}$/.test(formData.phone)) {
-      newErrors.phone = 'Số điện thoại không hợp lệ';
-    }
-
     if (!formData.password) {
       newErrors.password = 'Mật khẩu không được để trống';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Mật khẩu phải có ít nhất 6 ký tự';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Mật khẩu phải có ít nhất 8 ký tự';
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -77,33 +74,89 @@ const RegisterPage = () => {
     setIsLoading(true);
     
     try {
-      // Try API registration
-      const userData = await register({
-        name: formData.fullName,
+      // Try API registration with correct format
+      const registrationData = {
+        username: formData.username,
         email: formData.email,
-        phone: formData.phone,
         password: formData.password,
-        role: USER_ROLES.USER
-      });
+        confirm_password: formData.confirmPassword,
+        first_name: formData.firstName || '',
+        last_name: formData.lastName || ''
+      };
+
+      console.log('Sending registration data:', registrationData); // Debug log
+      const userData = await register(registrationData);
+      console.log('Received user data:', userData); // Debug log
       
       if (userData) {
-        navigate('/chat');
-      } else {
-        // Fallback to demo registration for development
+        // Registration successful, navigate to login page
+        navigate('/login', { 
+          state: { 
+            message: 'Đăng ký thành công! Vui lòng đăng nhập để tiếp tục.',
+            email: formData.email 
+          } 
+        });
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      
+      // Handle specific error messages
+      let errorMessage = 'Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.';
+      
+      if (error.message) {
+        if (error.message.includes('Validation error:')) {
+          // Parse validation errors and translate to Vietnamese
+          const validationMsg = error.message.replace('Validation error: ', '');
+          const errors = validationMsg.split('; ');
+          const translatedErrors = errors.map(err => {
+            if (err.includes('username:')) {
+              return err.replace('username:', 'Tên đăng nhập:');
+            } else if (err.includes('email:')) {
+              return err.replace('email:', 'Email:');
+            } else if (err.includes('password:')) {
+              return err.replace('password:', 'Mật khẩu:');
+            } else if (err.includes('confirm_password:')) {
+              return err.replace('confirm_password:', 'Xác nhận mật khẩu:');
+            } else if (err.includes('first_name:')) {
+              return err.replace('first_name:', 'Tên:');
+            } else if (err.includes('last_name:')) {
+              return err.replace('last_name:', 'Họ:');
+            }
+            return err;
+          });
+          errorMessage = translatedErrors.join('; ');
+        } else if (error.message.includes('email')) {
+          errorMessage = 'Email đã được sử dụng. Vui lòng chọn email khác.';
+        } else if (error.message.includes('username')) {
+          errorMessage = 'Tên đăng nhập đã được sử dụng. Vui lòng chọn tên khác.';
+        } else if (error.message.includes('password')) {
+          errorMessage = 'Mật khẩu không hợp lệ. Vui lòng kiểm tra lại.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setErrors({ submit: errorMessage });
+      
+      // Fallback to demo registration for development if API is not available
+      if (error.message && error.message.includes('Network error')) {
+        console.log('API not available, using demo registration');
         localStorage.setItem('isAuthenticated', 'true');
+        const displayName = formData.firstName && formData.lastName 
+          ? `${formData.firstName} ${formData.lastName}`.trim()
+          : formData.firstName || formData.lastName || formData.username;
         localStorage.setItem('userData', JSON.stringify({
-          name: formData.fullName,
+          name: displayName,
+          first_name: formData.firstName || '',
+          last_name: formData.lastName || '',
+          username: formData.username,
           email: formData.email,
-          phone: formData.phone,
           role: USER_ROLES.USER,
           accountNumber: Math.random().toString().slice(2, 12),
           balance: '0'
         }));
         navigate('/chat');
       }
-    } catch (error) {
-      console.error('Registration error:', error);
-      setErrors({ submit: 'Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.' });
     } finally {
       setIsLoading(false);
     }
@@ -115,31 +168,87 @@ const RegisterPage = () => {
       subtitle="Đăng ký để sử dụng VietBank AI chatbot"
     >
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Full Name */}
+        {/* Username */}
         <div>
-          <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
-            Họ và tên *
+          <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+            Tên đăng nhập *
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <IoPersonOutline className="h-5 w-5 text-gray-400" />
             </div>
             <input
-              id="fullName"
-              name="fullName"
+              id="username"
+              name="username"
               type="text"
               required
-              value={formData.fullName}
+              value={formData.username}
               onChange={handleInputChange}
               className={`pl-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent ${
-                errors.fullName ? 'border-red-300' : 'border-gray-200'
+                errors.username ? 'border-red-300' : 'border-gray-200'
               }`}
-              placeholder="Nhập họ và tên đầy đủ"
+              placeholder="Nhập tên đăng nhập"
             />
           </div>
-          {errors.fullName && (
-            <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>
+          {errors.username && (
+            <p className="mt-1 text-sm text-red-600">{errors.username}</p>
           )}
+        </div>
+
+        {/* First Name and Last Name */}
+        <div className="mb-2">
+          <p className="text-sm text-gray-500">Họ tên (không bắt buộc)</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+              Tên
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <IoPersonOutline className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                id="firstName"
+                name="firstName"
+                type="text"
+                value={formData.firstName}
+                onChange={handleInputChange}
+                className={`pl-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent ${
+                  errors.firstName ? 'border-red-300' : 'border-gray-200'
+                }`}
+                placeholder="Nhập tên"
+              />
+            </div>
+            {errors.firstName && (
+              <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+              Họ
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <IoPersonOutline className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                id="lastName"
+                name="lastName"
+                type="text"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                className={`pl-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent ${
+                  errors.lastName ? 'border-red-300' : 'border-gray-200'
+                }`}
+                placeholder="Nhập họ"
+              />
+            </div>
+            {errors.lastName && (
+              <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
+            )}
+          </div>
         </div>
 
         {/* Email */}
@@ -169,32 +278,7 @@ const RegisterPage = () => {
           )}
         </div>
 
-        {/* Phone */}
-        <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-            Số điện thoại *
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <IoCallOutline className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              id="phone"
-              name="phone"
-              type="tel"
-              required
-              value={formData.phone}
-              onChange={handleInputChange}
-              className={`pl-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent ${
-                errors.phone ? 'border-red-300' : 'border-gray-200'
-              }`}
-              placeholder="Nhập số điện thoại"
-            />
-          </div>
-          {errors.phone && (
-            <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
-          )}
-        </div>
+
 
         {/* Password */}
         <div>
@@ -291,6 +375,13 @@ const RegisterPage = () => {
             </Link>
           </label>
         </div>
+
+        {/* Error message */}
+        {errors.submit && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-600">{errors.submit}</p>
+          </div>
+        )}
 
         {/* Submit button */}
         <Button

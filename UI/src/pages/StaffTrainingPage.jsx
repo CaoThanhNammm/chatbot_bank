@@ -3,7 +3,7 @@ import { IoCloudUpload, IoDocument, IoCheckmarkCircle, IoCloseCircle, IoTime, Io
 import { ChatHeader } from '../components';
 import { Button } from '../components';
 import { mockTrainingFiles, TRAINING_DOMAINS, STATUS_COLORS } from '../data/adminData';
-import { getCurrentUserRole, USER_ROLES, hasPermission, PERMISSIONS } from '../utils/auth';
+import { useAuth } from '../contexts/AuthContext';
 
 const StaffTrainingPage = () => {
   // Fine-tuning form state
@@ -36,14 +36,14 @@ const StaffTrainingPage = () => {
   const [trainingResult, setTrainingResult] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const fileInputRef = useRef(null);
-  const currentUserRole = getCurrentUserRole();
+  const { user } = useAuth();
 
-  // Redirect if user doesn't have permission
+  // Redirect if user is not admin
   useEffect(() => {
-    if (!hasPermission(currentUserRole, PERMISSIONS.UPLOAD_TRAINING_FILES)) {
+    if (!user || !user.is_admin) {
       window.location.href = '/chat';
     }
-  }, [currentUserRole]);
+  }, [user]);
 
   // Handle form input changes
   const handleInputChange = (e) => {

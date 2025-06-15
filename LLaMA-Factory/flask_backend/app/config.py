@@ -73,6 +73,8 @@ class Config:
 class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True
+    # Use SQLite for development to avoid MySQL setup issues
+    SQLALCHEMY_DATABASE_URI = "sqlite:///llama_factory.db"
     
 class TestingConfig(Config):
     """Testing configuration."""

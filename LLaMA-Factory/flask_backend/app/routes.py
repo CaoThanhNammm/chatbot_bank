@@ -13,6 +13,7 @@ from .database import db
 from .model_manager import model_manager
 from .finetune_manager import finetune_manager
 from .models.finetune import FinetuningTask
+from .services.conversation_service import conversation_service
 from .schemas import (
     FinetuningSchema,
     ModelLoadSchema,
@@ -519,3 +520,137 @@ def chat():
             "message": "Validation error",
             "errors": e.messages
         }), 400
+
+# Conversation routes
+@api_bp.route('/conversations', methods=['POST'])
+def create_conversation():
+    """Create a new conversation."""
+    data = request.json
+    if not data:
+        return jsonify({"success": False, "message": "No data provided"}), 400
+    
+    title = data.get('title', 'New Conversation')
+    user_id = data.get('user_id')
+    
+    # Validate user_id if provided (should be a string UUID)
+    if user_id and not isinstance(user_id, str):
+        return jsonify({"success": False, "message": "Invalid user_id format"}), 400
+    
+    success, message, conversation_id = conversation_service.create_conversation(title, user_id)
+    
+    if success:
+        return jsonify({
+            "success": True,
+            "message": message,
+            "conversation_id": conversation_id
+        }), 200
+    else:
+        return jsonify({
+            "success": False,
+            "message": message
+        }), 400
+
+@api_bp.route('/conversations', methods=['GET'])
+def get_conversations():
+    """Get all conversations, optionally filtered by user."""
+    user_id = request.args.get('user_id')
+    
+    # user_id should be a string UUID if provided
+    # No conversion needed since it comes as string from query params
+    
+    conversations = conversation_service.get_all_conversations(user_id)
+    
+    return jsonify({
+        "success": True,
+        "conversations": conversations
+    }), 200
+
+@api_bp.route('/conversations/<conversation_id>', methods=['GET'])
+def get_conversation(conversation_id):
+    """Get a specific conversation."""
+    success, message, conversation = conversation_service.get_conversation(conversation_id)
+    
+    if success:
+        return jsonify({
+            "success": True,
+            "conversation": conversation
+        }), 200
+    else:
+        return jsonify({
+            "success": False,
+            "message": message
+        }), 404
+
+@api_bp.route('/conversations/<conversation_id>/messages', methods=['GET'])
+def get_conversation_messages(conversation_id):
+    """Get all messages in a conversation."""
+    success, message, messages = conversation_service.get_messages(conversation_id)
+    
+    if success:
+        return jsonify({
+            "success": True,
+            "messages": messages
+        }), 200
+    else:
+        return jsonify({
+            "success": False,
+            "message": message
+        }), 404
+
+@api_bp.route('/conversations/<conversation_id>/messages', methods=['POST'])
+def add_message_to_conversation(conversation_id):
+    """Add a message to a conversation."""
+    data = request.json
+    if not data:
+        return jsonify({"success": False, "message": "No data provided"}), 400
+    
+    role = data.get('role')
+    content = data.get('content')
+    
+    if not role or not content:
+        return jsonify({"success": False, "message": "Role and content are required"}), 400
+    
+    success, message = conversation_service.add_message(conversation_id, role, content)
+    
+    if success:
+        return jsonify({
+            "success": True,
+            "message": message
+        }), 200
+    else:
+        return jsonify({
+            "success": False,
+            "message": message
+        }), 400
+
+@api_bp.route('/conversations/<conversation_id>/clear', methods=['POST'])
+def clear_conversation(conversation_id):
+    """Clear all messages in a conversation."""
+    success, message = conversation_service.clear_conversation(conversation_id)
+    
+    if success:
+        return jsonify({
+            "success": True,
+            "message": message
+        }), 200
+    else:
+        return jsonify({
+            "success": False,
+            "message": message
+        }), 404
+
+@api_bp.route('/conversations/<conversation_id>', methods=['DELETE'])
+def delete_conversation(conversation_id):
+    """Delete a conversation."""
+    success, message = conversation_service.delete_conversation(conversation_id)
+    
+    if success:
+        return jsonify({
+            "success": True,
+            "message": message
+        }), 200
+    else:
+        return jsonify({
+            "success": False,
+            "message": message
+        }), 404

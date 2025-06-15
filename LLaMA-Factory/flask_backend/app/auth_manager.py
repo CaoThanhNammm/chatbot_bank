@@ -69,6 +69,7 @@ class AuthManager:
                 "email": new_user.email,
                 "first_name": new_user.first_name,
                 "last_name": new_user.last_name,
+                "is_admin": new_user.is_admin,
                 "created_at": new_user.created_at.isoformat()
             }
             
@@ -177,7 +178,8 @@ The LLaMA-Factory Team
                 "username": user.username,
                 "email": user.email,
                 "first_name": user.first_name,
-                "last_name": user.last_name
+                "last_name": user.last_name,
+                "is_admin": user.is_admin
             },
             "expires_at": (datetime.datetime.utcnow() + self.token_expiration).isoformat()
         }
@@ -388,7 +390,8 @@ The LLaMA-Factory Team
                 "username": user.username,
                 "email": user.email,
                 "first_name": user.first_name,
-                "last_name": user.last_name
+                "last_name": user.last_name,
+                "is_admin": user.is_admin
             }
             
             return True, user_data

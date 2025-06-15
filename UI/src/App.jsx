@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
@@ -12,12 +13,15 @@ import AdminUsersPage from './pages/AdminUsersPage';
 import AdminFineTuningPage from './pages/AdminFineTuningPage';
 import StaffTrainingPage from './pages/StaffTrainingPage';
 import ProtectedRoute from './routes/ProtectedRoute';
+import AdminRoute from './routes/AdminRoute';
 import './App.css';
+
 
 function App() {
   return (
-    <Router>
-      <div className="App">
+    <AuthProvider>
+      <Router>
+        <div className="App">
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
@@ -49,35 +53,36 @@ function App() {
           <Route
             path="/admin/users"
             element={
-              <ProtectedRoute>
+              <AdminRoute>
                 <AdminUsersPage />
-              </ProtectedRoute>
+              </AdminRoute>
             }
           />
           <Route
             path="/admin/fine-tuning"
             element={
-              <ProtectedRoute>
+              <AdminRoute>
                 <AdminFineTuningPage />
-              </ProtectedRoute>
+              </AdminRoute>
             }
           />
           
-          {/* Staff Routes */}
+          {/* Admin Training Routes */}
           <Route
-            path="/staff/training"
+            path="/admin/training"
             element={
-              <ProtectedRoute>
+              <AdminRoute>
                 <StaffTrainingPage />
-              </ProtectedRoute>
+              </AdminRoute>
             }
           />
           
           {/* Redirect unknown routes to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </div>
-    </Router>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 

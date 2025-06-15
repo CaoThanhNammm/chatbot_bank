@@ -135,3 +135,27 @@ body {
 .chat-history-scroll::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
+
+/* Conversation item animations */
+@keyframes conversationSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.conversation-item-new {
+  animation: conversationSlideIn 0.4s ease-out;
+}
+
+.conversation-item {
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.conversation-item:hover {
+  /* Remove transform to avoid conflicts with delete button positioning */
+}
