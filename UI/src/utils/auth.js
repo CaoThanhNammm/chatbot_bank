@@ -1,3 +1,5 @@
+import api from './api';
+
 // Admin and Staff role constants
 export const USER_ROLES = {
   USER: 'user',
@@ -94,8 +96,26 @@ export const validateLogin = (email, password) => {
   return account || null;
 };
 
-// Login function
-export const login = (email, password) => {
+// Login function - now using real API
+export const login = async (email, password) => {
+  try {
+    const response = await api.auth.login({ email, password });
+    
+    if (response.success) {
+      // Set authentication state
+      localStorage.setItem('isAuthenticated', 'true');
+      return response.data.user;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    return null;
+  }
+};
+
+// Login function (fallback to demo for development)
+export const loginDemo = (email, password) => {
   const account = validateLogin(email, password);
   if (account) {
     // Save user data to localStorage
@@ -116,4 +136,75 @@ export const login = (email, password) => {
     return userData;
   }
   return null;
+};
+
+// Register function
+export const register = async (userData) => {
+  try {
+    const response = await api.auth.register(userData);
+    
+    if (response.success) {
+      // Auto-login after successful registration
+      localStorage.setItem('isAuthenticated', 'true');
+      return response.data.user;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error('Registration error:', error);
+    return null;
+  }
+};
+
+// Logout function
+export const logout = async () => {
+  try {
+    await api.auth.logout();
+  } catch (error) {
+    console.error('Logout error:', error);
+  }
+  
+  // Clear local storage
+  localStorage.removeItem('token');
+  localStorage.removeItem('userData');
+  localStorage.removeItem('isAuthenticated');
+};
+
+// Get current user profile
+export const getCurrentUser = async () => {
+  try {
+    const response = await api.auth.getProfile();
+    if (response.success) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error('Error getting current user:', error);
+  }
+  
+  // Fallback to localStorage
+  const userData = localStorage.getItem('userData');
+  return userData ? JSON.parse(userData) : null;
+};
+
+// Update user profile
+export const updateProfile = async (profileData) => {
+  try {
+    const response = await api.auth.updateProfile(profileData);
+    if (response.success) {
+      // Update localStorage
+      localStorage.setItem('userData', JSON.stringify(response.data));
+      return response.data;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    return null;
+  }
+};
+
+// Check if user is authenticated
+export const isAuthenticated = () => {
+  const token = localStorage.getItem('token');
+  const authState = localStorage.getItem('isAuthenticated');
+  return !!(token || authState === 'true');
 };

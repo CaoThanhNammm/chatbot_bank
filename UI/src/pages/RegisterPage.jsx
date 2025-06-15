@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { IoEye, IoEyeOff, IoMail, IoLockClosed, IoPersonOutline, IoCallOutline } from 'react-icons/io5';
 import { AuthLayout, Button } from '../components';
-import { USER_ROLES } from '../utils/auth';
+import { USER_ROLES, register } from '../utils/auth';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -65,7 +65,6 @@ const RegisterPage = () => {
 
     return newErrors;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -77,19 +76,37 @@ const RegisterPage = () => {
 
     setIsLoading(true);
     
-    // Mô phỏng đăng ký
-    setTimeout(() => {
-      setIsLoading(false);      // Lưu thông tin người dùng
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('user', JSON.stringify({
+    try {
+      // Try API registration
+      const userData = await register({
         name: formData.fullName,
         email: formData.email,
         phone: formData.phone,
-        accountNumber: Math.random().toString().slice(2, 12),
-        balance: '0'
-      }));
-      navigate('/chat');
-    }, 2000);
+        password: formData.password,
+        role: USER_ROLES.USER
+      });
+      
+      if (userData) {
+        navigate('/chat');
+      } else {
+        // Fallback to demo registration for development
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userData', JSON.stringify({
+          name: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          role: USER_ROLES.USER,
+          accountNumber: Math.random().toString().slice(2, 12),
+          balance: '0'
+        }));
+        navigate('/chat');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      setErrors({ submit: 'Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

@@ -10,7 +10,7 @@ const Button = ({
   type = 'button',
   ...props 
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center font-medium transition-all duration-200 focus-ring rounded-lg';
+  const baseClasses = 'inline-flex items-center justify-center font-medium transition-all duration-200 focus-ring rounded-lg p-2';
   
   const variants = {
     primary: 'bg-charcoal text-white hover:bg-gray-800 disabled:bg-gray-400',

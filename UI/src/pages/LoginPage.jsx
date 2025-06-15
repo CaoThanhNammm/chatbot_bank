@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { IoEye, IoEyeOff, IoMail, IoLockClosed } from 'react-icons/io5';
 import { AuthLayout, Button, Input } from '../components';
-import { login, DEMO_ACCOUNTS } from '../utils/auth';
+import { login, loginDemo, DEMO_ACCOUNTS } from '../utils/auth';
 
 const LoginPage = () => {
   const navigate = useNavigate();  const [formData, setFormData] = useState({
@@ -26,17 +26,27 @@ const LoginPage = () => {
     setIsLoading(true);
     setLoginError('');
     
-    // Mô phỏng đăng nhập
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Try API login first
+      const userData = await login(formData.email, formData.password);
       
-      const userData = login(formData.email, formData.password);
       if (userData) {
         navigate('/chat');
       } else {
-        setLoginError('Email hoặc mật khẩu không chính xác!');
+        // Fallback to demo login for development
+        const demoUser = loginDemo(formData.email, formData.password);
+        if (demoUser) {
+          navigate('/chat');
+        } else {
+          setLoginError('Email hoặc mật khẩu không chính xác!');
+        }
       }
-    }, 1500);
+    } catch (error) {
+      console.error('Login error:', error);
+      setLoginError('Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

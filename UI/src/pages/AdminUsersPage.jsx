@@ -4,17 +4,20 @@ import { ChatHeader } from '../components';
 import { Button, UserModal } from '../components';
 import { mockUsers, STATUS_COLORS } from '../data/adminData';
 import { getCurrentUserRole, USER_ROLES, hasPermission, PERMISSIONS } from '../utils/auth';
+import api from '../utils/api';
 
 const AdminUsersPage = () => {
-  const [users, setUsers] = useState(mockUsers);
+  const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
-  const [filteredUsers, setFilteredUsers] = useState(users);
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const currentUserRole = getCurrentUserRole();
 
@@ -24,6 +27,33 @@ const AdminUsersPage = () => {
       window.location.href = '/chat';
     }
   }, [currentUserRole]);
+
+  // Load users from API
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.admin.getUsers();
+        
+        if (response.success) {
+          setUsers(response.data);
+        } else {
+          // Fallback to mock data for development
+          console.warn('API failed, using mock data:', response.error);
+          setUsers(mockUsers);
+        }
+      } catch (error) {
+        console.error('Error loading users:', error);
+        setError('Failed to load users');
+        // Fallback to mock data
+        setUsers(mockUsers);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUsers();
+  }, []);
 
   // Filter users based on search and filters
   useEffect(() => {
@@ -46,26 +76,63 @@ const AdminUsersPage = () => {
     }
 
     setFilteredUsers(filtered);
-  }, [users, searchQuery, selectedRole, selectedStatus]);
-  const handleStatusToggle = (userId) => {
-    setUsers(prev => prev.map(user =>
-      user.id === userId
-        ? { ...user, status: user.status === 'active' ? 'inactive' : 'active' }
-        : user
-    ));
-    setSuccessMessage('Cập nhật trạng thái người dùng thành công!');
-    setTimeout(() => setSuccessMessage(''), 3000);
+  }, [users, searchQuery, selectedRole, selectedStatus]);  const handleStatusToggle = async (userId) => {
+    try {
+      const user = users.find(u => u.id === userId);
+      const newStatus = user.status === 'active' ? 'inactive' : 'active';
+      
+      let response;
+      if (newStatus === 'active') {
+        response = await api.admin.activateUser(userId);
+      } else {
+        response = await api.admin.deactivateUser(userId);
+      }
+      
+      if (response.success) {
+        setUsers(prev => prev.map(user =>
+          user.id === userId
+            ? { ...user, status: newStatus }
+            : user
+        ));
+        setSuccessMessage('Cập nhật trạng thái người dùng thành công!');
+      } else {
+        setError(response.error || 'Failed to update user status');
+      }
+    } catch (error) {
+      console.error('Error updating user status:', error);
+      setError('Đã xảy ra lỗi khi cập nhật trạng thái');
+    }
+    
+    setTimeout(() => {
+      setSuccessMessage('');
+      setError('');
+    }, 3000);
   };
 
   const handleDeleteUser = (userId) => {
     setDeleteConfirm(userId);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteConfirm) {
-      setUsers(prev => prev.filter(user => user.id !== deleteConfirm));
-      setSuccessMessage('Xóa người dùng thành công!');
-      setTimeout(() => setSuccessMessage(''), 3000);
+      try {
+        const response = await api.admin.deleteUser(deleteConfirm);
+        
+        if (response.success) {
+          setUsers(prev => prev.filter(user => user.id !== deleteConfirm));
+          setSuccessMessage('Xóa người dùng thành công!');
+        } else {
+          setError(response.error || 'Failed to delete user');
+        }
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        setError('Đã xảy ra lỗi khi xóa người dùng');
+      }
+      
+      setTimeout(() => {
+        setSuccessMessage('');
+        setError('');
+      }, 3000);
       setDeleteConfirm(null);
     }
   };
@@ -118,7 +185,6 @@ const AdminUsersPage = () => {
       </span>
     );
   };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <ChatHeader />
@@ -133,6 +199,16 @@ const AdminUsersPage = () => {
             Quản lý tài khoản và quyền hạn của người dùng trong hệ thống
           </p>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center">
+              <IoCloseCircle className="text-red-500 mr-2" size={20} />
+              <span className="text-red-800">{error}</span>
+            </div>
+          </div>
+        )}
 
         {/* Success Message */}
         {successMessage && (
@@ -195,32 +271,38 @@ const AdminUsersPage = () => {
 
         {/* Users Table */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Người dùng
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Vai trò
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Phòng ban
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Trạng thái
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Đăng nhập cuối
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Thao tác
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredUsers.map((user) => (
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-500">Đang tải danh sách người dùng...</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Người dùng
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Vai trò
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Phòng ban
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Trạng thái
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Đăng nhập cuối
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Thao tác
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredUsers.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -287,20 +369,21 @@ const AdminUsersPage = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                  ))}
+                </tbody>
+              </table>
 
-          {filteredUsers.length === 0 && (
-            <div className="text-center py-12">
-              <IoPerson size={48} className="text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-500 mb-2">
-                Không tìm thấy người dùng
-              </h3>
-              <p className="text-gray-400">
-                Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm
-              </p>
+              {filteredUsers.length === 0 && (
+                <div className="text-center py-12">
+                  <IoPerson size={48} className="text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-500 mb-2">
+                    Không tìm thấy người dùng
+                  </h3>
+                  <p className="text-gray-400">
+                    Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>

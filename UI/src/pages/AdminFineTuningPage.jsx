@@ -4,16 +4,18 @@ import { ChatHeader } from '../components';
 import { Button, CreateModelModal } from '../components';
 import { mockFineTuningModels, TRAINING_DOMAINS, STATUS_COLORS } from '../data/adminData';
 import { getCurrentUserRole, USER_ROLES, hasPermission, PERMISSIONS } from '../utils/auth';
+import api from '../utils/api';
 
 const AdminFineTuningPage = () => {
-  const [models, setModels] = useState(mockFineTuningModels);
+  const [models, setModels] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDomain, setSelectedDomain] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
-  const [filteredModels, setFilteredModels] = useState(models);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [filteredModels, setFilteredModels] = useState([]);  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [loadingModels, setLoadingModels] = useState(new Set());
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const currentUserRole = getCurrentUserRole();
 
@@ -23,6 +25,33 @@ const AdminFineTuningPage = () => {
       window.location.href = '/chat';
     }
   }, [currentUserRole]);
+
+  // Load fine-tuning jobs from API
+  useEffect(() => {
+    const loadJobs = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.fineTuning.getJobs();
+        
+        if (response.success) {
+          setModels(response.data);
+        } else {
+          // Fallback to mock data for development
+          console.warn('Fine-tuning API failed, using mock data:', response.error);
+          setModels(mockFineTuningModels);
+        }
+      } catch (error) {
+        console.error('Error loading fine-tuning jobs:', error);
+        setError('Failed to load fine-tuning jobs');
+        // Fallback to mock data
+        setModels(mockFineTuningModels);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadJobs();
+  }, []);
 
   // Filter models based on search and filters
   useEffect(() => {
@@ -45,44 +74,68 @@ const AdminFineTuningPage = () => {
     }
 
     setFilteredModels(filtered);
-  }, [models, searchQuery, selectedDomain, selectedStatus]);
-  const handleStartTraining = (modelId) => {
+  }, [models, searchQuery, selectedDomain, selectedStatus]);  const handleStartTraining = async (modelId) => {
     setLoadingModels(prev => new Set(prev).add(modelId));
     
-    // Simulate API call
-    setTimeout(() => {
-      setModels(prev => prev.map(model =>
-        model.id === modelId
-          ? { ...model, status: 'training', updatedAt: new Date() }
-          : model
-      ));
+    try {
+      const response = await api.fineTuning.startJob(modelId);
+      
+      if (response.success) {
+        setModels(prev => prev.map(model =>
+          model.id === modelId
+            ? { ...model, status: 'training', updatedAt: new Date() }
+            : model
+        ));
+        setSuccessMessage('Bắt đầu huấn luyện mô hình thành công!');
+      } else {
+        setError(response.error || 'Failed to start training');
+      }
+    } catch (error) {
+      console.error('Error starting training:', error);
+      setError('Đã xảy ra lỗi khi bắt đầu huấn luyện');
+    } finally {
       setLoadingModels(prev => {
         const newSet = new Set(prev);
         newSet.delete(modelId);
         return newSet;
       });
-      setSuccessMessage('Bắt đầu huấn luyện mô hình thành công!');
-      setTimeout(() => setSuccessMessage(''), 3000);
-    }, 1000);
+      setTimeout(() => {
+        setSuccessMessage('');
+        setError('');
+      }, 3000);
+    }
   };
 
-  const handleStopTraining = (modelId) => {
+  const handleStopTraining = async (modelId) => {
     setLoadingModels(prev => new Set(prev).add(modelId));
     
-    setTimeout(() => {
-      setModels(prev => prev.map(model =>
-        model.id === modelId
-          ? { ...model, status: 'inactive', updatedAt: new Date() }
-          : model
-      ));
+    try {
+      const response = await api.fineTuning.stopJob(modelId);
+      
+      if (response.success) {
+        setModels(prev => prev.map(model =>
+          model.id === modelId
+            ? { ...model, status: 'stopped', updatedAt: new Date() }
+            : model
+        ));
+        setSuccessMessage('Dừng huấn luyện mô hình thành công!');
+      } else {
+        setError(response.error || 'Failed to stop training');
+      }
+    } catch (error) {
+      console.error('Error stopping training:', error);
+      setError('Đã xảy ra lỗi khi dừng huấn luyện');
+    } finally {
       setLoadingModels(prev => {
         const newSet = new Set(prev);
         newSet.delete(modelId);
         return newSet;
       });
-      setSuccessMessage('Dừng huấn luyện mô hình thành công!');
-      setTimeout(() => setSuccessMessage(''), 3000);
-    }, 1000);
+      setTimeout(() => {
+        setSuccessMessage('');
+        setError('');
+      }, 3000);
+    }
   };
 
   const handleActivateModel = (modelId) => {
@@ -165,7 +218,6 @@ const AdminFineTuningPage = () => {
         return <IoTime className="text-gray-500" size={20} />;
     }
   };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <ChatHeader />
@@ -181,6 +233,16 @@ const AdminFineTuningPage = () => {
           </p>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center">
+              <IoCloseCircle className="text-red-500 mr-2" size={20} />
+              <span className="text-red-800">{error}</span>
+            </div>
+          </div>
+        )}
+
         {/* Success Message */}
         {successMessage && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
@@ -191,10 +253,17 @@ const AdminFineTuningPage = () => {
           </div>
         )}
 
-        {/* Filters and Actions */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
-          <div className="p-6">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+        {/* Loading State */}
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        ) : (
+          <>
+            {/* Filters and Actions */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+              <div className="p-6">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
               {/* Search */}
               <div className="relative flex-1 max-w-md">
                 <IoSearch size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -407,8 +476,7 @@ const AdminFineTuningPage = () => {
           </div>
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="text-2xl font-bold text-purple-600">
-              {Math.round(models.filter(m => m.accuracy).reduce((sum, m) => sum + m.accuracy, 0) / models.filter(m => m.accuracy).length) || 0}%
-            </div>
+              {Math.round(models.filter(m => m.accuracy).reduce((sum, m) => sum + m.accuracy, 0) / models.filter(m => m.accuracy).length) || 0}%            </div>
             <div className="text-sm text-gray-600">Độ chính xác TB</div>          </div>
         </div>
 
@@ -417,6 +485,8 @@ const AdminFineTuningPage = () => {
           <div className="mt-4 p-4 bg-green-100 text-green-800 rounded-lg">
             {successMessage}
           </div>
+        )}
+          </>
         )}
       </div>
 
