@@ -32,10 +32,17 @@ def create_app(config_name=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
-    
-    # Initialize CORS
-    CORS(app)
-    
+      # Initialize CORS with specific settings
+    CORS(app, resources={
+        r"/api/*": {
+            "origins": ["http://localhost:5173", "http://localhost:3000", "*"],  # Allow all origins for development
+            "methods": ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
+            "allow_headers": ["Content-Type", "Authorization", "Accept", "ngrok-skip-browser-warning"],
+            "expose_headers": ["Content-Type"],
+            "supports_credentials": True
+        }
+    })
+
     # Initialize database
     db_config.init_app(app)
     

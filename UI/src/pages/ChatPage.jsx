@@ -57,7 +57,7 @@ const ChatPage = () => {
     }, 1500 + Math.random() * 1000); // Random delay between 1.5-2.5s
   }, []);
 
-  const handleSendMessage = useCallback((messageText) => {
+  const handleSendMessage = useCallback(async (messageText) => {
     const userMessage = {
       id: Date.now(),
       text: messageText,
@@ -66,8 +66,55 @@ const ChatPage = () => {
     };
     
     setMessages(prev => [...prev, userMessage]);
-    simulateBotResponse(messageText);
-  }, [simulateBotResponse]);
+    setIsTyping(true);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            message: messageText
+        })
+      });
+
+      const data = await response.json();
+      console.log('API Response:', data);
+
+      if (data.success && data.response) {
+        const botResponse = {
+          id: Date.now() + 1,
+          text: data.response.text || data.response,
+          isBot: true,
+          timestamp: new Date()
+        };
+        
+        setMessages(prev => [...prev, botResponse]);
+      } else {
+        // Handle error response
+        const errorMessage = {
+          id: Date.now() + 1,
+          text: data.message || "Xin lỗi, có lỗi xảy ra khi xử lý tin nhắn của bạn. Vui lòng thử lại sau.",
+          isBot: true,
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, errorMessage]);
+      }
+    } catch (error) {
+      // Handle network or other errors
+      const errorMessage = {
+        id: Date.now() + 1,
+        text: "Xin lỗi, không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng và thử lại.",
+        isBot: true,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsTyping(false);
+    }
+  }, []);
 
   const handlePromptSelect = useCallback((prompt) => {
     handleSendMessage(prompt);

@@ -36,14 +36,11 @@ if __name__ == "__main__":
     app = create_app()
     port = 5000
     
-    # Check if running on Kaggle
-    is_kaggle = os.getenv("KAGGLE_KERNEL_RUN_TYPE") is not None
-    
-    if is_kaggle:
-        # Setup ngrok when running on Kaggle
-        ngrok_success = run_with_ngrok(app, port)
-        if not ngrok_success:
-            print("Failed to setup ngrok tunnel. Check your auth token.")
+    # Setup ngrok tunnel
+    ngrok_success = run_with_ngrok(app, port)
+    if not ngrok_success:
+        print("Failed to setup ngrok tunnel. Check your auth token.")
+        print("Running without ngrok...")
     
     # Run the Flask app
     app.run(host="0.0.0.0", port=port, debug=True)
