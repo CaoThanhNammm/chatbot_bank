@@ -73,10 +73,10 @@ const Footer = () => {
                 📧 support@AGRIBANK-ai.com
               </li>
               <li className="text-gray-400">
-                📞 1800 588 888
+                📞 0354 487 785
               </li>
               <li className="text-gray-400">
-                📍 123 Đường Lê Lợi, Q1, TP.HCM
+                📍 307 Bà Triệu, TT Nông Cống, Thanh Hoá
               </li>
               <li className="text-gray-400">
                 🕒 24/7 - Hỗ trợ không ngừng
