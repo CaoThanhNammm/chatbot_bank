@@ -17,7 +17,7 @@ export const CURRENT_ENV = import.meta.env.MODE || ENVIRONMENTS.DEVELOPMENT;
 export const API_CONFIGS = {
   [ENVIRONMENTS.DEVELOPMENT]: {
     BASE_URL: 'https://1386-171-247-78-59.ngrok-free.app/api',
-    CHAT_ENDPOINT: 'https://9b74-34-55-107-219.ngrok-free.app/api/chat', // Using ngrok for development
+    CHAT_ENDPOINT: 'https://3c18-34-134-184-47.ngrok-free.app/api/chat', // Using ngrok for development
     TIMEOUT: 30000,
     USE_EXTERNAL_CHAT: true
   },

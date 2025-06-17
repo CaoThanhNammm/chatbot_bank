@@ -188,7 +188,7 @@ const ExternalChatDemo = () => {
           External Chat API Demo
         </h2>
         <p className="text-gray-600 mb-4">
-          Test integration with external chat API: https://9b74-34-55-107-219.ngrok-free.app/api/chat
+          Test integration with external chat API: https://3c18-34-134-184-47.ngrok-free.app/api/chat
         </p>
         
         {/* Connection Status */}
@@ -299,7 +299,7 @@ const ExternalChatDemo = () => {
       <div className="mt-6 p-4 bg-gray-100 rounded-lg">
         <h3 className="font-semibold text-gray-800 mb-2">API Information:</h3>
         <div className="text-sm text-gray-600 space-y-1">
-          <p><strong>Endpoint:</strong> https://9b74-34-55-107-219.ngrok-free.app/api/chat</p>
+          <p><strong>Endpoint:</strong> https://3c18-34-134-184-47.ngrok-free.app/api/chat</p>
           <p><strong>Method:</strong> POST</p>
           <p><strong>Request Body:</strong> {"{ \"message\": \"your message\" }"}</p>
           <p><strong>Response:</strong> {"{ \"response\": \"bot response\", \"success\": true }"}</p>
