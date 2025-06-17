@@ -45,10 +45,10 @@ export const getCurrentConfig = () => {
 // Chat API Configuration
 export const CHAT_CONFIG = {
   // Ngrok endpoint for external chat
-  NGROK_ENDPOINT: 'https://3c18-34-134-184-47.ngrok-free.app/api/chat',
+  NGROK_ENDPOINT: 'https://896b-34-172-145-7.ngrok-free.app/api/chat',
   
   // Guest chat endpoint (new API)
-  GUEST_CHAT_ENDPOINT: 'https://3c18-34-134-184-47.ngrok-free.app/api/chat',
+  GUEST_CHAT_ENDPOINT: 'https://896b-34-172-145-7.ngrok-free.app/api/chat',
   
   // Local endpoint for internal chat
   LOCAL_ENDPOINT: '/api/chat',
