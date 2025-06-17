@@ -23,7 +23,7 @@ const GUEST_SESSION_KEY = 'guestSessionId';
 const GuestChatPage = () => {
   const defaultWelcomeMessage = {
     id: 1,
-    text: "Xin chào! Tôi là trợ lý ảo của VietBank. Bạn có thể hỏi tôi về các sản phẩm và dịch vụ ngân hàng. Lưu ý rằng đây là phiên trò chuyện khách, các thông tin cá nhân và lịch sử trò chuyện sẽ được lưu trữ cục bộ trên trình duyệt của bạn.",
+    text: "Xin chào! Tôi là trợ lý ảo của AGRIBANK. Bạn có thể hỏi tôi về các sản phẩm và dịch vụ ngân hàng. Lưu ý rằng đây là phiên trò chuyện khách, các thông tin cá nhân và lịch sử trò chuyện sẽ được lưu trữ cục bộ trên trình duyệt của bạn.",
     isBot: true,
     timestamp: new Date()
   };
@@ -111,8 +111,8 @@ const GuestChatPage = () => {
     setIsTyping(true);
     
     try {
-      // Use conversation manager to send message
-      const result = await conversationManager.sendMessage(messageText, sessionId);
+      // Use conversation manager to send message with guest mode flag
+      const result = await conversationManager.sendMessage(messageText, sessionId, true);
       
       if (result.success) {
         setMessages(prev => [...prev, result.botMessage]);
@@ -143,7 +143,7 @@ const GuestChatPage = () => {
   const handleNewChat = useCallback(() => {
     const welcomeMessage = {
       id: Date.now(),
-      text: "Xin chào! Tôi là trợ lý ảo của VietBank. Bạn có thể hỏi tôi về các sản phẩm và dịch vụ ngân hàng. Lưu ý rằng đây là phiên trò chuyện khách, các thông tin cá nhân và lịch sử trò chuyện sẽ được lưu trữ cục bộ trên trình duyệt của bạn.",
+      text: "Xin chào! Tôi là trợ lý ảo của AGRIBANK. Bạn có thể hỏi tôi về các sản phẩm và dịch vụ ngân hàng. Lưu ý rằng đây là phiên trò chuyện khách, các thông tin cá nhân và lịch sử trò chuyện sẽ được lưu trữ cục bộ trên trình duyệt của bạn.",
       isBot: true,
       timestamp: new Date()
     };

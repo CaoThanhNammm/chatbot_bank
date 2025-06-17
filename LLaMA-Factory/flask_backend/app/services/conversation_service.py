@@ -6,9 +6,13 @@ import uuid
 from typing import Dict, List, Optional, Any, Tuple
 import threading
 from datetime import datetime
+import pytz
 
 from ..database import db
 from ..models.conversation import Conversation, Message
+
+# Vietnam timezone
+VN_TZ = pytz.timezone('Asia/Ho_Chi_Minh')
 
 class ConversationService:
     """
@@ -34,8 +38,8 @@ class ConversationService:
             conversation = Conversation(
                 title=title,
                 user_id=user_id,
-                created_at=datetime.utcnow(),
-                updated_at=datetime.utcnow()
+                created_at=datetime.now(VN_TZ).replace(tzinfo=None),
+                updated_at=datetime.now(VN_TZ).replace(tzinfo=None)
             )
             
             db.session.add(conversation)
@@ -85,7 +89,7 @@ class ConversationService:
         
         try:
             conversation.add_message(role, content)
-            conversation.updated_at = datetime.utcnow()
+            conversation.updated_at = datetime.now(VN_TZ).replace(tzinfo=None)
             db.session.commit()
             return True, "Message added successfully"
         except Exception as e:

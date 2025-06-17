@@ -65,7 +65,7 @@ const HomePage = () => {
               {getGreeting()}, <span className="text-blue-600">{getDisplayName()}</span>!
             </h1>
             <p className="max-w-2xl mx-auto mb-8 text-xl leading-relaxed text-gray-600">
-              Chào mừng bạn quay trở lại với VietBank AI. Hãy bắt đầu trò chuyện để được hỗ trợ tốt nhất.
+              Chào mừng bạn quay trở lại với AGRIBANK AI. Hãy bắt đầu trò chuyện để được hỗ trợ tốt nhất.
             </p>
             
             <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-y-0 sm:space-x-6">
@@ -265,7 +265,7 @@ const HomePage = () => {
               Tính năng nổi bật
             </h2>
             <p className="max-w-2xl mx-auto text-lg text-gray-600">
-              Những tính năng giúp VietBank AI trở thành trợ lý ngân hàng hoàn hảo cho bạn
+              Những tính năng giúp AGRIBANK AI trở thành trợ lý ngân hàng hoàn hảo cho bạn
             </p>
           </div>
           
@@ -294,7 +294,7 @@ const HomePage = () => {
             Sẵn sàng trải nghiệm?
           </h2>
           <p className="mb-8 text-xl text-blue-100">
-            Tham gia cùng hàng nghìn khách hàng đã tin tưởng VietBank AI
+            Tham gia cùng hàng nghìn khách hàng đã tin tưởng AGRIBANK AI
           </p>
           <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
             <Link to="/guest-chat">

@@ -79,19 +79,19 @@ const ChatPage = () => {
     const userBalance = user?.balance || '125,750,000';
     
     if (lowerMessage.includes('số dư') || lowerMessage.includes('kiểm tra tài khoản')) {
-      return `Xin chào ${userName}! Số dư tài khoản hiện tại của bạn là ${userBalance} VNĐ. Bạn có thể kiểm tra chi tiết giao dịch qua ứng dụng VietBank Mobile hoặc Internet Banking.`;
+      return `Xin chào ${userName}! Số dư tài khoản hiện tại của bạn là ${userBalance} VNĐ. Bạn có thể kiểm tra chi tiết giao dịch qua ứng dụng AGRIBANK Mobile hoặc Internet Banking.`;
     }
     
     if (lowerMessage.includes('chuyển khoản') || lowerMessage.includes('chuyển tiền')) {
-      return `${userName}, để thực hiện chuyển khoản, bạn vui lòng sử dụng ứng dụng VietBank Mobile hoặc Internet Banking để đảm bảo an toàn. Bạn có cần hướng dẫn chi tiết không?`;
+      return `${userName}, để thực hiện chuyển khoản, bạn vui lòng sử dụng ứng dụng AGRIBANK Mobile hoặc Internet Banking để đảm bảo an toàn. Bạn có cần hướng dẫn chi tiết không?`;
     }
     
     if (lowerMessage.includes('lãi suất') || lowerMessage.includes('gửi tiết kiệm')) {
-      return `${userName}, lãi suất tiết kiệm hiện tại của VietBank từ 4.5% - 6.8%/năm tùy theo kỳ hạn. Bạn có muốn biết thêm chi tiết về các gói tiết kiệm không?`;
+      return `${userName}, lãi suất tiết kiệm hiện tại của AGRIBANK từ 4.5% - 6.8%/năm tùy theo kỳ hạn. Bạn có muốn biết thêm chi tiết về các gói tiết kiệm không?`;
     }
     
     // Default response
-    return `Xin chào ${userName}! Tôi là trợ lý ảo của VietBank. Tôi có thể giúp bạn kiểm tra số dư, hướng dẫn chuyển khoản, tư vấn sản phẩm và nhiều dịch vụ khác. Bạn cần hỗ trợ gì?`;
+    return `Xin chào ${userName}! Tôi là trợ lý ảo của AGRIBANK. Tôi có thể giúp bạn kiểm tra số dư, hướng dẫn chuyển khoản, tư vấn sản phẩm và nhiều dịch vụ khác. Bạn cần hỗ trợ gì?`;
   }, [user]);
 
   const handleSendMessage = useCallback(async (messageText) => {

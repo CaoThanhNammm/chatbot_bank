@@ -155,7 +155,7 @@ const ProfilePage = () => {
                 <h1 className="text-2xl font-semibold text-gray-900 mb-2">
                   {user.fullName}
                 </h1>
-                <p className="text-gray-600">Khách hàng VietBank</p>
+                <p className="text-gray-600">Khách hàng AGRIBANK</p>
                 <p className="text-sm text-gray-500 mt-1">Thành viên từ {user.joinDate}</p>                
                 {/* Edit Button */}
                 <div className="mt-4">

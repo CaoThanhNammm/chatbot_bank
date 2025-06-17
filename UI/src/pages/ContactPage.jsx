@@ -23,7 +23,7 @@ const ContactPage = () => {
     {
       icon: <IoMail size={24} />,
       title: 'Email hỗ trợ',
-      content: 'support@vietbank-ai.com',
+      content: 'support@AGRIBANK-ai.com',
       description: 'Phản hồi trong vòng 2 giờ'
     },
     {
@@ -42,11 +42,11 @@ const ContactPage = () => {
 
   const faqItems = [
     {
-      question: 'VietBank AI có miễn phí không?',
-      answer: 'Có, VietBank AI hoàn toàn miễn phí cho khách hàng. Bạn chỉ cần đăng ký tài khoản để sử dụng.'
+      question: 'AGRIBANK AI có miễn phí không?',
+      answer: 'Có, AGRIBANK AI hoàn toàn miễn phí cho khách hàng. Bạn chỉ cần đăng ký tài khoản để sử dụng.'
     },
     {
-      question: 'Tôi có thể hỏi những gì với VietBank AI?',
+      question: 'Tôi có thể hỏi những gì với AGRIBANK AI?',
       answer: 'Bạn có thể hỏi về mọi dịch vụ ngân hàng: mở tài khoản, chuyển tiền, vay vốn, đầu tư, bảo hiểm, và nhiều hơn nữa.'
     },
     {
@@ -54,8 +54,8 @@ const ContactPage = () => {
       answer: 'Tuyệt đối. Chúng tôi sử dụng mã hóa cấp ngân hàng và tuân thủ các tiêu chuẩn bảo mật quốc tế nghiêm ngặt.'
     },
     {
-      question: 'VietBank AI có thể thực hiện giao dịch không?',
-      answer: 'Hiện tại VietBank AI chỉ tư vấn và hướng dẫn. Mọi giao dịch cần được thực hiện qua kênh chính thức của ngân hàng.'
+      question: 'AGRIBANK AI có thể thực hiện giao dịch không?',
+      answer: 'Hiện tại AGRIBANK AI chỉ tư vấn và hướng dẫn. Mọi giao dịch cần được thực hiện qua kênh chính thức của ngân hàng.'
     }
   ];
 

@@ -76,7 +76,7 @@ const AboutPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-6">
-              Về VietBank AI
+              Về AGRIBANK AI
             </h1>
             <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
               Chúng tôi đang cách mạng hóa ngành ngân hàng Việt Nam bằng công nghệ 
@@ -95,7 +95,7 @@ const AboutPage = () => {
                 Sứ mệnh của chúng tôi
               </h2>
               <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                VietBank AI được sinh ra với sứ mệnh democratize việc tiếp cận dịch vụ ngân hàng 
+                AGRIBANK AI được sinh ra với sứ mệnh democratize việc tiếp cận dịch vụ ngân hàng 
                 chất lượng cao cho mọi người dân Việt Nam. Chúng tôi tin rằng mọi ai cũng xứng đáng 
                 có được sự hỗ trợ tài chính thông minh và kịp thời.
               </p>
@@ -136,7 +136,7 @@ const AboutPage = () => {
               Công nghệ đột phá
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Những tính năng vượt trội giúp VietBank AI trở thành trợ lý ngân hàng 
+              Những tính năng vượt trội giúp AGRIBANK AI trở thành trợ lý ngân hàng 
               thông minh nhất Việt Nam
             </p>
           </div>
@@ -167,7 +167,7 @@ const AboutPage = () => {
               Hành trình phát triển
             </h2>
             <p className="text-lg text-gray-600">
-              Từ ý tưởng đến hiện thực - câu chuyện về VietBank AI
+              Từ ý tưởng đến hiện thực - câu chuyện về AGRIBANK AI
             </p>
           </div>
 
@@ -208,7 +208,7 @@ const AboutPage = () => {
             Sẵn sàng khám phá tương lai ngân hàng?
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Tham gia cùng hàng nghìn khách hàng đã trải nghiệm VietBank AI
+            Tham gia cùng hàng nghìn khách hàng đã trải nghiệm AGRIBANK AI
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
             <Link to="/chat">

@@ -1,6 +1,8 @@
 // Common/Shared Components exports
 // This file can be used for components that are shared across multiple sections
-// For now, we re-export from other modules for convenience
+
+// Common components
+export { default as ApiStatus } from './ApiStatus';
 
 // Re-export UI components
 export * from '../ui';

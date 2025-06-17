@@ -37,10 +37,10 @@ const ChatWindow = ({ messages, isTyping, loading = false }) => {
               <span className="text-2xl">🏦</span>
             </div>
             <h2 className="text-2xl font-playfair font-semibold text-neutral-800 mb-2">
-              Chào mừng đến với VietBank AI
+              Chào mừng đến với AGRIBANK AI
             </h2>
             <p className="text-neutral-600 max-w-md mx-auto">
-              Tôi là trợ lý AI của VietBank, sẵn sàng hỗ trợ bạn về các dịch vụ ngân hàng, 
+              Tôi là trợ lý AI của AGRIBANK, sẵn sàng hỗ trợ bạn về các dịch vụ ngân hàng, 
               tư vấn tài chính và giải đáp mọi thắc mắc. Bạn cần hỗ trợ gì hôm nay?
             </p>
           </div>

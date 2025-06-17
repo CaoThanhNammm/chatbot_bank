@@ -4,7 +4,7 @@ export const mockUsers = [
   {
     id: 1,
     name: 'Nguyễn Văn Admin',
-    email: 'admin@vietbank.com',
+    email: 'admin@AGRIBANK.com',
     role: 'admin',
     status: 'active',
     createdAt: new Date(2024, 0, 15),
@@ -14,7 +14,7 @@ export const mockUsers = [
   {
     id: 2,
     name: 'Trần Thị Nhân Viên',
-    email: 'staff@vietbank.com',
+    email: 'staff@AGRIBANK.com',
     role: 'staff',
     status: 'active',
     createdAt: new Date(2024, 2, 20),
@@ -24,7 +24,7 @@ export const mockUsers = [
   {
     id: 3,
     name: 'Lê Văn Khách Hàng',
-    email: 'user@vietbank.com',
+    email: 'user@AGRIBANK.com',
     role: 'user',
     status: 'active',
     createdAt: new Date(2024, 5, 10),
@@ -34,7 +34,7 @@ export const mockUsers = [
   {
     id: 4,
     name: 'Phạm Thị Mai',
-    email: 'mai.pham@vietbank.com',
+    email: 'mai.pham@AGRIBANK.com',
     role: 'staff',
     status: 'inactive',
     createdAt: new Date(2024, 1, 5),
@@ -44,7 +44,7 @@ export const mockUsers = [
   {
     id: 5,
     name: 'Hoàng Văn Tùng',
-    email: 'tung.hoang@vietbank.com',
+    email: 'tung.hoang@AGRIBANK.com',
     role: 'user',
     status: 'active',
     createdAt: new Date(2024, 7, 12),
@@ -56,7 +56,7 @@ export const mockUsers = [
 export const mockFineTuningModels = [
   {
     id: 1,
-    name: 'VietBank Lending Model v2.1',
+    name: 'AGRIBANK Lending Model v2.1',
     domain: 'lending',
     status: 'active',
     accuracy: 94.5,
@@ -68,7 +68,7 @@ export const mockFineTuningModels = [
   },
   {
     id: 2,
-    name: 'VietBank Investment Advisor v1.3',
+    name: 'AGRIBANK Investment Advisor v1.3',
     domain: 'investment',
     status: 'training',
     accuracy: 91.2,
@@ -80,7 +80,7 @@ export const mockFineTuningModels = [
   },
   {
     id: 3,
-    name: 'VietBank Customer Service v3.0',
+    name: 'AGRIBANK Customer Service v3.0',
     domain: 'customer_service',
     status: 'inactive',
     accuracy: 89.8,
@@ -92,7 +92,7 @@ export const mockFineTuningModels = [
   },
   {
     id: 4,
-    name: 'VietBank Savings Consultant v1.0',
+    name: 'AGRIBANK Savings Consultant v1.0',
     domain: 'savings',
     status: 'pending',
     accuracy: null,

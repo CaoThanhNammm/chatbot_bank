@@ -1,4 +1,4 @@
-# VietBank AI - Vietnamese Banking Chatbot
+# AGRIBANK AI - Vietnamese Banking Chatbot
 
 A modern, responsive AI chatbot interface specifically designed for Vietnamese banking services, built with Vite + React + TailwindCSS.
 
@@ -87,13 +87,13 @@ A modern, responsive AI chatbot interface specifically designed for Vietnamese b
    Navigate to `http://localhost:5173`
 
 ### Demo Credentials
-- **Email**: `demo@vietbank.com`
+- **Email**: `demo@AGRIBANK.com`
 - **Password**: `demo123`
 
 ## 🎯 Usage Guide
 
 ### 🏠 Getting Started
-1. Visit the homepage to learn about VietBank AI
+1. Visit the homepage to learn about AGRIBANK AI
 2. Click "Bắt đầu ngay" to register or "Đăng nhập" if you have an account
 3. Use demo credentials for quick access
 

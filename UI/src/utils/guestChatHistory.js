@@ -1,6 +1,6 @@
 // Guest Chat History utility functions
-export const GUEST_CONVERSATIONS_KEY = 'vietbank_guest_conversations';
-export const GUEST_CURRENT_CONVERSATION_KEY = 'vietbank_guest_current_conversation';
+export const GUEST_CONVERSATIONS_KEY = 'AGRIBANK_guest_conversations';
+export const GUEST_CURRENT_CONVERSATION_KEY = 'AGRIBANK_guest_current_conversation';
 
 /**
  * Generate a title for a conversation based on the first user message

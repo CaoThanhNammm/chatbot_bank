@@ -12,7 +12,7 @@ const Footer = () => {
               <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white text-sm font-bold">🏦</span>
               </div>
-              <h3 className="text-lg font-semibold">VietBank AI</h3>
+              <h3 className="text-lg font-semibold">AGRIBANK AI</h3>
             </div>
             <p className="text-gray-400 text-sm mb-4">
               Trợ lý AI ngân hàng thông minh, hỗ trợ khách hàng 24/7 với công nghệ tiên tiến.
@@ -70,7 +70,7 @@ const Footer = () => {
             <h4 className="text-white font-semibold mb-4">Liên hệ</h4>
             <ul className="space-y-2 text-sm">
               <li className="text-gray-400">
-                📧 support@vietbank-ai.com
+                📧 support@AGRIBANK-ai.com
               </li>
               <li className="text-gray-400">
                 📞 1800 588 888
@@ -88,7 +88,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-sm text-gray-500">
-            © 2025 VietBank AI. Tất cả quyền được bảo lưu. | 
+            © 2025 AGRIBANK AI. Tất cả quyền được bảo lưu. | 
             <span className="mx-2">Chính sách bảo mật</span> | 
             <span className="mx-2">Điều khoản sử dụng</span>
           </p>

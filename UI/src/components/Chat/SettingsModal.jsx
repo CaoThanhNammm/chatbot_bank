@@ -50,7 +50,7 @@ const SettingsModal = ({ isOpen, onClose, isGuestMode = false }) => {
           ) : (
             <div className="p-4 border rounded-lg bg-sage-50 border-sage-200">
               <p className="text-sm text-neutral-600">
-                Đã đăng nhập: <strong>Khách hàng VietBank</strong>
+                Đã đăng nhập: <strong>Khách hàng AGRIBANK</strong>
               </p>
             </div>
           )}

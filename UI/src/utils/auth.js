@@ -61,22 +61,23 @@ export const setUserRole = (role) => {
 // Demo accounts for testing different roles
 export const DEMO_ACCOUNTS = {
   admin: {
-    email: 'admin@vietbank.com',
-    password: 'admin123456',
+    email: 'admin@gmail.com',
+    password: '12345678',
     role: USER_ROLES.ADMIN,
-    name: 'Admin VietBank',
+    isAdmin: 1,
+    name: 'Admin AGRIBANK',
     first_name: 'Admin',
-    last_name: 'VietBank',
+    last_name: 'AGRIBANK',
     phone: '0123456789',
     department: 'IT Administration'
   },
   staff: {
-    email: 'staff@vietbank.com', 
+    email: 'staff@AGRIBANK.com', 
     password: 'staff123456',
     role: USER_ROLES.STAFF,
-    name: 'Nhân viên VietBank',
+    name: 'Nhân viên AGRIBANK',
     first_name: 'Nhân viên',
-    last_name: 'VietBank',
+    last_name: 'AGRIBANK',
     phone: '0987654321',
     department: 'Training Department'
   },
@@ -84,9 +85,9 @@ export const DEMO_ACCOUNTS = {
     email: 'user@gmail.com',
     password: 'user123456', 
     role: USER_ROLES.USER,
-    name: 'Khách hàng VietBank',
+    name: 'Khách hàng AGRIBANK',
     first_name: 'Khách hàng',
-    last_name: 'VietBank',
+    last_name: 'AGRIBANK',
     phone: '0999888777',
     department: null
   }

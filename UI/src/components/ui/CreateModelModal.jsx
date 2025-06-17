@@ -131,7 +131,7 @@ const CreateModelModal = ({ isOpen, onClose, onSave }) => {
                 className={`pl-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent ${
                   errors.name ? 'border-red-300' : 'border-gray-200'
                 }`}
-                placeholder="VD: VietBank Customer Service v2.0"
+                placeholder="VD: AGRIBANK Customer Service v2.0"
               />
             </div>
             {errors.name && (

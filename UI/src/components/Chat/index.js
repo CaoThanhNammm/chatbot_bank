@@ -7,3 +7,4 @@ export { default as SettingsModal } from './SettingsModal';
 export { default as SidePanel } from './SidePanel';
 export { default as ChatPrefix } from './ChatPrefix';
 export { default as ChatHeader } from '../layout/Header';
+export { default as ExternalChatDemo } from './ExternalChatDemo';

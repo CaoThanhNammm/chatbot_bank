@@ -1,5 +1,5 @@
 // Chat history utility functions
-export const STORAGE_KEY = 'vietbank_chat_history';
+export const STORAGE_KEY = 'AGRIBANK_chat_history';
 
 /**
  * Generate a title for a conversation based on the first user message

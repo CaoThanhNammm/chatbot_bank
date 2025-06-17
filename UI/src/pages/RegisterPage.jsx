@@ -165,7 +165,7 @@ const RegisterPage = () => {
   return (
     <AuthLayout 
       title="Tạo tài khoản mới"
-      subtitle="Đăng ký để sử dụng VietBank AI chatbot"
+      subtitle="Đăng ký để sử dụng AGRIBANK AI chatbot"
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Username */}

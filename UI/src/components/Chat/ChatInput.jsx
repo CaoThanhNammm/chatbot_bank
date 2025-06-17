@@ -1,10 +1,29 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { IoSend, IoMicOutline } from 'react-icons/io5';
 import Button from '../ui/Button';
 
 const ChatInput = ({ onSendMessage, disabled = false }) => {
   const [message, setMessage] = useState('');
   const textareaRef = useRef(null);
+
+  // Focus input when component mounts
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, []);
+
+  // Focus input when disabled state changes from true to false (bot finished responding)
+  useEffect(() => {
+    if (!disabled && textareaRef.current) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.focus();
+        }
+      }, 100);
+    }
+  }, [disabled]);
 
   const handleSend = () => {
     if (message.trim() && !disabled) {
@@ -14,6 +33,12 @@ const ChatInput = ({ onSendMessage, disabled = false }) => {
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
       }
+      // Focus back to input after sending message
+      setTimeout(() => {
+        if (textareaRef.current && !disabled) {
+          textareaRef.current.focus();
+        }
+      }, 100);
     }
   };
 

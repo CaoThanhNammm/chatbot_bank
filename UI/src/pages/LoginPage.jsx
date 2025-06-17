@@ -107,7 +107,7 @@ const LoginPage = () => {
   return (
     <AuthLayout 
       title="Chào mừng trở lại"
-      subtitle="Đăng nhập vào tài khoản VietBank AI của bạn"
+      subtitle="Đăng nhập vào tài khoản AGRIBANK AI của bạn"
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Username or Email */}

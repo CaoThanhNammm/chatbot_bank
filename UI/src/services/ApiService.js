@@ -39,6 +39,11 @@ class ApiService {
    * Build full URL
    */
   buildUrl(endpoint) {
+    // If endpoint is already an absolute URL, return it as is
+    if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
+      return endpoint;
+    }
+    // Otherwise, combine with base URL
     return `${this.baseURL}${endpoint}`;
   }
 
@@ -261,9 +266,39 @@ class ApiService {
    * Send simple chat message (new API)
    */
   async sendSimpleMessage(message) {
-    return this.post(this.endpoints.CHAT.SIMPLE_CHAT, {
-      message
-    });
+    const endpoint = this.endpoints.CHAT.SIMPLE_CHAT;
+    
+    // If using ngrok endpoint, use specialized ngrok service
+    if (endpoint.includes('ngrok')) {
+      try {
+        // Import ngrok service dynamically to avoid circular dependency
+        const { default: ngrokChatService } = await import('./NgrokChatService.js');
+        const result = await ngrokChatService.sendMessage(message);
+        
+        // Convert to our standard response format
+        return {
+          success: result.success,
+          data: result.data,
+          error: result.error,
+          status: result.status || (result.success ? 200 : 500)
+        };
+      } catch (error) {
+        console.error('Ngrok service error:', error);
+        return this.handleError(error);
+      }
+    }
+    
+    // Default behavior for non-ngrok endpoints
+    return this.post(endpoint, { message });
+  }
+
+  /**
+   * Send message to external chat API (ngrok endpoint)
+   */
+  async sendExternalMessage(message) {
+    // Import external chat service dynamically to avoid circular dependency
+    const { default: externalChatService } = await import('./ExternalChatService.js');
+    return externalChatService.sendMessage(message);
   }
 
   /**

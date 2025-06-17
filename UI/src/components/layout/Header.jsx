@@ -61,7 +61,7 @@ const Header = ({
             </div>
             <div>
               <h1 className="text-xl font-semibold font-playfair text-neutral-800">
-                VietBank AI
+                AGRIBANK AI
               </h1>
               <p className="-mt-1 text-xs text-neutral-500">
                 Trợ lý AI ngân hàng
@@ -210,7 +210,7 @@ const Header = ({
             </div>
             <div>
               <h1 className="text-xl font-display font-bold text-gray-900">
-                VietBank AI
+                AGRIBANK AI
               </h1>
               <p className="text-xs text-gray-500">Chatbot Ngân hàng</p>
             </div>

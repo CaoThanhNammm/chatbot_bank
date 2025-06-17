@@ -3,10 +3,15 @@
  * Centralized place for all API-related constants
  */
 
+import { getCurrentConfig, CHAT_CONFIG } from '../config/environment.js';
+
+// Get current environment configuration
+const envConfig = getCurrentConfig();
+
 // Base Configuration
 export const API_CONFIG = {
-  BASE_URL: 'http://127.0.0.1:5000/api',
-  TIMEOUT: 30000, // 30 seconds
+  BASE_URL: envConfig.BASE_URL,
+  TIMEOUT: envConfig.TIMEOUT,
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000, // 1 second
 };
@@ -52,7 +57,8 @@ export const API_ENDPOINTS = {
   // Chat
   CHAT: {
     SEND_MESSAGE: '/chat',
-    SIMPLE_CHAT: '/api/chat', // New simple chat endpoint
+    SIMPLE_CHAT: envConfig.CHAT_ENDPOINT || CHAT_CONFIG.NGROK_ENDPOINT, // Use environment-specific chat endpoint
+    EXTERNAL_CHAT: CHAT_CONFIG.NGROK_ENDPOINT, // External ngrok chat API
     CONVERSATIONS: '/conversations',
     CONVERSATION: (id) => `/conversations/${id}`,
     DELETE_CONVERSATION: (id) => `/conversations/${id}`,
