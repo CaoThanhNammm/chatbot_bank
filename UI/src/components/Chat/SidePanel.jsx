@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { IoAdd, IoTimeOutline, IoLogInOutline, IoTrashOutline, IoEllipsisVertical, IoChatbubbleOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import Button from '../ui/Button';
-import { getChatHistory } from '../../utils/chatHistory';
 import { getGuestConversations } from '../../utils/guestChatHistory';
 
 const SidePanel = ({ 

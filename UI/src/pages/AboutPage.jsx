@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { IoShieldCheckmark, IoSpeedometer, IoChatbubbles, IoTrendingUp, IoGlobeOutline, IoRocketOutline } from 'react-icons/io5';
 import { Button, Header, Footer } from '../components';
+import MessageBubble from '../components/Chat/MessageBubble';
 
 const AboutPage = () => {
   const features = [
@@ -197,6 +198,65 @@ const AboutPage = () => {
                 <div className="w-5/12"></div>
               </div>
             ))}
+          </div>        </div>
+      </section>
+
+      {/* Message Formatting Demo Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-display font-bold text-center text-gray-900 mb-4">
+            Hệ thống định dạng tin nhắn
+          </h2>
+          <p className="text-xl text-center text-gray-600 mb-12">
+            AGRIBANK AI hỗ trợ định dạng Markdown để làm cho cuộc trò chuyện trở nên sinh động hơn
+          </p>
+          
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Các định dạng được hỗ trợ:</h3>
+              
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-medium text-gray-700 mb-3">Cú pháp:</h4>
+                  <div className="bg-gray-100 p-3 rounded font-mono text-sm space-y-2">
+                    <div>**Chữ đậm**</div>
+                    <div>*Chữ nghiêng*</div>
+                    <div>_Chữ nghiêng_</div>
+                    <div>***Đậm và nghiêng***</div>
+                    <div>__Gạch chân__</div>
+                    <div>~~Gạch ngang~~</div>
+                    <div>`Mã nguồn`</div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-gray-700 mb-3">Kết quả:</h4>
+                  <div className="space-y-3">
+                    <MessageBubble 
+                      message="**Chào mừng bạn đến với AGRIBANK!** Tôi có thể giúp bạn với *nhiều dịch vụ ngân hàng* khác nhau."
+                      isBot={true}
+                      timestamp={new Date()}
+                    />
+                    <MessageBubble 
+                      message="Tôi muốn biết về ***sản phẩm tiết kiệm*** và các `mã lãi suất` hiện tại."
+                      isBot={false}
+                      timestamp={new Date()}
+                    />
+                    <MessageBubble 
+                      message="__Lãi suất tiết kiệm hiện tại:__\n- Kỳ hạn 6 tháng: `6.8%/năm`\n- Kỳ hạn 12 tháng: `7.2%/năm`\n\n*Lưu ý:* ~~Lãi suất cũ 6.5%~~ đã được điều chỉnh tăng!"
+                      isBot={true}
+                      timestamp={new Date()}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Mẹo:</strong> Bạn có thể sử dụng các định dạng này khi chat với AI để làm nổi bật thông tin quan trọng!
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
