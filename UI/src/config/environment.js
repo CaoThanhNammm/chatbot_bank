@@ -17,21 +17,21 @@ export const CURRENT_ENV = import.meta.env.MODE || ENVIRONMENTS.DEVELOPMENT;
 export const API_CONFIGS = {
   [ENVIRONMENTS.DEVELOPMENT]: {
     BASE_URL: 'https://1386-171-247-78-59.ngrok-free.app/api',
-    CHAT_ENDPOINT: 'https://3c18-34-134-184-47.ngrok-free.app/api/chat', // Using ngrok for development
+    CHAT_ENDPOINT: 'https://896b-34-172-145-7.ngrok-free.app/api/chat', // Using ngrok for development
     TIMEOUT: 30000,
     USE_EXTERNAL_CHAT: true
   },
   
   [ENVIRONMENTS.STAGING]: {
     BASE_URL: 'https://1386-171-247-78-59.ngrok-free.app/api',
-    CHAT_ENDPOINT: 'https://staging-api.example.com/api/chat',
+    CHAT_ENDPOINT: 'https://896b-34-172-145-7.ngrok-free.app/api/chat',
     TIMEOUT: 30000,
     USE_EXTERNAL_CHAT: false
   },
   
   [ENVIRONMENTS.PRODUCTION]: {
     BASE_URL: 'https://1386-171-247-78-59.ngrok-free.app/api',
-    CHAT_ENDPOINT: 'https://api.example.com/api/chat',
+    CHAT_ENDPOINT: 'https://896b-34-172-145-7.ngrok-free.app/api/chat',
     TIMEOUT: 30000,
     USE_EXTERNAL_CHAT: false
   }
