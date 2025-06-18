@@ -110,26 +110,77 @@ const GuestChatPage = () => {
     setMessages(prev => [...prev, userMessage]);
     setIsTyping(true);
     
+    // Prepare for streaming response
+    let botResponseText = '';
+    let botMessageId = Date.now() + 1;
+    
+    // Add empty bot message for streaming
+    const botMessage = {
+      id: botMessageId,
+      text: '',
+      isBot: true,
+      timestamp: new Date(),
+      isStreaming: true
+    };
+    setMessages(prev => [...prev, botMessage]);
+    
     try {
-      // Use conversation manager to send message with guest mode flag
-      const result = await conversationManager.sendMessage(messageText, sessionId, true);
+      // Use conversation manager with streaming support
+      const result = await conversationManager.sendMessage(
+        messageText, 
+        sessionId, 
+        true, // isGuestMode
+        (chunk) => {
+          // Update bot message with new chunk
+          botResponseText += chunk;
+          // Use functional update to avoid stale closure
+          setMessages(prev => {
+            const lastMessage = prev[prev.length - 1];
+            if (lastMessage && lastMessage.id === botMessageId) {
+              // Only update if it's the last message and it's the bot message we're streaming
+              return [
+                ...prev.slice(0, -1),
+                { ...lastMessage, text: botResponseText, isStreaming: true }
+              ];
+            }
+            return prev;
+          });
+        }
+      );
       
-      if (result.success) {
-        setMessages(prev => [...prev, result.botMessage]);
-      } else {
+      if (!result.success) {
         throw new Error(result.error || 'Failed to get response');
       }
+      
+      // Ensure we have the complete response and mark as finished
+      if (result.botMessage && result.botMessage.text && result.botMessage.text !== botResponseText) {
+        botResponseText = result.botMessage.text;
+      }
+      
+      // Mark streaming as finished
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === botMessageId 
+            ? { ...msg, text: botResponseText, isStreaming: false }
+            : msg
+        )
+      );
+      
     } catch (error) {
       console.error('Chat error:', error);
+      
+      // Remove the empty bot message and add error message
+      setMessages(prev => prev.filter(msg => msg.id !== botMessageId));
+      
       // Fallback response
-      const botResponse = {
-        id: Date.now() + 1,
+      const errorResponse = {
+        id: Date.now() + 2,
         text: "Xin lỗi, tôi đang gặp sự cố kết nối. Vui lòng thử lại sau hoặc liên hệ với chúng tôi qua hotline 1900 123456.",
         isBot: true,
         timestamp: new Date()
       };
       
-      setMessages(prev => [...prev, botResponse]);
+      setMessages(prev => [...prev, errorResponse]);
     }
     
     setIsTyping(false);

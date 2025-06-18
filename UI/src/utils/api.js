@@ -14,7 +14,7 @@ export const authApi = {
 // Chat API - using new ApiService
 export const chatApi = {
   sendMessage: (message, conversationId = null) => apiService.sendMessage(message, conversationId),
-  sendSimpleMessage: (message) => apiService.sendSimpleMessage(message), // New simple chat method
+  sendSimpleMessage: (message, onChunk = null) => apiService.sendSimpleMessage(message, onChunk), // New simple chat method with streaming
   createConversation: (title, userId = null) => apiService.createConversation(title, userId),
   getConversations: (userId = null) => apiService.getConversations(userId),
   getConversation: (conversationId) => apiService.getConversation(conversationId),

@@ -279,7 +279,7 @@ class ApiService {
   /**
    * Send simple chat message (new API)
    */
-  async sendSimpleMessage(message) {
+  async sendSimpleMessage(message, onChunk = null) {
     const endpoint = this.endpoints.CHAT.SIMPLE_CHAT;
     
     // If using ngrok endpoint, use specialized ngrok service
@@ -287,7 +287,7 @@ class ApiService {
       try {
         // Import ngrok service dynamically to avoid circular dependency
         const { default: ngrokChatService } = await import('./NgrokChatService.js');
-        const result = await ngrokChatService.sendMessage(message);
+        const result = await ngrokChatService.sendMessage(message, onChunk);
         
         // Convert to our standard response format
         return {
@@ -302,8 +302,118 @@ class ApiService {
       }
     }
     
-    // Default behavior for non-ngrok endpoints
+    // Default behavior for non-ngrok endpoints - handle streaming
+    if (onChunk && typeof onChunk === 'function') {
+      return this.postStream(endpoint, { message }, onChunk);
+    }
+    
     return this.post(endpoint, { message });
+  }
+
+  /**
+   * POST request with streaming support
+   */
+  async postStream(endpoint, data, onChunk) {
+    const url = this.buildUrl(endpoint);
+    
+    try {
+      const response = await fetch(url, {
+        method: this.methods.POST,
+        headers: this.getDefaultHeaders(),
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return this.handleResponse(response, errorData);
+      }
+
+      // Handle streaming response with optimized performance
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let fullResponse = '';
+      let isFirstChunk = true;
+      let chunkBuffer = ''; // Buffer for batching small chunks
+      let lastUpdate = Date.now();
+      const UPDATE_INTERVAL = 50; // Update UI every 50ms for smoother experience
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          buffer += chunk;
+
+          // Process complete lines from buffer
+          let lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (let line of lines) {
+            if (line.trim()) {
+              try {
+                if (isFirstChunk && line.includes('"success": true, "response": "')) {
+                  const startIndex = line.indexOf('"response": "') + 13;
+                  const content = line.substring(startIndex);
+                  if (content && content !== '"') {
+                    const cleanContent = content.replace(/\\n/g, '\n').replace(/\\"/g, '"');
+                    chunkBuffer += cleanContent;
+                    fullResponse += cleanContent;
+                  }
+                  isFirstChunk = false;
+                } else if (!isFirstChunk && line !== '"}') {
+                  const cleanContent = line.replace(/\\n/g, '\n').replace(/\\"/g, '"');
+                  chunkBuffer += cleanContent;
+                  fullResponse += cleanContent;
+                }
+              } catch (parseError) {
+                if (!isFirstChunk) {
+                  chunkBuffer += line;
+                  fullResponse += line;
+                }
+              }
+            }
+          }
+
+          // Batch updates for smoother UI - only update every UPDATE_INTERVAL ms
+          const now = Date.now();
+          if (chunkBuffer && (now - lastUpdate >= UPDATE_INTERVAL || done)) {
+            onChunk(chunkBuffer);
+            chunkBuffer = '';
+            lastUpdate = now;
+          }
+        }
+
+        // Process remaining buffer
+        if (buffer.trim() && buffer.trim() !== '"}') {
+          const cleanContent = buffer.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/"}$/, '');
+          if (cleanContent) {
+            fullResponse += cleanContent;
+            chunkBuffer += cleanContent;
+          }
+        }
+
+        // Send any remaining buffered content
+        if (chunkBuffer) {
+          onChunk(chunkBuffer);
+        }
+
+        return {
+          success: true,
+          data: { response: fullResponse },
+          error: null,
+          status: response.status
+        };
+
+      } finally {
+        reader.releaseLock();
+      }
+
+    } catch (error) {
+      return this.handleError(error);
+    }
   }
 
   /**

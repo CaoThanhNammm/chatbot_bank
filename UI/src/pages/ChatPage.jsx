@@ -3,6 +3,7 @@ import { IoMenuOutline, IoCloseOutline } from 'react-icons/io5';
 import { Button, ChatHeader, ChatWindow, ChatInput, SidePanel, SettingsModal, ChatHistoryModal, ChatPrefix } from '../components';
 import { useAuth } from '../contexts/AuthContext';
 import { useConversations } from '../hooks/useConversations';
+import { useStreamingMessage } from '../hooks/useStreamingMessage';
 import { chatApi } from '../utils/api';
 
 const ChatPage = () => {
@@ -27,6 +28,9 @@ const ChatPage = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
+  
+  // Use streaming message hook for optimized performance
+  const { startStreaming, updateStreamingContent, finishStreaming } = useStreamingMessage();
 
   // Show loading while authentication is being checked
   if (loading) {
@@ -108,6 +112,10 @@ const ChatPage = () => {
     setCurrentMessages(prev => [...prev, userMessage]);
     setIsTyping(true);
 
+    // Declare variables for error handling
+    let botMessageId = Date.now() + 1;
+    let botResponseText = '';
+
     try {
       let conversationToUse = currentConversation;
       
@@ -153,34 +161,53 @@ const ChatPage = () => {
         }
       }
 
-      // Try to get AI response via new simple API
-      let botResponseText;
+      // Try to get AI response via streaming API
+      
+      // Add empty bot message to UI for streaming
+      const botMessage = {
+        id: botMessageId,
+        text: '',
+        isBot: true,
+        timestamp: new Date(),
+        isStreaming: true
+      };
+      setCurrentMessages(prev => [...prev, botMessage]);
+      
+      // Start streaming with optimized hook
+      startStreaming(botMessageId);
+
       try {
-        const response = await chatApi.sendSimpleMessage(messageText);
+        // Handle streaming response
+        const response = await chatApi.sendSimpleMessage(messageText, (chunk) => {
+          // Update bot message with new chunk using optimized hook
+          updateStreamingContent(chunk, setCurrentMessages);
+          botResponseText += chunk;
+        });
         
-        if (response.success && response.data.response) {
-          botResponseText = response.data.response;
-        } else {
-          throw new Error('No AI response received');
+        if (!response.success) {
+          throw new Error(response.error || 'No AI response received');
         }
+        
+        // Ensure we have the complete response and mark as finished
+        if (response.data && response.data.response && response.data.response !== botResponseText) {
+          botResponseText = response.data.response;
+        }
+        
+        // Mark streaming as finished using optimized hook
+        finishStreaming(setCurrentMessages, botResponseText);
+        
       } catch (apiError) {
         console.warn('AI API failed, using fallback response:', apiError);
         
         // Use fallback banking response
         botResponseText = getBankingResponse(messageText);
+        
+        // Update the bot message with fallback response using optimized hook
+        finishStreaming(setCurrentMessages, botResponseText);
       }
 
-      // Add AI response to UI
-      const botMessage = {
-        id: Date.now() + 1,
-        text: botResponseText,
-        isBot: true,
-        timestamp: new Date()
-      };
-      setCurrentMessages(prev => [...prev, botMessage]);
-
       // Save bot response to conversation if we have one
-      if (conversationToUse && authenticated) {
+      if (conversationToUse && authenticated && botResponseText) {
         try {
           await addMessageToConversation(conversationToUse.id, 'assistant', botResponseText);
         } catch (msgError) {
@@ -191,12 +218,12 @@ const ChatPage = () => {
     } catch (error) {
       console.error('Error sending message:', error);
       
-      // Remove optimistic user message and show error
-      setCurrentMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
+      // Remove optimistic user message and any bot message
+      setCurrentMessages(prev => prev.filter(msg => msg.id !== userMessage.id && msg.id !== botMessageId));
       
       // Add error message
       const errorMessage = {
-        id: Date.now() + 1,
+        id: Date.now() + 2,
         text: "Xin lỗi, tôi đang gặp sự cố kỹ thuật. Vui lòng thử lại sau.",
         isBot: true,
         timestamp: new Date()

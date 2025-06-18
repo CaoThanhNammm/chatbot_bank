@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { memo } from 'react';
+import '../../styles/streaming.css';
 
-const MessageBubble = ({ message, isBot, timestamp }) => {
+const MessageBubble = memo(({ message, isBot, timestamp, isStreaming = false }) => {
   const formatTime = (timestamp) => {
     try {
       // Ensure timestamp is a valid Date object
@@ -132,31 +133,39 @@ const MessageBubble = ({ message, isBot, timestamp }) => {
   };
   
   return (
-    <div className={`flex ${isBot ? 'justify-start' : 'justify-end'} mb-4 message-enter`}>
+    <div className={`flex ${isBot ? 'justify-start' : 'justify-end'} mb-4 message-enter message-container`}>
       <div 
         className={`
           max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl
-          px-4 py-3 rounded-2xl shadow-sm
+          px-4 py-3 rounded-2xl shadow-sm message-bubble
           ${isBot 
             ? 'bg-white text-charcoal mr-auto border border-gray-100' 
             : 'bg-charcoal text-white ml-auto'
           }
         `.trim().replace(/\s+/g, ' ')}
       >
-        <div className="text-sm leading-relaxed font-body">
+        <div className={`text-sm leading-relaxed font-body message-bubble-content ${isStreaming ? 'streaming-text' : ''}`}>
           {formatMessage(message)}
+          {isStreaming && isBot && (
+            <span className="inline-block ml-1 w-2 h-4 bg-primary opacity-75 streaming-cursor"></span>
+          )}
         </div>
         <div 
           className={`
-            text-xs mt-2 opacity-70
+            text-xs mt-2 opacity-70 flex items-center justify-between
             ${isBot ? 'text-gray-500' : 'text-gray-300'}
           `.trim()}
         >
-          {formatTime(timestamp)}
+          <span>{formatTime(timestamp)}</span>
+          {isStreaming && isBot && (
+            <span className="text-xs text-primary animate-pulse">Đang trả lời...</span>
+          )}
         </div>
       </div>
     </div>
   );
-};
+});
+
+MessageBubble.displayName = 'MessageBubble';
 
 export default MessageBubble;

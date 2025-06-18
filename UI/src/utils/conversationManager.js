@@ -21,9 +21,10 @@ class ConversationManager {
    * @param {string} messageText - The message text to send
    * @param {string|null} conversationId - Optional conversation ID
    * @param {boolean} isGuestMode - Whether this is a guest mode conversation
+   * @param {Function} onChunk - Optional callback for streaming chunks
    * @returns {Promise<Object>} - Response object with botMessage and conversationId
    */
-  async sendMessage(messageText, conversationId = null, isGuestMode = false) {
+  async sendMessage(messageText, conversationId = null, isGuestMode = false, onChunk = null) {
     if (this.isProcessing) {
       return {
         success: false,
@@ -38,13 +39,24 @@ class ConversationManager {
       let responseText;
       
       if (isGuestMode) {
-        // Use the new guest chat API
+        // Use the new guest chat API with streaming support
         try {
-          const apiResponse = await sendGuestMessage(messageText);
-          if (apiResponse.success) {
-            responseText = apiResponse.response;
+          if (onChunk && typeof onChunk === 'function') {
+            // Streaming mode - return early and let the callback handle chunks
+            const apiResponse = await sendGuestMessage(messageText, onChunk);
+            if (apiResponse.success) {
+              responseText = apiResponse.response;
+            } else {
+              throw new Error(apiResponse.error);
+            }
           } else {
-            throw new Error(apiResponse.error);
+            // Non-streaming mode
+            const apiResponse = await sendGuestMessage(messageText);
+            if (apiResponse.success) {
+              responseText = apiResponse.response;
+            } else {
+              throw new Error(apiResponse.error);
+            }
           }
         } catch (error) {
           console.error('Guest chat API error:', error);
