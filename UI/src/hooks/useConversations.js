@@ -19,9 +19,21 @@ export const useConversations = () => {
     
     try {
       const response = await chatApi.getConversations(user.id);
-      if (response.success && response.data.conversations) {
-        setConversations(response.data.conversations);
+      console.log('Conversations API response:', response);
+      
+      if (response.success) {
+        // Handle different response structures
+        let conversations = [];
+        if (response.data && response.data.conversations && Array.isArray(response.data.conversations)) {
+          conversations = response.data.conversations;
+        } else if (response.data && Array.isArray(response.data)) {
+          conversations = response.data;
+        }
+        
+        console.log('Loaded conversations:', conversations);
+        setConversations(conversations);
       } else {
+        console.error('Failed to load conversations:', response.error);
         setError('Failed to load conversations');
       }
     } catch (err) {

@@ -29,10 +29,17 @@ class ApiService {
    * Get default headers
    */
   getDefaultHeaders() {
-    return {
+    const headers = {
       'Content-Type': this.contentTypes.JSON,
       ...this.getAuthHeaders()
     };
+    
+    // Add ngrok headers if using ngrok endpoint
+    if (this.baseURL.includes('ngrok')) {
+      headers['ngrok-skip-browser-warning'] = 'true';
+    }
+    
+    return headers;
   }
 
   /**
@@ -316,8 +323,29 @@ class ApiService {
    * Get conversations
    */
   async getConversations(userId = null) {
-    const url = userId ? `${this.endpoints.CHAT.CONVERSATIONS}?user_id=${userId}` : this.endpoints.CHAT.CONVERSATIONS;
-    return this.get(url);
+    const endpoint = userId ? `${this.endpoints.CHAT.CONVERSATIONS}?user_id=${userId}` : this.endpoints.CHAT.CONVERSATIONS;
+    const fullUrl = this.buildUrl(endpoint);
+    
+    console.log('Getting conversations:', {
+      userId,
+      endpoint,
+      fullUrl
+    });
+    
+    const response = await this.get(endpoint);
+    console.log('Conversations response:', response);
+    
+    // Handle the new API response format
+    if (response.success && response.data && response.data.conversations) {
+      return {
+        ...response,
+        data: {
+          conversations: response.data.conversations
+        }
+      };
+    }
+    
+    return response;
   }
 
   /**

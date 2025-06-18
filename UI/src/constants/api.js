@@ -59,7 +59,7 @@ export const API_ENDPOINTS = {
     SEND_MESSAGE: '/chat',
     SIMPLE_CHAT: envConfig.CHAT_ENDPOINT || CHAT_CONFIG.NGROK_ENDPOINT, // Use environment-specific chat endpoint
     EXTERNAL_CHAT: CHAT_CONFIG.NGROK_ENDPOINT, // External ngrok chat API
-    CONVERSATIONS: '/conversations',
+    CONVERSATIONS: '/conversations', // Updated to use new API endpoint
     CONVERSATION: (id) => `/conversations/${id}`,
     DELETE_CONVERSATION: (id) => `/conversations/${id}`,
     CLEAR_CONVERSATION: (id) => `/conversations/${id}/clear`,

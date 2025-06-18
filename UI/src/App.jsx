@@ -12,6 +12,7 @@ import ProfilePage from './pages/ProfilePage';
 import AdminUsersPage from './pages/AdminUsersPage';
 import AdminFineTuningPage from './pages/AdminFineTuningPage';
 import StaffTrainingPage from './pages/StaffTrainingPage';
+import ConversationsDebugPage from './pages/ConversationsDebugPage';
 import ProtectedRoute from './routes/ProtectedRoute';
 import AdminRoute from './routes/AdminRoute';
 import './App.css';
@@ -74,6 +75,16 @@ function App() {
               <AdminRoute>
                 <StaffTrainingPage />
               </AdminRoute>
+            }
+          />
+          
+          {/* Debug Routes */}
+          <Route
+            path="/debug/conversations"
+            element={
+              <ProtectedRoute>
+                <ConversationsDebugPage />
+              </ProtectedRoute>
             }
           />
           
