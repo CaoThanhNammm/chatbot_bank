@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { isAuthenticated, getCurrentUser, logout } from '../utils/auth';
+import { STORAGE_KEYS } from '../constants/api';
 
 const AuthContext = createContext();
 
@@ -41,8 +42,8 @@ export const AuthProvider = ({ children }) => {
   const login = async (userData) => {
     setUser(userData);
     setAuthenticated(true);
-    localStorage.setItem('isAuthenticated', 'true');
-    localStorage.setItem('userData', JSON.stringify(userData));
+    localStorage.setItem(STORAGE_KEYS.IS_AUTHENTICATED, 'true');
+    localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userData));
   };
 
   const logoutUser = async () => {
@@ -54,13 +55,13 @@ export const AuthProvider = ({ children }) => {
     
     setUser(null);
     setAuthenticated(false);
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userData');
+    localStorage.removeItem(STORAGE_KEYS.IS_AUTHENTICATED);
+    localStorage.removeItem(STORAGE_KEYS.USER_DATA);
   };
 
   const updateUser = (userData) => {
     setUser(userData);
-    localStorage.setItem('userData', JSON.stringify(userData));
+    localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userData));
   };
 
   const value = {

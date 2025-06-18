@@ -3,6 +3,7 @@ import Modal from './Modal';
 import Button from './Button';
 import Input from './Input';
 import { IoEyeOutline, IoEyeOffOutline, IoShieldCheckmarkOutline } from 'react-icons/io5';
+import { changePassword } from '../../utils/auth';
 
 const ChangePasswordModal = ({ isOpen, onClose }) => {
   const [passwordForm, setPasswordForm] = useState({
@@ -17,6 +18,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const validatePassword = (password) => {
     const errors = [];
@@ -98,22 +100,47 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
     }
     
     setIsLoading(true);
+    setErrors({});
+    setSuccessMessage('');
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Reset form
-      setPasswordForm({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
+      // Call API to change password
+      const response = await changePassword({
+        current_password: passwordForm.currentPassword,
+        new_password: passwordForm.newPassword,
+        confirm_password: passwordForm.confirmPassword
       });
-      setErrors({});      // Show success message
-      alert('Đổi mật khẩu thành công!');
-      onClose();
-    } catch {
-      setErrors({ general: 'Có lỗi xảy ra. Vui lòng thử lại.' });
+      
+      if (response.success) {
+        // Reset form
+        setPasswordForm({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        });
+        setErrors({});
+        setSuccessMessage('Đổi mật khẩu thành công!');
+        
+        // Close modal after showing success message
+        setTimeout(() => {
+          setSuccessMessage('');
+          onClose();
+        }, 2000);
+      } else {
+        // Handle API error response
+        setErrors({ 
+          general: response.error || 'Đổi mật khẩu thất bại. Vui lòng kiểm tra lại mật khẩu hiện tại.' 
+        });
+      }
+    } catch (error) {
+      console.error('Change password error:', error);
+      
+      // Handle different types of errors
+      if (error.message) {
+        setErrors({ general: error.message });
+      } else {
+        setErrors({ general: 'Có lỗi xảy ra. Vui lòng thử lại sau.' });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -126,6 +153,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
       confirmPassword: ''
     });
     setErrors({});
+    setSuccessMessage('');
     setShowPasswords({
       current: false,
       new: false,
@@ -296,6 +324,13 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
             <p className="text-sm text-red-600 mt-1">{errors.confirmPassword}</p>
           )}
         </div>
+
+        {/* Success Message */}
+        {successMessage && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+            <p className="text-sm text-green-600">{successMessage}</p>
+          </div>
+        )}
 
         {/* General Error */}
         {errors.general && (

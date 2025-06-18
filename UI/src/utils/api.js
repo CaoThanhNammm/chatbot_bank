@@ -8,6 +8,7 @@ export const authApi = {
   logout: () => apiService.logout(),
   getProfile: () => apiService.getProfile(),
   updateProfile: (profileData) => apiService.updateProfile(profileData),
+  changePassword: (passwordData) => apiService.changePassword(passwordData),
 };
 
 // Chat API - using new ApiService

@@ -241,23 +241,6 @@ const LoginPage = () => {
             <p className="text-xs text-gray-500 mt-1">Quản lý người dùng & Fine-tuning</p>
           </div>
 
-          {/* Staff Account */}
-          <div className="mb-3 p-3 bg-white rounded border border-blue-200">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded">STAFF</span>
-              <button
-                type="button"
-                onClick={() => setFormData({usernameOrEmail: DEMO_ACCOUNTS.staff.email, password: DEMO_ACCOUNTS.staff.password})}
-                className="text-xs text-blue-600 hover:text-blue-800"
-              >
-                Sử dụng
-              </button>
-            </div>
-            <p className="text-xs text-gray-600">Email: {DEMO_ACCOUNTS.staff.email}</p>
-            <p className="text-xs text-gray-600">Password: {DEMO_ACCOUNTS.staff.password}</p>
-            <p className="text-xs text-gray-500 mt-1">Upload dữ liệu huấn luyện</p>
-          </div>
-
           {/* User Account */}
           <div className="p-3 bg-white rounded border border-blue-200">
             <div className="flex items-center justify-between mb-2">

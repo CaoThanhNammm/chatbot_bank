@@ -19,29 +19,70 @@ const ProfilePage = () => {
     const loadProfile = async () => {
       try {
         setIsLoading(true);
+        setError('');
+        
+        // Try to get user data from API first
         const userData = await getCurrentUser();
         
         if (userData) {
-          setUser(userData);
-          setEditForm(userData);
+          // Normalize user data structure
+          const normalizedUser = {
+            id: userData.id,
+            fullName: userData.fullName || userData.name || userData.first_name + ' ' + userData.last_name || 'Người dùng',
+            name: userData.name || userData.fullName,
+            email: userData.email || '',
+            phone: userData.phone || '',
+            address: userData.address || '',
+            accountNumber: userData.accountNumber || userData.account_number || '',
+            accountType: userData.accountType || userData.account_type || 'Tài khoản cá nhân',
+            balance: userData.balance || '0',
+            joinDate: userData.joinDate || userData.created_at || new Date().toLocaleDateString('vi-VN'),
+            role: userData.role || 'user',
+            department: userData.department || null
+          };
+          
+          setUser(normalizedUser);
+          setEditForm(normalizedUser);
         } else {
-          // Fallback to demo data
+          // Fallback to demo data if no user data available
           const fallbackUser = {
+            id: 'demo',
             fullName: 'Nguyễn Văn An',
+            name: 'Nguyễn Văn An',
             email: 'nguyen.van.an@email.com',
             phone: '0901 234 567',
             address: '123 Đường Lê Lợi, Quận 1, TP.HCM',
             accountNumber: '0123456789',
             accountType: 'Tài khoản tiết kiệm',
             balance: '125,750,000',
-            joinDate: '15/03/2020'
+            joinDate: '15/03/2020',
+            role: 'user',
+            department: null
           };
           setUser(fallbackUser);
           setEditForm(fallbackUser);
         }
       } catch (error) {
         console.error('Error loading profile:', error);
-        setError('Không thể tải thông tin hồ sơ');
+        setError('Không thể tải thông tin hồ sơ. Vui lòng thử lại sau.');
+        
+        // Still show fallback data even on error
+        const fallbackUser = {
+          id: 'demo',
+          fullName: 'Nguyễn Văn An',
+          name: 'Nguyễn Văn An',
+          email: 'nguyen.van.an@email.com',
+          phone: '0901 234 567',
+          address: '123 Đường Lê Lợi, Quận 1, TP.HCM',
+          accountNumber: '0123456789',
+          accountType: 'Tài khoản tiết kiệm',
+          balance: '125,750,000',
+          joinDate: '15/03/2020',
+          role: 'user',
+          department: null
+        };
+        setUser(fallbackUser);
+        setEditForm(fallbackUser);
       } finally {
         setIsLoading(false);
       }
@@ -59,24 +100,48 @@ const ProfilePage = () => {
     try {
       setIsSaving(true);
       setError('');
+      setSuccessMessage('');
       
+      // Validate required fields
+      if (!editForm.fullName && !editForm.name) {
+        setError('Vui lòng nhập họ và tên');
+        return;
+      }
+      
+      if (!editForm.email) {
+        setError('Vui lòng nhập địa chỉ email');
+        return;
+      }
+      
+      // Try to update profile via API
       const updatedUser = await updateProfile(editForm);
       
       if (updatedUser) {
-        setUser(updatedUser);
+        // API update successful
+        const normalizedUser = {
+          ...editForm,
+          fullName: editForm.fullName || editForm.name,
+          name: editForm.name || editForm.fullName
+        };
+        setUser(normalizedUser);
         setIsEditing(false);
         setSuccessMessage('Cập nhật hồ sơ thành công!');
         setTimeout(() => setSuccessMessage(''), 3000);
       } else {
-        // Fallback for demo mode
-        setUser(editForm);
+        // Fallback for demo mode - still save locally
+        const normalizedUser = {
+          ...editForm,
+          fullName: editForm.fullName || editForm.name,
+          name: editForm.name || editForm.fullName
+        };
+        setUser(normalizedUser);
         setIsEditing(false);
-        setSuccessMessage('Cập nhật hồ sơ thành công!');
+        setSuccessMessage('Cập nhật hồ sơ thành công! (Chế độ demo)');
         setTimeout(() => setSuccessMessage(''), 3000);
       }
     } catch (error) {
       console.error('Error updating profile:', error);
-      setError('Đã xảy ra lỗi khi cập nhật hồ sơ');
+      setError('Đã xảy ra lỗi khi cập nhật hồ sơ. Vui lòng thử lại.');
     } finally {
       setIsSaving(false);
     }
@@ -119,73 +184,67 @@ const ProfilePage = () => {
     );
   }
   return (
-    <div className="min-h-screen bg-gray-50">      {/* Header - Same as ChatPage */}
+    <div className="min-h-screen bg-gray-50">
+      {/* Header - Same as ChatPage */}
       <ChatHeader onSettingsClick={() => setIsSettingsOpen(true)} />
 
       <div className="max-w-3xl mx-auto px-4 py-8">
-        {/* Loading State */}
-        {isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <span className="text-red-800">{error}</span>
           </div>
-        ) : (
-          <>
-            {/* Error Message */}
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <span className="text-red-800">{error}</span>
-              </div>
-            )}
+        )}
 
-            {/* Success Message */}
-            {successMessage && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <span className="text-green-800">{successMessage}</span>
-              </div>
-            )}
+        {/* Success Message */}
+        {successMessage && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <span className="text-green-800">{successMessage}</span>
+          </div>
+        )}
 
-            {/* Profile Header */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
-              <div className="px-6 py-8 text-center">
-                <div className="w-20 h-20 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-semibold text-sage-700">
-                    {user.fullName.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                  </span>
-                </div>
-                <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-                  {user.fullName}
-                </h1>
-                <p className="text-gray-600">Khách hàng AGRIBANK</p>
-                <p className="text-sm text-gray-500 mt-1">Thành viên từ {user.joinDate}</p>                
-                {/* Edit Button */}
-                <div className="mt-4">
-                  {!isEditing ? (
-                    <Button variant="outline" onClick={handleEdit}>
-                      Chỉnh sửa thông tin
-                    </Button>
-                  ) : (
-                    <div className="flex justify-center space-x-3">
-                      <Button 
-                        variant="primary" 
-                        onClick={handleSave}
-                        disabled={isSaving}
-                      >
-                        {isSaving ? 'Đang lưu...' : 'Lưu thay đổi'}
-                      </Button>
-                      <Button variant="secondary" onClick={handleCancel}>
-                        Hủy
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
+        {/* Profile Header */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+          <div className="px-6 py-8 text-center">
+            <div className="w-20 h-20 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl font-semibold text-sage-700">
+                {user.fullName ? user.fullName.split(' ').map(n => n[0]).join('').slice(0, 2) : 'U'}
+              </span>
             </div>
+            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+              {user.fullName || user.name || 'Người dùng'}
+            </h1>
+            <p className="text-gray-600">Khách hàng AGRIBANK</p>
+            <p className="text-sm text-gray-500 mt-1">Thành viên từ {user.joinDate || 'N/A'}</p>                
+            {/* Edit Button */}
+            <div className="mt-4">
+              {!isEditing ? (
+                <Button variant="outline" onClick={handleEdit}>
+                  Chỉnh sửa thông tin
+                </Button>
+              ) : (
+                <div className="flex justify-center space-x-3">
+                  <Button 
+                    variant="primary" 
+                    onClick={handleSave}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? 'Đang lưu...' : 'Lưu thay đổi'}
+                  </Button>
+                  <Button variant="secondary" onClick={handleCancel}>
+                    Hủy
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
 
-            {/* Main Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Personal Information */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="px-6 py-4 border-b border-gray-200">
+        {/* Main Content */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Personal Information */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900">
                 Thông tin cá nhân
               </h2>
@@ -198,12 +257,12 @@ const ProfilePage = () => {
                 </label>
                 {isEditing ? (
                   <Input
-                    value={editForm.fullName}
+                    value={editForm.fullName || editForm.name || ''}
                     onChange={(e) => handleInputChange('fullName', e.target.value)}
                     placeholder="Nhập họ và tên"
                   />
                 ) : (
-                  <p className="text-gray-900">{user.fullName}</p>
+                  <p className="text-gray-900">{user.fullName || user.name || 'Chưa cập nhật'}</p>
                 )}
               </div>
 
@@ -214,12 +273,12 @@ const ProfilePage = () => {
                 {isEditing ? (
                   <Input
                     type="email"
-                    value={editForm.email}
+                    value={editForm.email || ''}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     placeholder="Nhập địa chỉ email"
                   />
                 ) : (
-                  <p className="text-gray-900">{user.email}</p>
+                  <p className="text-gray-900">{user.email || 'Chưa cập nhật'}</p>
                 )}
               </div>
 
@@ -229,12 +288,12 @@ const ProfilePage = () => {
                 </label>
                 {isEditing ? (
                   <Input
-                    value={editForm.phone}
+                    value={editForm.phone || ''}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
                     placeholder="Nhập số điện thoại"
                   />
                 ) : (
-                  <p className="text-gray-900">{user.phone}</p>
+                  <p className="text-gray-900">{user.phone || 'Chưa cập nhật'}</p>
                 )}
               </div>
 
@@ -244,12 +303,12 @@ const ProfilePage = () => {
                 </label>
                 {isEditing ? (
                   <Input
-                    value={editForm.address}
+                    value={editForm.address || ''}
                     onChange={(e) => handleInputChange('address', e.target.value)}
                     placeholder="Nhập địa chỉ"
                   />
                 ) : (
-                  <p className="text-gray-900">{user.address}</p>
+                  <p className="text-gray-900">{user.address || 'Chưa cập nhật'}</p>
                 )}
               </div>
             </div>
@@ -268,14 +327,14 @@ const ProfilePage = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Số tài khoản
                 </label>
-                <p className="text-gray-900 font-mono text-sm">{user.accountNumber}</p>
+                <p className="text-gray-900 font-mono text-sm">{user.accountNumber || 'Chưa cập nhật'}</p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Loại tài khoản
                 </label>
-                <p className="text-gray-900">{user.accountType}</p>
+                <p className="text-gray-900">{user.accountType || 'Tài khoản cá nhân'}</p>
               </div>
 
               <div>
@@ -283,7 +342,7 @@ const ProfilePage = () => {
                   Số dư khả dụng
                 </label>
                 <p className="text-sage-600 font-semibold text-lg">
-                  {user.balance} VNĐ
+                  {user.balance || '0'} VNĐ
                 </p>
               </div>
 
@@ -291,7 +350,7 @@ const ProfilePage = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Ngày mở tài khoản
                 </label>
-                <p className="text-gray-900">{user.joinDate}</p>
+                <p className="text-gray-900">{user.joinDate || user.created_at || 'Chưa cập nhật'}</p>
               </div>
             </div>
           </div>
@@ -331,8 +390,6 @@ const ProfilePage = () => {
             </div>
           </div>
         </div>
-          </>
-        )}
       </div>
       
       {/* Settings Modal */}

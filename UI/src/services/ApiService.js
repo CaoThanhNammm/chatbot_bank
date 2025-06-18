@@ -257,6 +257,13 @@ class ApiService {
     return this.put(this.endpoints.AUTH.UPDATE_PROFILE, profileData);
   }
 
+  /**
+   * Change user password
+   */
+  async changePassword(passwordData) {
+    return this.post(this.endpoints.AUTH.CHANGE_PASSWORD, passwordData);
+  }
+
   // ==================== CHAT METHODS ====================
 
   /**

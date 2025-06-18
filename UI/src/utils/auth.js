@@ -34,7 +34,7 @@ export const hasPermission = (userRole, permission) => {
 // Get user role from localStorage or API
 export const getCurrentUserRole = () => {
   try {
-    const userData = localStorage.getItem('userData');
+    const userData = localStorage.getItem(STORAGE_KEYS.USER_DATA);
     if (userData) {
       const parsed = JSON.parse(userData);
       return parsed.role || USER_ROLES.USER;
@@ -49,10 +49,10 @@ export const getCurrentUserRole = () => {
 // Set user role (for demo purposes)
 export const setUserRole = (role) => {
   try {
-    const existingData = localStorage.getItem('userData');
+    const existingData = localStorage.getItem(STORAGE_KEYS.USER_DATA);
     const userData = existingData ? JSON.parse(existingData) : {};
     userData.role = role;
-    localStorage.setItem('userData', JSON.stringify(userData));
+    localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userData));
   } catch (error) {
     console.error('Error setting user role:', error);
   }
@@ -62,7 +62,7 @@ export const setUserRole = (role) => {
 export const DEMO_ACCOUNTS = {
   admin: {
     email: 'admin@gmail.com',
-    password: '12345678',
+    password: 'admin123456A@',
     role: USER_ROLES.ADMIN,
     isAdmin: 1,
     name: 'Admin AGRIBANK',
@@ -82,8 +82,8 @@ export const DEMO_ACCOUNTS = {
     department: 'Training Department'
   },
   user: {
-    email: 'user@gmail.com',
-    password: 'user123456', 
+    email: 'guest@gmail.com',
+    password: '12345678', 
     role: USER_ROLES.USER,
     name: 'Khách hàng AGRIBANK',
     first_name: 'Khách hàng',
@@ -259,13 +259,24 @@ export const updateProfile = async (profileData) => {
     const response = await api.auth.updateProfile(profileData);
     if (response.success) {
       // Update localStorage
-      localStorage.setItem('userData', JSON.stringify(response.data));
+      localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(response.data));
       return response.data;
     }
     return null;
   } catch (error) {
     console.error('Error updating profile:', error);
     return null;
+  }
+};
+
+// Change user password
+export const changePassword = async (passwordData) => {
+  try {
+    const response = await api.auth.changePassword(passwordData);
+    return response;
+  } catch (error) {
+    console.error('Error changing password:', error);
+    throw error;
   }
 };
 
