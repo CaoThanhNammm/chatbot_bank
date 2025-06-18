@@ -17,29 +17,92 @@ const MessageBubble = memo(({ message, isBot, timestamp, isStreaming = false }) 
       console.error('Error formatting time:', error);
       return 'Vừa xong';
     }
-  };  const formatMessage = (text) => {
-    // Enhanced markdown-like formatting with support for multiple formats
-    const formatLine = (line) => {
+  };
+
+  const formatMessage = (text) => {
+    // Enhanced markdown-like formatting with support for multiple formats and bullet lists
+    const formatLine = (line, lineIndex, allLines) => {
+      // Check if this line is a bullet point (starts with * followed by optional space)
+      const bulletMatch = line.match(/^(\s*)\*\s*(.+)$/);
+      if (bulletMatch) {
+        const [, indent, content] = bulletMatch;
+        const indentLevel = Math.floor(indent.length / 2); // 2 spaces = 1 indent level
+        const marginLeft = indentLevel * 16; // 16px per indent level
+        
+        return (
+          <div 
+            key={`bullet-${lineIndex}`} 
+            className="flex items-start my-1"
+            style={{ marginLeft: `${marginLeft}px` }}
+          >
+            <span className="text-primary mr-2 mt-0.5 flex-shrink-0">•</span>
+            <span className="flex-1">{formatInlineText(content)}</span>
+          </div>
+        );
+      }
+      
+      // Check if this line is a numbered list (starts with + followed by optional space)
+      const numberedMatch = line.match(/^(\s*)\+\s*(.+)$/);
+      if (numberedMatch) {
+        const [, indent, content] = numberedMatch;
+        const indentLevel = Math.floor(indent.length / 2);
+        const marginLeft = indentLevel * 16;
+        
+        // Count previous numbered items at the same level to get the number
+        let itemNumber = 1;
+        for (let i = lineIndex - 1; i >= 0; i--) {
+          const prevLine = allLines[i];
+          const prevMatch = prevLine.match(/^(\s*)\+\s*(.+)$/);
+          if (prevMatch) {
+            const prevIndent = Math.floor(prevMatch[1].length / 2);
+            if (prevIndent === indentLevel) {
+              itemNumber++;
+            } else if (prevIndent < indentLevel) {
+              break;
+            }
+          } else if (prevLine.trim() === '') {
+            continue;
+          } else {
+            break;
+          }
+        }
+        
+        return (
+          <div 
+            key={`numbered-${lineIndex}`} 
+            className="flex items-start my-1"
+            style={{ marginLeft: `${marginLeft}px` }}
+          >
+            <span className="text-primary mr-2 mt-0.5 flex-shrink-0 font-medium">{itemNumber}.</span>
+            <span className="flex-1">{formatInlineText(content)}</span>
+          </div>
+        );
+      }
+      
+      // Regular line formatting
+      return formatInlineText(line);
+    };
+    
+    const formatInlineText = (text) => {
       // Define formatting patterns with priority order (longer patterns first to avoid conflicts)
       const patterns = [
         { regex: /\*\*\*(.*?)\*\*\*/g, tag: 'strongem', className: 'font-bold italic' },  // ***bold italic***
         { regex: /\*\*(.*?)\*\*/g, tag: 'strong', className: 'font-bold' },              // **bold**
-        { regex: /\*(.*?)\*/g, tag: 'em', className: 'italic' },                         // *italic*
         { regex: /__(.*?)__/g, tag: 'u', className: 'underline' },                       // __underline__
-        { regex: /_(.*?)_/g, tag: 'em', className: 'italic' },                          // _italic_ (alternative)
+        { regex: /_(.*?)_/g, tag: 'em', className: 'italic' },                          // _italic_
         { regex: /~~(.*?)~~/g, tag: 'del', className: 'line-through opacity-75' },       // ~~strikethrough~~
         { regex: /`(.*?)`/g, tag: 'code', className: 'bg-gray-100 px-1 py-0.5 rounded text-xs font-mono' }, // `code`
       ];
       
       // Find all matches without overlaps
       const matches = [];
-      let workingLine = line;
+      let workingText = text;
       
       patterns.forEach(pattern => {
         let match;
         const regex = new RegExp(pattern.regex.source, 'g');
         
-        while ((match = regex.exec(workingLine)) !== null) {
+        while ((match = regex.exec(workingText)) !== null) {
           // Check if this match overlaps with existing matches
           const start = match.index;
           const end = match.index + match[0].length;
@@ -70,7 +133,7 @@ const MessageBubble = memo(({ message, isBot, timestamp, isStreaming = false }) 
       
       // Build formatted content
       if (matches.length === 0) {
-        return line;
+        return text;
       }
       
       const result = [];
@@ -79,7 +142,7 @@ const MessageBubble = memo(({ message, isBot, timestamp, isStreaming = false }) 
       matches.forEach((match, index) => {
         // Add text before this match
         if (match.start > currentIndex) {
-          result.push(line.slice(currentIndex, match.start));
+          result.push(text.slice(currentIndex, match.start));
         }
         
         // Add the formatted match
@@ -116,20 +179,38 @@ const MessageBubble = memo(({ message, isBot, timestamp, isStreaming = false }) 
       });
       
       // Add remaining text
-      if (currentIndex < line.length) {
-        result.push(line.slice(currentIndex));
+      if (currentIndex < text.length) {
+        result.push(text.slice(currentIndex));
       }
       
       return result;
     };
     
-    // Process each line and handle line breaks
-    return text.split('\n').map((line, index) => (
-      <React.Fragment key={index}>
-        {formatLine(line)}
-        {index < text.split('\n').length - 1 && <br />}
-      </React.Fragment>
-    ));
+    // Split text into lines and process each line
+    const lines = text.split('\n');
+    const processedLines = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const formattedLine = formatLine(line, i, lines);
+      
+      // Check if this is a bullet/numbered list item
+      const isBulletPoint = line.match(/^(\s*)[*+]\s*(.+)$/);
+      
+      if (isBulletPoint) {
+        processedLines.push(formattedLine);
+      } else {
+        // Regular line - add with line break if not the last line
+        processedLines.push(
+          <React.Fragment key={i}>
+            {formattedLine}
+            {i < lines.length - 1 && <br />}
+          </React.Fragment>
+        );
+      }
+    }
+    
+    return processedLines;
   };
   
   return (
