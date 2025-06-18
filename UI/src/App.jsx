@@ -13,6 +13,7 @@ import AdminUsersPage from './pages/AdminUsersPage';
 import AdminFineTuningPage from './pages/AdminFineTuningPage';
 import StaffTrainingPage from './pages/StaffTrainingPage';
 import ConversationsDebugPage from './pages/ConversationsDebugPage';
+import MessageFormattingTestPage from './pages/MessageFormattingTestPage';
 import ProtectedRoute from './routes/ProtectedRoute';
 import AdminRoute from './routes/AdminRoute';
 import './App.css';
@@ -87,6 +88,9 @@ function App() {
               </ProtectedRoute>
             }
           />
+          
+          {/* Test Routes */}
+          <Route path="/test/formatting" element={<MessageFormattingTestPage />} />
           
           {/* Redirect unknown routes to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
