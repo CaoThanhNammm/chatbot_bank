@@ -80,43 +80,39 @@ const ContactPage = () => {
         message: ''
       });
     }, 3000);
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50">
+  };  return (
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100">
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-20">
+      <section className="bg-gradient-to-br from-red-700 via-red-800 to-red-900 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-6">
               Liên hệ với chúng tôi
             </h1>
-            <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+            <p className="text-xl text-red-100 mb-8 max-w-3xl mx-auto">
               Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn. 
               Hãy liên hệ bất cứ khi nào bạn cần!
             </p>
           </div>
         </div>
-      </section>
-
-      {/* Contact Info */}
+      </section>      {/* Contact Info */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             {contactInfo.map((info, index) => (
-              <div key={index} className="text-center p-6 bg-gray-50 rounded-xl hover:shadow-lg transition-shadow">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600">
+              <div key={index} className="text-center p-6 bg-red-50 rounded-xl hover:shadow-lg transition-shadow border border-red-200">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-700">
                   {info.icon}
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-red-900 mb-2">
                   {info.title}
                 </h3>
-                <p className="text-blue-600 font-medium mb-1">
+                <p className="text-red-700 font-medium mb-1">
                   {info.content}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-red-800">
                   {info.description}
                 </p>
               </div>
@@ -126,22 +122,21 @@ const ContactPage = () => {
       </section>
 
       {/* Contact Form & Map */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gradient-to-br from-red-50 to-pink-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Contact Form */}
-            <div className="bg-white p-8 rounded-xl shadow-sm">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            <div className="bg-white p-8 rounded-xl shadow-sm border border-red-200">
+              <h2 className="text-2xl font-bold text-red-900 mb-6">
                 Gửi tin nhắn cho chúng tôi
               </h2>
-              
-              {isSubmitted ? (
+                {isSubmitted ? (
                 <div className="text-center py-12">
-                  <IoCheckmarkCircle size={64} className="text-green-500 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  <IoCheckmarkCircle size={64} className="text-red-600 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-red-900 mb-2">
                     Cảm ơn bạn đã liên hệ!
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-red-800">
                     Chúng tôi sẽ phản hồi trong vòng 24 giờ.
                   </p>
                 </div>
@@ -149,7 +144,7 @@ const ContactPage = () => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-red-800 mb-2">
                         Họ và tên *
                       </label>
                       <Input
@@ -158,9 +153,8 @@ const ContactPage = () => {
                         placeholder="Nhập họ và tên"
                         required
                       />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                    </div>                    <div>
+                      <label className="block text-sm font-medium text-red-800 mb-2">
                         Email *
                       </label>
                       <Input
@@ -175,7 +169,7 @@ const ContactPage = () => {
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-red-800 mb-2">
                         Số điện thoại
                       </label>
                       <Input
@@ -185,11 +179,11 @@ const ContactPage = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-red-800 mb-2">
                         Chủ đề *
                       </label>
                       <select 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         value={formData.subject}
                         onChange={(e) => handleInputChange('subject', e.target.value)}
                         required
@@ -204,11 +198,11 @@ const ContactPage = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-red-800 mb-2">
                       Nội dung tin nhắn *
                     </label>
                     <textarea
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       rows={6}
                       value={formData.message}
                       onChange={(e) => handleInputChange('message', e.target.value)}
@@ -217,7 +211,7 @@ const ContactPage = () => {
                     />
                   </div>
 
-                  <Button type="submit" size="lg" className="w-full">
+                  <Button type="submit" size="lg" className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800">
                     <IoSend className="mr-2" size={20} />
                     Gửi tin nhắn
                   </Button>
@@ -230,17 +224,16 @@ const ContactPage = () => {
               <div className="bg-white p-8 rounded-xl shadow-sm mb-8">
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
                   Văn phòng chính
-                </h3>
-                <div className="space-y-4">
+                </h3>                <div className="space-y-4">
                   <div className="flex items-start space-x-3">
-                    <IoLocation size={20} className="text-blue-600 mt-1" />
+                    <IoLocation size={20} className="text-red-600 mt-1" />
                     <div>
                       <p className="font-medium text-gray-900">Địa chỉ</p>
                       <p className="text-gray-600">123 Đường Lê Lợi, Quận 1, TP.HCM</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
-                    <IoTime size={20} className="text-blue-600 mt-1" />
+                    <IoTime size={20} className="text-red-600 mt-1" />
                     <div>
                       <p className="font-medium text-gray-900">Giờ làm việc</p>
                       <p className="text-gray-600">Thứ 2 - Thứ 6: 8:00 - 17:00</p>

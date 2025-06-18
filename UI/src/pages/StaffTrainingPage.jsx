@@ -157,11 +157,10 @@ const StaffTrainingPage = () => {
   const formatDate = (date) => {
     return date.toLocaleDateString('vi-VN');
   };
-
   const getStatusBadge = (status) => {
     const statusMap = {
-      uploaded: { text: 'Đã tải lên', color: 'bg-green-100 text-green-800' },
-      processing: { text: 'Đang xử lý', color: 'bg-blue-100 text-blue-800' },
+      uploaded: { text: 'Đã tải lên', color: 'bg-red-100 text-red-800' },
+      processing: { text: 'Đang xử lý', color: 'bg-red-100 text-red-800' },
       failed: { text: 'Thất bại', color: 'bg-red-100 text-red-800' }
     };
 
@@ -177,10 +176,9 @@ const StaffTrainingPage = () => {
   const getDomainBadge = (domain) => {
     const domainInfo = TRAINING_DOMAINS.find(d => d.value === domain) || 
                      { label: domain, color: 'gray' };
-    
-    const colorMap = {
-      blue: 'bg-blue-100 text-blue-800',
-      green: 'bg-green-100 text-green-800',
+      const colorMap = {
+      blue: 'bg-red-100 text-red-800',
+      green: 'bg-red-100 text-red-800',
       yellow: 'bg-yellow-100 text-yellow-800',
       purple: 'bg-purple-100 text-purple-800',
       red: 'bg-red-100 text-red-800',
@@ -198,9 +196,9 @@ const StaffTrainingPage = () => {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'uploaded':
-        return <IoCheckmarkCircle className="text-green-500" size={20} />;
+        return <IoCheckmarkCircle className="text-red-600" size={20} />;
       case 'processing':
-        return <IoTime className="text-blue-500" size={20} />;
+        return <IoTime className="text-red-600" size={20} />;
       case 'failed':
         return <IoCloseCircle className="text-red-500" size={20} />;
       default:
@@ -226,7 +224,7 @@ const StaffTrainingPage = () => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
           <div className="p-6">
             <div className="flex items-center mb-4">
-              <IoSettings className="text-blue-500 mr-2" size={24} />
+              <IoSettings className="text-red-600 mr-2" size={24} />
               <h2 className="text-lg font-semibold text-gray-900">
                 Cấu hình Fine-tuning
               </h2>
@@ -234,10 +232,9 @@ const StaffTrainingPage = () => {
             
             {/* Success Message */}
             {successMessage && (
-              <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center">
-                  <IoCheckmarkCircle className="text-green-500 mr-2" size={20} />
-                  <span className="text-green-800">{successMessage}</span>
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center">                  <IoCheckmarkCircle className="text-red-600 mr-2" size={20} />
+                  <span className="text-red-800">{successMessage}</span>
                 </div>
               </div>
             )}
@@ -254,14 +251,13 @@ const StaffTrainingPage = () => {
 
             {/* Training Progress */}
             {isTraining && (
-              <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <div className="flex items-center mb-2">
-                  <IoPlay className="text-blue-500 mr-2" size={20} />
-                  <span className="text-blue-800 font-medium">Đang huấn luyện... {Math.round(trainingProgress)}%</span>
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center mb-2">                  <IoPlay className="text-red-600 mr-2" size={20} />
+                  <span className="text-red-800 font-medium">Đang huấn luyện... {Math.round(trainingProgress)}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    className="bg-red-600 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${trainingProgress}%` }}
                   ></div>
                 </div>

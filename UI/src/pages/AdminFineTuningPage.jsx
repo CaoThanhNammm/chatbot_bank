@@ -161,11 +161,10 @@ const AdminFineTuningPage = () => {
   const formatDate = (date) => {
     return date.toLocaleDateString('vi-VN');
   };
-
   const getStatusBadge = (status) => {
     const statusMap = {
-      active: { text: 'Đang hoạt động', color: 'bg-green-100 text-green-800' },
-      training: { text: 'Đang huấn luyện', color: 'bg-blue-100 text-blue-800' },
+      active: { text: 'Đang hoạt động', color: 'bg-red-100 text-red-800' },
+      training: { text: 'Đang huấn luyện', color: 'bg-red-100 text-red-800' },
       inactive: { text: 'Không hoạt động', color: 'bg-gray-100 text-gray-800' },
       pending: { text: 'Chờ xử lý', color: 'bg-yellow-100 text-yellow-800' },
       failed: { text: 'Thất bại', color: 'bg-red-100 text-red-800' }
@@ -183,10 +182,9 @@ const AdminFineTuningPage = () => {
   const getDomainBadge = (domain) => {
     const domainInfo = TRAINING_DOMAINS.find(d => d.value === domain) || 
                      { label: domain, color: 'gray' };
-    
-    const colorMap = {
-      blue: 'bg-blue-100 text-blue-800',
-      green: 'bg-green-100 text-green-800',
+      const colorMap = {
+      blue: 'bg-red-100 text-red-800',
+      green: 'bg-red-100 text-red-800',
       yellow: 'bg-yellow-100 text-yellow-800',
       purple: 'bg-purple-100 text-purple-800',
       red: 'bg-red-100 text-red-800',
@@ -204,9 +202,9 @@ const AdminFineTuningPage = () => {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'active':
-        return <IoCheckmarkCircle className="text-green-500" size={20} />;
+        return <IoCheckmarkCircle className="text-red-600" size={20} />;
       case 'training':
-        return <IoTime className="text-blue-500" size={20} />;
+        return <IoTime className="text-red-600" size={20} />;
       case 'failed':
         return <IoCloseCircle className="text-red-500" size={20} />;
       default:
@@ -240,10 +238,10 @@ const AdminFineTuningPage = () => {
 
         {/* Success Message */}
         {successMessage && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-center">
-              <IoCheckmarkCircle className="text-green-500 mr-2" size={20} />
-              <span className="text-green-800">{successMessage}</span>
+              <IoCheckmarkCircle className="text-red-600 mr-2" size={20} />
+              <span className="text-red-800">{successMessage}</span>
             </div>
           </div>
         )}
@@ -251,7 +249,7 @@ const AdminFineTuningPage = () => {
         {/* Loading State */}
         {isLoading ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
           </div>
         ) : (
           <>
@@ -343,7 +341,7 @@ const AdminFineTuningPage = () => {
                   <tr key={model.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
                           {getStatusIcon(model.status)}
                         </div>
                         <div className="ml-4">
@@ -362,7 +360,7 @@ const AdminFineTuningPage = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {model.accuracy ? (
                         <div className="flex items-center">
-                          <IoTrendingUp size={14} className="mr-1 text-green-500" />
+                          <IoTrendingUp size={14} className="mr-1 text-red-600" />
                           {model.accuracy}%
                         </div>
                       ) : (
@@ -383,7 +381,7 @@ const AdminFineTuningPage = () => {
                         {model.status === 'inactive' && (
                           <button
                             onClick={() => handleStartTraining(model.id)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-full"
                             title="Bắt đầu huấn luyện"
                             disabled={loadingModels.has(model.id)}
                           >
@@ -403,7 +401,7 @@ const AdminFineTuningPage = () => {
                         {(model.status === 'inactive' || model.status === 'pending') && (
                           <button
                             onClick={() => handleActivateModel(model.id)}
-                            className="p-2 text-green-600 hover:bg-green-50 rounded-full"
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-full"
                             title="Kích hoạt mô hình"
                             disabled={loadingModels.has(model.id)}
                           >
@@ -423,7 +421,7 @@ const AdminFineTuningPage = () => {
                           <IoSettings size={18} />
                         </button>
                         <button
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-full"
                           title="Tải xuống"
                         >
                           <IoDownload size={18} />
@@ -458,13 +456,13 @@ const AdminFineTuningPage = () => {
             <div className="text-sm text-gray-600">Tổng mô hình</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-red-600">
               {models.filter(m => m.status === 'active').length}
             </div>
             <div className="text-sm text-gray-600">Đang hoạt động</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-red-600">
               {models.filter(m => m.status === 'training').length}
             </div>
             <div className="text-sm text-gray-600">Đang huấn luyện</div>
@@ -477,7 +475,7 @@ const AdminFineTuningPage = () => {
 
         {/* Success Message */}
         {successMessage && (
-          <div className="mt-4 p-4 bg-green-100 text-green-800 rounded-lg">
+          <div className="mt-4 p-4 bg-red-100 text-red-800 rounded-lg">
             {successMessage}
           </div>
         )}

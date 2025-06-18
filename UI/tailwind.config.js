@@ -5,13 +5,17 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {
-      colors: {
+    extend: {      colors: {
         'charcoal': '#111827',
         'pastel-lavender': '#d6ccf2',
         'sky-blue': '#c3e0f0',
-        'off-white': '#fafafa',
-        'soft-beige': '#f5f5f0',
+        'off-white': '#800020', // Màu đỏ booc đô chủ đạo
+        'soft-beige': '#A0001C', // Màu đỏ booc đô đậm
+        'reddish-brown': '#800020', // Màu đỏ booc đô
+        'light-reddish-brown': '#B22B47', // Màu đỏ booc đô nhạt
+        'burgundy': '#800020', // Burgundy chính
+        'light-burgundy': '#B22B47', // Burgundy nhạt
+        'dark-burgundy': '#5D001A', // Burgundy đậm
       },
       fontFamily: {
         'display': ['Playfair Display', 'serif'],

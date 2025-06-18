@@ -128,7 +128,7 @@ const CreateModelModal = ({ isOpen, onClose, onSave }) => {
                 type="text"
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
-                className={`pl-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent ${
+                className={`pl-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-transparent text-gray-900 ${
                   errors.name ? 'border-red-300' : 'border-gray-200'
                 }`}
                 placeholder="VD: AGRIBANK Customer Service v2.0"
@@ -147,7 +147,7 @@ const CreateModelModal = ({ isOpen, onClose, onSave }) => {
             <select
               value={formData.domain}
               onChange={(e) => handleInputChange('domain', e.target.value)}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent ${
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-transparent text-gray-900 ${
                 errors.domain ? 'border-red-300' : 'border-gray-200'
               }`}
             >
@@ -172,7 +172,7 @@ const CreateModelModal = ({ isOpen, onClose, onSave }) => {
               type="text"
               value={formData.trainingData}
               onChange={(e) => handleInputChange('trainingData', e.target.value)}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent ${
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-transparent text-gray-900 ${
                 errors.trainingData ? 'border-red-300' : 'border-gray-200'
               }`}
               placeholder="VD: customer_service_data_2024.jsonl"
@@ -190,7 +190,7 @@ const CreateModelModal = ({ isOpen, onClose, onSave }) => {
             <textarea
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent resize-none ${
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-transparent text-gray-900 resize-none ${
                 errors.description ? 'border-red-300' : 'border-gray-200'
               }`}
               rows={3}
