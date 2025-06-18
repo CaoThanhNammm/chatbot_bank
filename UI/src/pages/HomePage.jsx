@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { IoArrowForward, IoShieldCheckmark, IoSpeedometer, IoChatbubbles, IoStatsChart, IoCard, IoTime, IoPersonOutline } from 'react-icons/io5';
+import { IoArrowForward, IoShieldCheckmark, IoSpeedometer, IoChatbubbles, IoStatsChart, IoCard, IoTime, IoPersonOutline, IoNewspaper, IoTrendingUp, IoCash, IoHome, IoSchool, IoBusinessOutline } from 'react-icons/io5';
 import { Button, Header, Footer } from '../components';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -86,58 +86,78 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Quick Actions */}
+      {/* News and Announcements */}
       <section className="py-16 bg-white">
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
             <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl font-display">
-              Thao tác nhanh
+              Tin tức & Thông báo
             </h2>
             <p className="max-w-2xl mx-auto text-lg text-gray-600">
-              Các tính năng thường dùng để bạn có thể truy cập nhanh chóng
+              Cập nhật những thông tin mới nhất từ AGRIBANK
             </p>
           </div>
           
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <Link to="/chat" className="p-6 text-center transition-all border border-gray-100 rounded-xl hover:shadow-lg hover:border-blue-200">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="p-6 transition-all bg-white border border-gray-100 rounded-xl hover:shadow-lg hover:border-blue-200">
               <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 text-blue-600 bg-blue-100 rounded-full">
-                <IoChatbubbles size={24} />
+                <IoNewspaper size={24} />
               </div>
-              <h3 className="mb-2 text-lg font-semibold text-gray-900">Chat AI</h3>
-              <p className="text-sm text-gray-600">Trò chuyện với trợ lý AI</p>
-            </Link>
+              <div className="mb-2 text-xs font-medium text-blue-600 uppercase tracking-wide">
+                15/12/2024
+              </div>
+              <h3 className="mb-3 text-lg font-semibold text-gray-900">
+                Ra mắt tính năng AI Banking mới
+              </h3>
+              <p className="mb-4 text-sm text-gray-600 line-clamp-3">
+                AGRIBANK chính thức triển khai hệ thống trợ lý AI thông minh, hỗ trợ khách hàng 24/7 với khả năng xử lý ngôn ngữ tự nhiên tiên tiến.
+              </p>
+              <div className="text-sm font-medium text-blue-600 cursor-pointer hover:text-blue-800">
+                Đọc thêm →
+              </div>
+            </div>
 
-            <Link to="/profile" className="p-6 text-center transition-all border border-gray-100 rounded-xl hover:shadow-lg hover:border-blue-200">
+            <div className="p-6 transition-all bg-white border border-gray-100 rounded-xl hover:shadow-lg hover:border-green-200">
               <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 text-green-600 bg-green-100 rounded-full">
-                <IoPersonOutline size={24} />
+                <IoTrendingUp size={24} />
               </div>
-              <h3 className="mb-2 text-lg font-semibold text-gray-900">Hồ sơ</h3>
-              <p className="text-sm text-gray-600">Quản lý thông tin cá nhân</p>
-            </Link>
+              <div className="mb-2 text-xs font-medium text-green-600 uppercase tracking-wide">
+                12/12/2024
+              </div>
+              <h3 className="mb-3 text-lg font-semibold text-gray-900">
+                Ưu đãi lãi suất tiết kiệm tháng 12
+              </h3>
+              <p className="mb-4 text-sm text-gray-600 line-clamp-3">
+                Áp dụng lãi suất ưu đãi lên đến 6.5%/năm cho các kỳ hạn từ 12 tháng trở lên. Chương trình có hiệu lực đến hết tháng 12/2024.
+              </p>
+              <div className="text-sm font-medium text-green-600 cursor-pointer hover:text-green-800">
+                Xem chi tiết →
+              </div>
+            </div>
 
-            {user?.balance && (
-              <div className="p-6 text-center border border-gray-100 rounded-xl">
-                <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 text-purple-600 bg-purple-100 rounded-full">
-                  <IoCard size={24} />
-                </div>
-                <h3 className="mb-2 text-lg font-semibold text-gray-900">Số dư</h3>
-                <p className="text-sm font-medium text-purple-600">{user.balance} VND</p>
+            <div className="p-6 transition-all bg-white border border-gray-100 rounded-xl hover:shadow-lg hover:border-purple-200">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 text-purple-600 bg-purple-100 rounded-full">
+                <IoShieldCheckmark size={24} />
               </div>
-            )}
-
-            <div className="p-6 text-center border border-gray-100 rounded-xl">
-              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 text-orange-600 bg-orange-100 rounded-full">
-                <IoTime size={24} />
+              <div className="mb-2 text-xs font-medium text-purple-600 uppercase tracking-wide">
+                10/12/2024
               </div>
-              <h3 className="mb-2 text-lg font-semibold text-gray-900">Hỗ trợ 24/7</h3>
-              <p className="text-sm text-gray-600">Luôn sẵn sàng hỗ trợ bạn</p>
+              <h3 className="mb-3 text-lg font-semibold text-gray-900">
+                Nâng cấp bảo mật hệ thống
+              </h3>
+              <p className="mb-4 text-sm text-gray-600 line-clamp-3">
+                Triển khai công nghệ xác thực sinh trắc học và mã hóa đa lớp nhằm đảm bảo an toàn tuyệt đối cho mọi giao dịch của khách hàng.
+              </p>
+              <div className="text-sm font-medium text-purple-600 cursor-pointer hover:text-purple-800">
+                Tìm hiểu thêm →
+              </div>
             </div>
           </div>
-          
-          {/* Admin Quick Actions */}
+
+          {/* Admin Quick Actions - Keep for admin users */}
           {user && user.is_admin && (
-            <div className="mt-12">
-              <h3 className="mb-6 text-2xl font-bold text-center text-gray-900">Quản trị hệ thống</h3>
+            <div className="mt-16 pt-12 border-t border-gray-200">
+              <h3 className="mb-8 text-2xl font-bold text-center text-gray-900">Quản trị hệ thống</h3>
               <div className="grid gap-6 md:grid-cols-2">
                 <Link to="/admin/users" className="p-6 text-center transition-all border border-red-100 rounded-xl hover:shadow-lg hover:border-red-200 bg-red-50">
                   <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 text-red-600 bg-red-100 rounded-full">
@@ -160,62 +180,207 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Account Info */}
-      {user && (
-        <section className="py-16 bg-gray-50">
-          <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div className="p-8 bg-white rounded-2xl shadow-sm">
-              <h2 className="mb-6 text-2xl font-bold text-gray-900">Thông tin tài khoản</h2>
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <div className="p-4 bg-blue-50 rounded-lg">
-                  <h3 className="mb-2 text-sm font-medium text-blue-800">Tên hiển thị</h3>
-                  <p className="text-lg font-semibold text-blue-900">{getDisplayName()}</p>
+      {/* Banking Services and Products */}
+      <section className="py-16 bg-gray-50">
+        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="mb-12 text-center">
+            <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl font-display">
+              Dịch vụ & Sản phẩm nổi bật
+            </h2>
+            <p className="max-w-2xl mx-auto text-lg text-gray-600">
+              Khám phá các sản phẩm và dịch vụ ngân hàng hiện đại của AGRIBANK
+            </p>
+          </div>
+          
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="p-8 transition-all bg-white rounded-2xl shadow-sm hover:shadow-lg hover:scale-105">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-6 text-green-600 bg-green-100 rounded-full">
+                <IoCash size={28} />
+              </div>
+              <h3 className="mb-4 text-xl font-semibold text-center text-gray-900">
+                Tiết kiệm Online
+              </h3>
+              <div className="mb-4 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Lãi suất:</span>
+                  <span className="text-sm font-semibold text-green-600">Lên đến 6.5%/năm</span>
                 </div>
-                
-                <div className="p-4 bg-green-50 rounded-lg">
-                  <h3 className="mb-2 text-sm font-medium text-green-800">Email</h3>
-                  <p className="text-lg font-semibold text-green-900 break-all">{user.email}</p>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Kỳ hạn:</span>
+                  <span className="text-sm font-semibold text-gray-900">1-36 tháng</span>
                 </div>
-                
-                {user.username && (
-                  <div className="p-4 bg-cyan-50 rounded-lg">
-                    <h3 className="mb-2 text-sm font-medium text-cyan-800">Tên đăng nhập</h3>
-                    <p className="text-lg font-semibold text-cyan-900">{user.username}</p>
-                  </div>
-                )}
-                
-                <div className="p-4 bg-purple-50 rounded-lg">
-                  <h3 className="mb-2 text-sm font-medium text-purple-800">Vai trò</h3>
-                  <p className="text-lg font-semibold text-purple-900">
-                    {user.is_admin ? 'Quản trị viên' : 'Khách hàng'}
-                  </p>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Số tiền tối thiểu:</span>
+                  <span className="text-sm font-semibold text-gray-900">100.000 VND</span>
                 </div>
-                
-                {user.accountNumber && (
-                  <div className="p-4 bg-orange-50 rounded-lg">
-                    <h3 className="mb-2 text-sm font-medium text-orange-800">Số tài khoản</h3>
-                    <p className="text-lg font-semibold text-orange-900">{user.accountNumber}</p>
-                  </div>
-                )}
-                
-                {user.phone && (
-                  <div className="p-4 bg-indigo-50 rounded-lg">
-                    <h3 className="mb-2 text-sm font-medium text-indigo-800">Số điện thoại</h3>
-                    <p className="text-lg font-semibold text-indigo-900">{user.phone}</p>
-                  </div>
-                )}
-                
-                {user.department && (
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <h3 className="mb-2 text-sm font-medium text-gray-800">Phòng ban</h3>
-                    <p className="text-lg font-semibold text-gray-900">{user.department}</p>
-                  </div>
-                )}
+              </div>
+              <p className="mb-6 text-sm text-center text-gray-600">
+                Gửi tiết kiệm trực tuyến với lãi suất hấp dẫn, linh hoạt thời gian
+              </p>
+              <div className="text-center">
+                <Button size="sm" className="px-6 py-2">
+                  Mở tài khoản
+                </Button>
+              </div>
+            </div>
+
+            <div className="p-8 transition-all bg-white rounded-2xl shadow-sm hover:shadow-lg hover:scale-105">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-6 text-blue-600 bg-blue-100 rounded-full">
+                <IoHome size={28} />
+              </div>
+              <h3 className="mb-4 text-xl font-semibold text-center text-gray-900">
+                Vay mua nhà
+              </h3>
+              <div className="mb-4 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Lãi suất:</span>
+                  <span className="text-sm font-semibold text-blue-600">Từ 6.8%/năm</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Thời hạn:</span>
+                  <span className="text-sm font-semibold text-gray-900">Lên đến 25 năm</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Tỷ lệ cho vay:</span>
+                  <span className="text-sm font-semibold text-gray-900">Lên đến 85%</span>
+                </div>
+              </div>
+              <p className="mb-6 text-sm text-center text-gray-600">
+                Hiện thực hóa giấc mơ sở hữu ngôi nhà với lãi suất ưu đãi
+              </p>
+              <div className="text-center">
+                <Button size="sm" variant="secondary" className="px-6 py-2">
+                  Tư vấn ngay
+                </Button>
+              </div>
+            </div>
+
+            <div className="p-8 transition-all bg-white rounded-2xl shadow-sm hover:shadow-lg hover:scale-105">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-6 text-purple-600 bg-purple-100 rounded-full">
+                <IoSchool size={28} />
+              </div>
+              <h3 className="mb-4 text-xl font-semibold text-center text-gray-900">
+                Vay học tập
+              </h3>
+              <div className="mb-4 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Lãi suất:</span>
+                  <span className="text-sm font-semibold text-purple-600">Từ 5.5%/năm</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Hạn mức:</span>
+                  <span className="text-sm font-semibold text-gray-900">Lên đến 500 triệu</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Ân hạn:</span>
+                  <span className="text-sm font-semibold text-gray-900">Trong thời gian học</span>
+                </div>
+              </div>
+              <p className="mb-6 text-sm text-center text-gray-600">
+                Đầu tư cho tương lai với gói vay học tập ưu đãi đặc biệt
+              </p>
+              <div className="text-center">
+                <Button size="sm" variant="secondary" className="px-6 py-2">
+                  Đăng ký vay
+                </Button>
+              </div>
+            </div>
+
+            <div className="p-8 transition-all bg-white rounded-2xl shadow-sm hover:shadow-lg hover:scale-105">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-6 text-orange-600 bg-orange-100 rounded-full">
+                <IoCard size={28} />
+              </div>
+              <h3 className="mb-4 text-xl font-semibold text-center text-gray-900">
+                Thẻ tín dụng
+              </h3>
+              <div className="mb-4 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Hạn mức:</span>
+                  <span className="text-sm font-semibold text-orange-600">Lên đến 1 tỷ VND</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Miễn phí:</span>
+                  <span className="text-sm font-semibold text-gray-900">Năm đầu tiên</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Hoàn tiền:</span>
+                  <span className="text-sm font-semibold text-gray-900">Lên đến 2%</span>
+                </div>
+              </div>
+              <p className="mb-6 text-sm text-center text-gray-600">
+                Thanh toán thông minh với nhiều ưu đãi và tích lũy điểm thưởng
+              </p>
+              <div className="text-center">
+                <Button size="sm" className="px-6 py-2">
+                  Đăng ký thẻ
+                </Button>
+              </div>
+            </div>
+
+            <div className="p-8 transition-all bg-white rounded-2xl shadow-sm hover:shadow-lg hover:scale-105">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-6 text-indigo-600 bg-indigo-100 rounded-full">
+                <IoTrendingUp size={28} />
+              </div>
+              <h3 className="mb-4 text-xl font-semibold text-center text-gray-900">
+                Đầu tư chứng khoán
+              </h3>
+              <div className="mb-4 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Phí giao dịch:</span>
+                  <span className="text-sm font-semibold text-indigo-600">Từ 0.15%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Số dư tối thiểu:</span>
+                  <span className="text-sm font-semibold text-gray-900">10 triệu VND</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Hỗ trợ:</span>
+                  <span className="text-sm font-semibold text-gray-900">Tư vấn chuyên nghiệp</span>
+                </div>
+              </div>
+              <p className="mb-6 text-sm text-center text-gray-600">
+                Đầu tư thông minh với nền tảng giao dịch hiện đại và an toàn
+              </p>
+              <div className="text-center">
+                <Button size="sm" variant="secondary" className="px-6 py-2">
+                  Tìm hiểu thêm
+                </Button>
+              </div>
+            </div>
+
+            <div className="p-8 transition-all bg-white rounded-2xl shadow-sm hover:shadow-lg hover:scale-105">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-6 text-teal-600 bg-teal-100 rounded-full">
+                <IoBusinessOutline size={28} />
+              </div>
+              <h3 className="mb-4 text-xl font-semibold text-center text-gray-900">
+                Tài khoản doanh nghiệp
+              </h3>
+              <div className="mb-4 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Phí duy trì:</span>
+                  <span className="text-sm font-semibold text-teal-600">Miễn phí 6 tháng</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Giao dịch:</span>
+                  <span className="text-sm font-semibold text-gray-900">Không giới hạn</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Internet Banking:</span>
+                  <span className="text-sm font-semibold text-gray-900">Miễn phí</span>
+                </div>
+              </div>
+              <p className="mb-6 text-sm text-center text-gray-600">
+                Giải pháp tài chính toàn diện cho doanh nghiệp mọi quy mô
+              </p>
+              <div className="text-center">
+                <Button size="sm" variant="secondary" className="px-6 py-2">
+                  Mở tài khoản
+                </Button>
               </div>
             </div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
     </>
   );
 
