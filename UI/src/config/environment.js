@@ -16,22 +16,22 @@ export const CURRENT_ENV = import.meta.env.MODE || ENVIRONMENTS.DEVELOPMENT;
 // API Configurations for different environments
 export const API_CONFIGS = {
   [ENVIRONMENTS.DEVELOPMENT]: {
-    BASE_URL: 'https://1386-171-247-78-59.ngrok-free.app/api',
-    CHAT_ENDPOINT: 'https://896b-34-172-145-7.ngrok-free.app/api/chat', // Using ngrok for development
+    BASE_URL: 'https://21f2-171-247-78-59.ngrok-free.app/api',
+    CHAT_ENDPOINT: 'https://b451-34-9-47-109.ngrok-free.app/api/chat', // Using ngrok for development
     TIMEOUT: 30000,
     USE_EXTERNAL_CHAT: true
   },
   
   [ENVIRONMENTS.STAGING]: {
-    BASE_URL: 'https://1386-171-247-78-59.ngrok-free.app/api',
-    CHAT_ENDPOINT: 'https://896b-34-172-145-7.ngrok-free.app/api/chat',
+    BASE_URL: 'https://21f2-171-247-78-59.ngrok-free.app/api',
+    CHAT_ENDPOINT: 'https://b451-34-9-47-109.ngrok-free.app/api/chat',
     TIMEOUT: 30000,
     USE_EXTERNAL_CHAT: false
   },
   
   [ENVIRONMENTS.PRODUCTION]: {
-    BASE_URL: 'https://1386-171-247-78-59.ngrok-free.app/api',
-    CHAT_ENDPOINT: 'https://896b-34-172-145-7.ngrok-free.app/api/chat',
+    BASE_URL: 'https://21f2-171-247-78-59.ngrok-free.app/api',
+    CHAT_ENDPOINT: 'https://b451-34-9-47-109.ngrok-free.app/api/chat',
     TIMEOUT: 30000,
     USE_EXTERNAL_CHAT: false
   }
@@ -45,10 +45,10 @@ export const getCurrentConfig = () => {
 // Chat API Configuration
 export const CHAT_CONFIG = {
   // Ngrok endpoint for external chat
-  NGROK_ENDPOINT: 'https://896b-34-172-145-7.ngrok-free.app/api/chat',
+  NGROK_ENDPOINT: 'https://b451-34-9-47-109.ngrok-free.app/api/chat',
   
   // Guest chat endpoint (new API)
-  GUEST_CHAT_ENDPOINT: 'https://896b-34-172-145-7.ngrok-free.app/api/chat',
+  GUEST_CHAT_ENDPOINT: 'https://b451-34-9-47-109.ngrok-free.app/api/chat',
   
   // Local endpoint for internal chat
   LOCAL_ENDPOINT: '/api/chat',
