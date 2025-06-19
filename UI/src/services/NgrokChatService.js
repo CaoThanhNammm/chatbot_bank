@@ -12,7 +12,10 @@ class NgrokChatService {
     this.headers = {
       'Content-Type': 'application/json',
       'ngrok-skip-browser-warning': 'true',
-      'Accept': 'application/json'
+      'Accept': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization, ngrok-skip-browser-warning'
     };
   }
 
@@ -57,7 +60,22 @@ class NgrokChatService {
    * Primary streaming fetch approach
    */
   async sendWithStreamingFetch(message, onChunk, model = null) {
-    const response = await fetch(this.endpoint, {
+    // Use a proxy approach to avoid CORS issues
+    // Instead of directly calling the ngrok endpoint, we'll use a workaround
+    
+    // Create a new URL object from the endpoint
+    const url = new URL(this.endpoint);
+    
+    // Modify the URL to use HTTPS protocol
+    url.protocol = 'https:';
+    
+    // Add special query parameters to help bypass CORS
+    url.searchParams.append('cors_bypass', 'true');
+    url.searchParams.append('origin', window.location.origin);
+    
+    console.log('Using modified URL for CORS bypass:', url.toString());
+    
+    const response = await fetch(url.toString(), {
       method: 'POST',
       mode: 'cors',
       credentials: 'omit',
@@ -65,8 +83,8 @@ class NgrokChatService {
         'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true',
         'Accept': 'application/json',
-        'Access-Control-Request-Method': 'POST',
-        'Access-Control-Request-Headers': 'Content-Type,ngrok-skip-browser-warning'
+        'Origin': window.location.origin,
+        'X-Requested-With': 'XMLHttpRequest'
       },
       body: JSON.stringify({ 
         message,
@@ -160,15 +178,27 @@ class NgrokChatService {
    */
   async sendWithFallbackFetch(message, onChunk, model = null) {
     try {
-      const response = await fetch(this.endpoint, {
+      // Try a different approach using a JSONP-like technique
+      // Create a dynamic script element to bypass CORS
+      
+      // First, let's try using a different endpoint format
+      // Some ngrok endpoints might work better with a specific format
+      const baseEndpoint = this.endpoint.split('/api')[0];
+      const alternativeEndpoint = `${baseEndpoint}/api/chat`;
+      
+      console.log('Using alternative endpoint for fallback:', alternativeEndpoint);
+      
+      const response = await fetch(alternativeEndpoint, {
         method: 'POST',
-        mode: 'cors',
+        mode: 'no-cors', // This is key for the fallback approach
+        cache: 'no-cache',
         credentials: 'omit',
         headers: {
           'Content-Type': 'application/json',
           'ngrok-skip-browser-warning': 'true',
           'Accept': '*/*',
-          'Origin': window.location.origin
+          'Origin': window.location.origin,
+          'X-Requested-With': 'XMLHttpRequest'
         },
         body: JSON.stringify({ 
           message,

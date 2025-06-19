@@ -71,10 +71,11 @@ def create_app(chat_model: "ChatModel") -> "FastAPI":
     app = FastAPI(lifespan=partial(lifespan, chat_model=chat_model), root_path=root_path)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=["*", "http://localhost:3000", "https://d15f-35-232-143-151.ngrok-free.app", "https://c790-171-247-78-59.ngrok-free.app"],
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allow_headers=["*", "Content-Type", "Authorization", "Accept", "ngrok-skip-browser-warning"],
+        expose_headers=["Content-Type", "Access-Control-Allow-Origin", "Access-Control-Allow-Methods", "Access-Control-Allow-Headers"],
     )
     api_key = os.getenv("API_KEY")
     security = HTTPBearer(auto_error=False)

@@ -35,10 +35,10 @@ def create_app(config_name=None):
       # Initialize CORS with specific settings
     CORS(app, resources={
         r"/api/*": {
-            "origins": ["http://localhost:5173", "http://localhost:3000", "*"],  # Allow all origins for development
+            "origins": ["http://localhost:5173", "http://localhost:3000", "https://d15f-35-232-143-151.ngrok-free.app", "https://c790-171-247-78-59.ngrok-free.app", "*"],  # Allow all origins for development
             "methods": ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
             "allow_headers": ["Content-Type", "Authorization", "Accept", "ngrok-skip-browser-warning"],
-            "expose_headers": ["Content-Type"],
+            "expose_headers": ["Content-Type", "Access-Control-Allow-Origin", "Access-Control-Allow-Methods", "Access-Control-Allow-Headers"],
             "supports_credentials": True
         }
     })

@@ -12,13 +12,21 @@ class ApiUrlManager {
     // Common headers for ngrok requests
     this.NGROK_HEADERS = {
       'ngrok-skip-browser-warning': 'true',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': 'http://localhost:3000',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+      'Access-Control-Allow-Credentials': 'true'
     };
     
     // Common headers for localhost requests (also using ngrok, so include ngrok headers)
     this.LOCALHOST_HEADERS = {
       'ngrok-skip-browser-warning': 'true',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': 'http://localhost:3000',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+      'Access-Control-Allow-Credentials': 'true'
     };
   }
 
@@ -340,6 +348,30 @@ class ApiUrlManager {
    */
   updateLocalhostBase(newLocalhostBase) {
     this.LOCALHOST_BASE = newLocalhostBase.endsWith('/api') ? newLocalhostBase : `${newLocalhostBase}/api`;
+  }
+
+  /**
+   * Get URL with CORS proxy for problematic endpoints
+   * This is a client-side workaround for CORS issues
+   */
+  getProxiedUrl(endpoint) {
+    // Check if we need to use a CORS proxy
+    const needsProxy = this.isNgrokEndpoint(endpoint);
+    
+    if (!needsProxy) {
+      return this.getUrl(endpoint);
+    }
+    
+    // Use a CORS proxy service
+    // Options:
+    // 1. Use a public CORS proxy (not recommended for production)
+    // const corsProxyUrl = 'https://cors-anywhere.herokuapp.com/';
+    // return `${corsProxyUrl}${this.getNgrokUrl(endpoint)}`;
+    
+    // 2. Use a local proxy approach (better for development)
+    // Add a special parameter to indicate this needs CORS handling
+    const originalUrl = this.getNgrokUrl(endpoint);
+    return `${originalUrl}?cors_bypass=true&origin=${encodeURIComponent(window.location.origin)}`;
   }
 }
 
