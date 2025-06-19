@@ -9,24 +9,30 @@ class ApiUrlManager {
     this.NGROK_BASE = 'https://4484-35-237-117-77.ngrok-free.app/api';
     this.LOCALHOST_BASE = 'https://c790-171-247-78-59.ngrok-free.app/api';
     
-    // Common headers for ngrok requests
+    // Common headers for ngrok requests - Enhanced CORS bypass
     this.NGROK_HEADERS = {
       'ngrok-skip-browser-warning': 'true',
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': 'http://localhost:3000',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
-      'Access-Control-Allow-Credentials': 'true'
+      'Accept': 'application/json, text/plain, */*',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
+      // Additional headers to bypass CORS
+      'X-Requested-With': 'XMLHttpRequest',
+      'Origin': typeof window !== 'undefined' ? window.location.origin : 'https://chatbot-bank.vercel.app',
+      'Referer': typeof window !== 'undefined' ? window.location.href : 'https://chatbot-bank.vercel.app'
     };
     
-    // Common headers for localhost requests (also using ngrok, so include ngrok headers)
+    // Common headers for localhost requests - Enhanced CORS bypass
     this.LOCALHOST_HEADERS = {
       'ngrok-skip-browser-warning': 'true',
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': 'http://localhost:3000',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
-      'Access-Control-Allow-Credentials': 'true'
+      'Accept': 'application/json, text/plain, */*',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
+      // Additional headers to bypass CORS
+      'X-Requested-With': 'XMLHttpRequest',
+      'Origin': typeof window !== 'undefined' ? window.location.origin : 'https://chatbot-bank.vercel.app',
+      'Referer': typeof window !== 'undefined' ? window.location.href : 'https://chatbot-bank.vercel.app'
     };
   }
 
@@ -337,6 +343,21 @@ class ApiUrlManager {
   }
 
   /**
+   * Get CORS-safe headers for any endpoint
+   */
+  getCorsHeaders(endpoint, additionalHeaders = {}) {
+    const baseHeaders = this.getHeaders(endpoint);
+    
+    return {
+      ...baseHeaders,
+      // Force CORS bypass headers
+      'Access-Control-Request-Method': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Request-Headers': 'Content-Type, Authorization, X-Requested-With',
+      ...additionalHeaders
+    };
+  }
+
+  /**
    * Update ngrok base URL (useful for dynamic ngrok URLs)
    */
   updateNgrokBase(newNgrokBase) {
@@ -351,27 +372,130 @@ class ApiUrlManager {
   }
 
   /**
-   * Get URL with CORS proxy for problematic endpoints
-   * This is a client-side workaround for CORS issues
+   * Get URL with CORS bypass parameters
+   * This adds necessary parameters to bypass CORS restrictions
    */
   getProxiedUrl(endpoint) {
-    // Check if we need to use a CORS proxy
-    const needsProxy = this.isNgrokEndpoint(endpoint);
+    const originalUrl = this.getUrl(endpoint);
+    const separator = originalUrl.includes('?') ? '&' : '?';
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://chatbot-bank.vercel.app';
     
-    if (!needsProxy) {
-      return this.getUrl(endpoint);
+    return `${originalUrl}${separator}cors_bypass=true&origin=${encodeURIComponent(origin)}&_t=${Date.now()}`;
+  }
+
+  /**
+   * Make a CORS-safe request with proper headers and error handling
+   */
+  async makeCorsRequest(url, options = {}) {
+    const isNgrok = url.includes('ngrok');
+    const headers = isNgrok ? this.getNgrokHeaders() : this.getLocalhostHeaders();
+    
+    // Merge with provided options
+    const requestOptions = {
+      mode: 'cors',
+      credentials: 'omit', // Avoid credentials for CORS
+      ...options,
+      headers: {
+        ...headers,
+        ...options.headers
+      }
+    };
+
+    try {
+      // First try the original request
+      const response = await fetch(url, requestOptions);
+      
+      if (response.ok) {
+        return response;
+      }
+      
+      // If failed, try with proxied URL
+      if (response.status === 0 || response.status >= 400) {
+        console.warn(`CORS issue detected for ${url}, trying with proxy parameters...`);
+        const proxiedUrl = this.getProxiedUrl(url.replace(/\?.*$/, '').replace(this.NGROK_BASE, '').replace(this.LOCALHOST_BASE, ''));
+        
+        return await fetch(proxiedUrl, {
+          ...requestOptions,
+          mode: 'no-cors' // Fallback to no-cors mode
+        });
+      }
+      
+      return response;
+    } catch (error) {
+      console.error(`Request failed for ${url}:`, error);
+      
+      // Try one more time with no-cors mode
+      try {
+        const proxiedUrl = this.getProxiedUrl(url.replace(/\?.*$/, '').replace(this.NGROK_BASE, '').replace(this.LOCALHOST_BASE, ''));
+        return await fetch(proxiedUrl, {
+          ...requestOptions,
+          mode: 'no-cors'
+        });
+      } catch (fallbackError) {
+        console.error(`Fallback request also failed:`, fallbackError);
+        throw error; // Throw original error
+      }
     }
-    
-    // Use a CORS proxy service
-    // Options:
-    // 1. Use a public CORS proxy (not recommended for production)
-    // const corsProxyUrl = 'https://cors-anywhere.herokuapp.com/';
-    // return `${corsProxyUrl}${this.getNgrokUrl(endpoint)}`;
-    
-    // 2. Use a local proxy approach (better for development)
-    // Add a special parameter to indicate this needs CORS handling
-    const originalUrl = this.getNgrokUrl(endpoint);
-    return `${originalUrl}?cors_bypass=true&origin=${encodeURIComponent(window.location.origin)}`;
+  }
+
+  // ==================== CONVENIENCE METHODS ====================
+  
+  /**
+   * Perform GET request with automatic CORS handling
+   */
+  async get(endpoint, options = {}) {
+    const url = this.getUrl(endpoint);
+    return this.makeCorsRequest(url, {
+      method: 'GET',
+      ...options
+    });
+  }
+
+  /**
+   * Perform POST request with automatic CORS handling
+   */
+  async post(endpoint, data = null, options = {}) {
+    const url = this.getUrl(endpoint);
+    return this.makeCorsRequest(url, {
+      method: 'POST',
+      body: data ? JSON.stringify(data) : null,
+      ...options
+    });
+  }
+
+  /**
+   * Perform PUT request with automatic CORS handling
+   */
+  async put(endpoint, data = null, options = {}) {
+    const url = this.getUrl(endpoint);
+    return this.makeCorsRequest(url, {
+      method: 'PUT',
+      body: data ? JSON.stringify(data) : null,
+      ...options
+    });
+  }
+
+  /**
+   * Perform DELETE request with automatic CORS handling
+   */
+  async delete(endpoint, options = {}) {
+    const url = this.getUrl(endpoint);
+    return this.makeCorsRequest(url, {
+      method: 'DELETE',
+      ...options
+    });
+  }
+
+  /**
+   * Perform PATCH request with automatic CORS handling
+   */
+  async patch(endpoint, data = null, options = {}) {
+    const url = this.getUrl(endpoint);
+    return this.makeCorsRequest(url, {
+      method: 'PATCH',
+      body: data ? JSON.stringify(data) : null,
+      ...options
+    });
   }
 }
 
