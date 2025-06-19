@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { IoSearch, IoAdd, IoPlay, IoStop, IoDownload, IoEye, IoSettings, IoTrendingUp, IoCheckmarkCircle, IoCloseCircle, IoTime } from 'react-icons/io5';
+import { IoSearch, IoDownload, IoTrendingUp, IoCheckmarkCircle, IoCloseCircle, IoTime } from 'react-icons/io5';
 import { ChatHeader } from '../components';
-import { Button, CreateModelModal } from '../components';
-import { mockFineTuningModels, TRAINING_DOMAINS, STATUS_COLORS } from '../data/adminData';
+import { Button } from '../components';
+import { mockFineTuningModels, STATUS_COLORS } from '../data/adminData';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../utils/api';
 
 const AdminFineTuningPage = () => {
   const [models, setModels] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDomain, setSelectedDomain] = useState('all');
+
   const [selectedStatus, setSelectedStatus] = useState('all');
-  const [filteredModels, setFilteredModels] = useState([]);  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [filteredModels, setFilteredModels] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [loadingModels, setLoadingModels] = useState(new Set());
   const [isLoading, setIsLoading] = useState(true);
@@ -21,23 +21,23 @@ const AdminFineTuningPage = () => {
 
   // This component is already protected by AdminRoute, so no need for additional permission check
 
-  // Load fine-tuning jobs from API
+  // Load fine-tuning models from API
   useEffect(() => {
-    const loadJobs = async () => {
+    const loadModels = async () => {
       try {
         setIsLoading(true);
-        const response = await api.fineTuning.getJobs();
+        const response = await api.fineTuning.getModels();
         
         if (response.success) {
           setModels(response.data);
         } else {
           // Fallback to mock data for development
-          console.warn('Fine-tuning API failed, using mock data:', response.error);
+          console.warn('Fine-tuning models API failed, using mock data:', response.error);
           setModels(mockFineTuningModels);
         }
       } catch (error) {
-        console.error('Error loading fine-tuning jobs:', error);
-        setError('Failed to load fine-tuning jobs');
+        console.error('Error loading fine-tuning models:', error);
+        setError('Failed to load fine-tuning models');
         // Fallback to mock data
         setModels(mockFineTuningModels);
       } finally {
@@ -45,7 +45,7 @@ const AdminFineTuningPage = () => {
       }
     };
 
-    loadJobs();
+    loadModels();
   }, []);
 
   // Filter models based on search and filters
@@ -60,78 +60,12 @@ const AdminFineTuningPage = () => {
       );
     }
 
-    if (selectedDomain !== 'all') {
-      filtered = filtered.filter(model => model.domain === selectedDomain);
-    }
-
     if (selectedStatus !== 'all') {
       filtered = filtered.filter(model => model.status === selectedStatus);
     }
 
     setFilteredModels(filtered);
-  }, [models, searchQuery, selectedDomain, selectedStatus]);  const handleStartTraining = async (modelId) => {
-    setLoadingModels(prev => new Set(prev).add(modelId));
-    
-    try {
-      const response = await api.fineTuning.startJob(modelId);
-      
-      if (response.success) {
-        setModels(prev => prev.map(model =>
-          model.id === modelId
-            ? { ...model, status: 'training', updatedAt: new Date() }
-            : model
-        ));
-        setSuccessMessage('Bắt đầu huấn luyện mô hình thành công!');
-      } else {
-        setError(response.error || 'Failed to start training');
-      }
-    } catch (error) {
-      console.error('Error starting training:', error);
-      setError('Đã xảy ra lỗi khi bắt đầu huấn luyện');
-    } finally {
-      setLoadingModels(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(modelId);
-        return newSet;
-      });
-      setTimeout(() => {
-        setSuccessMessage('');
-        setError('');
-      }, 3000);
-    }
-  };
-
-  const handleStopTraining = async (modelId) => {
-    setLoadingModels(prev => new Set(prev).add(modelId));
-    
-    try {
-      const response = await api.fineTuning.stopJob(modelId);
-      
-      if (response.success) {
-        setModels(prev => prev.map(model =>
-          model.id === modelId
-            ? { ...model, status: 'stopped', updatedAt: new Date() }
-            : model
-        ));
-        setSuccessMessage('Dừng huấn luyện mô hình thành công!');
-      } else {
-        setError(response.error || 'Failed to stop training');
-      }
-    } catch (error) {
-      console.error('Error stopping training:', error);
-      setError('Đã xảy ra lỗi khi dừng huấn luyện');
-    } finally {
-      setLoadingModels(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(modelId);
-        return newSet;
-      });
-      setTimeout(() => {
-        setSuccessMessage('');
-        setError('');
-      }, 3000);
-    }
-  };
+  }, [models, searchQuery, selectedStatus]);
 
   const handleActivateModel = (modelId) => {
     setLoadingModels(prev => new Set(prev).add(modelId));
@@ -152,21 +86,15 @@ const AdminFineTuningPage = () => {
     }, 1000);
   };
 
-  const handleSaveModel = (modelData) => {
-    setModels(prev => [modelData, ...prev]);
-    setSuccessMessage('Tạo mô hình mới thành công!');
-    setTimeout(() => setSuccessMessage(''), 3000);
-  };
 
-  const formatDate = (date) => {
-    return date.toLocaleDateString('vi-VN');
-  };
+
+
 
   const getStatusBadge = (status) => {
     const statusMap = {
-      active: { text: 'Đang hoạt động', color: 'bg-green-100 text-green-800' },
+      active: { text: 'Đã kích hoạt', color: 'bg-green-100 text-green-800' },
       training: { text: 'Đang huấn luyện', color: 'bg-blue-100 text-blue-800' },
-      inactive: { text: 'Không hoạt động', color: 'bg-gray-100 text-gray-800' },
+      inactive: { text: 'Đã tải', color: 'bg-gray-100 text-gray-800' },
       pending: { text: 'Chờ xử lý', color: 'bg-yellow-100 text-yellow-800' },
       failed: { text: 'Thất bại', color: 'bg-red-100 text-red-800' }
     };
@@ -180,26 +108,7 @@ const AdminFineTuningPage = () => {
     );
   };
 
-  const getDomainBadge = (domain) => {
-    const domainInfo = TRAINING_DOMAINS.find(d => d.value === domain) || 
-                     { label: domain, color: 'gray' };
-    
-    const colorMap = {
-      blue: 'bg-blue-100 text-blue-800',
-      green: 'bg-green-100 text-green-800',
-      yellow: 'bg-yellow-100 text-yellow-800',
-      purple: 'bg-purple-100 text-purple-800',
-      red: 'bg-red-100 text-red-800',
-      indigo: 'bg-indigo-100 text-indigo-800',
-      gray: 'bg-gray-100 text-gray-800'
-    };
 
-    return (
-      <span className={`px-2 py-1 text-xs font-medium rounded-full ${colorMap[domainInfo.color]}`}>
-        {domainInfo.label}
-      </span>
-    );
-  };
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -274,36 +183,15 @@ const AdminFineTuningPage = () => {
               {/* Filters */}
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
                 <select
-                  value={selectedDomain}
-                  onChange={(e) => setSelectedDomain(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="all">Tất cả lĩnh vực</option>
-                  {TRAINING_DOMAINS.map(domain => (
-                    <option key={domain.value} value={domain.value}>
-                      {domain.label}
-                    </option>
-                  ))}
-                </select>
-
-                <select
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="all">Tất cả trạng thái</option>
-                  <option value="active">Đang hoạt động</option>
                   <option value="training">Đang huấn luyện</option>
-                  <option value="inactive">Không hoạt động</option>
-                  <option value="pending">Chờ xử lý</option>
-                  <option value="failed">Thất bại</option>
+                  <option value="inactive">Đã tải</option>
+                  <option value="active">Đã kích hoạt</option>
                 </select>
-                <Button
-                  onClick={() => setIsCreateModalOpen(true)}
-                  className="flex items-center space-x-2"
-                >
-                  <span>Tạo mô hình mới</span>
-                </Button>
               </div>
             </div>
           </div>
@@ -319,9 +207,6 @@ const AdminFineTuningPage = () => {
                     Mô hình
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Lĩnh vực
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Độ chính xác
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -329,9 +214,6 @@ const AdminFineTuningPage = () => {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Người tạo
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Cập nhật cuối
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Thao tác
@@ -356,9 +238,6 @@ const AdminFineTuningPage = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getDomainBadge(model.domain)}
-                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {model.accuracy ? (
                         <div className="flex items-center">
@@ -375,31 +254,8 @@ const AdminFineTuningPage = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {model.creator}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(model.updatedAt)}
-                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-2">
-                        {model.status === 'inactive' && (
-                          <button
-                            onClick={() => handleStartTraining(model.id)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
-                            title="Bắt đầu huấn luyện"
-                            disabled={loadingModels.has(model.id)}
-                          >
-                            {loadingModels.has(model.id) ? <IoTime className="animate-spin" /> : <IoPlay size={18} />}
-                          </button>
-                        )}
-                        {model.status === 'training' && (
-                          <button
-                            onClick={() => handleStopTraining(model.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-full"
-                            title="Dừng huấn luyện"
-                            disabled={loadingModels.has(model.id)}
-                          >
-                            {loadingModels.has(model.id) ? <IoTime className="animate-spin" /> : <IoStop size={18} />}
-                          </button>
-                        )}
                         {(model.status === 'inactive' || model.status === 'pending') && (
                           <button
                             onClick={() => handleActivateModel(model.id)}
@@ -410,18 +266,6 @@ const AdminFineTuningPage = () => {
                             {loadingModels.has(model.id) ? <IoTime className="animate-spin" /> : <IoCheckmarkCircle size={18} />}
                           </button>
                         )}
-                        <button
-                          className="p-2 text-gray-600 hover:bg-gray-50 rounded-full"
-                          title="Xem chi tiết"
-                        >
-                          <IoEye size={18} />
-                        </button>
-                        <button
-                          className="p-2 text-gray-600 hover:bg-gray-50 rounded-full"
-                          title="Cài đặt"
-                        >
-                          <IoSettings size={18} />
-                        </button>
                         <button
                           className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
                           title="Tải xuống"
@@ -461,7 +305,7 @@ const AdminFineTuningPage = () => {
             <div className="text-2xl font-bold text-green-600">
               {models.filter(m => m.status === 'active').length}
             </div>
-            <div className="text-sm text-gray-600">Đang hoạt động</div>
+            <div className="text-sm text-gray-600">Đã kích hoạt</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="text-2xl font-bold text-blue-600">
@@ -485,12 +329,7 @@ const AdminFineTuningPage = () => {
         )}
       </div>
 
-      {/* Create Model Modal */}
-      <CreateModelModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSave={handleSaveModel}
-      />
+
     </div>
   );
 };

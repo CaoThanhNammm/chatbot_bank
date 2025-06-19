@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { IoAdd, IoTimeOutline, IoLogInOutline, IoTrashOutline, IoEllipsisVertical, IoChatbubbleOutline } from 'react-icons/io5';
+import { IoTimeOutline, IoLogInOutline, IoTrashOutline, IoEllipsisVertical, IoChatbubbleOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import Button from '../ui/Button';
 import { getGuestConversations } from '../../utils/guestChatHistory';
@@ -7,7 +7,6 @@ import { getGuestConversations } from '../../utils/guestChatHistory';
 const SidePanel = ({ 
   isOpen, 
   onClose, 
-  onNewChat, 
   onSelectConversation, 
   onDeleteConversation,
   onClearHistory, 
@@ -102,31 +101,23 @@ const SidePanel = ({
 
   return (
     <>
-      {/* Backdrop for mobile */}
+      {/* Backdrop */}
       {isOpen && (
         <div 
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+          className="fixed inset-0 z-40 bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out"
           onClick={onClose}
         />
       )}
       
       {/* Side panel */}
       <div className={`
-        fixed top-0 left-0 z-50 h-full transition-transform duration-300 transform bg-white shadow-xl w-80
-        lg:relative lg:shadow-none lg:border-r lg:border-gray-100 lg:translate-x-0 lg:h-screen
-        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        fixed top-0 left-0 z-50 h-full transition-all duration-300 ease-in-out transform bg-white shadow-2xl w-80
+        ${isOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}
         flex flex-col
       `}>
+        {/* Header */}
         <div className="p-4 border-b border-gray-100 flex-shrink-0">
-          <Button
-            onClick={onNewChat}
-            className="w-full mb-4"
-            variant="primary"
-          >
-            <IoAdd size={18} className="mr-2" />
-            Cuộc trò chuyện mới
-          </Button>
-          
+          <h2 className="text-lg font-semibold text-gray-800 mb-3">Lịch sử trò chuyện</h2>
           {isGuestMode && (
             <Link to="/login">
               <Button

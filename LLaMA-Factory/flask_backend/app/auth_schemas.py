@@ -3,6 +3,29 @@ Schema validation for authentication API requests.
 """
 
 from marshmallow import Schema, fields, validate, validates, validates_schema, ValidationError
+import re
+
+def validate_strong_password(password):
+    """Validate password strength."""
+    errors = []
+    
+    if len(password) < 8:
+        errors.append('Mật khẩu phải có ít nhất 8 ký tự')
+    
+    if not re.search(r'[a-z]', password):
+        errors.append('Phải có ít nhất 1 chữ cái thường')
+    
+    if not re.search(r'[A-Z]', password):
+        errors.append('Phải có ít nhất 1 chữ cái hoa')
+    
+    if not re.search(r'\d', password):
+        errors.append('Phải có ít nhất 1 số')
+    
+    if not re.search(r'[@$!%*?&]', password):
+        errors.append('Phải có ít nhất 1 ký tự đặc biệt (@$!%*?&)')
+    
+    if errors:
+        raise ValidationError('; '.join(errors))
 
 class RegisterSchema(Schema):
     """Schema for user registration requests."""
@@ -23,7 +46,7 @@ class RegisterSchema(Schema):
     )
     password = fields.String(
         required=True, 
-        validate=validate.Length(min=8),
+        validate=validate_strong_password,
         error_messages={
             'required': 'Mật khẩu là bắt buộc',
             'invalid': 'Mật khẩu không hợp lệ'
@@ -60,7 +83,7 @@ class LoginSchema(Schema):
 class ChangePasswordSchema(Schema):
     """Schema for change password requests."""
     current_password = fields.String(required=True)
-    new_password = fields.String(required=True, validate=validate.Length(min=8))
+    new_password = fields.String(required=True, validate=validate_strong_password)
     confirm_password = fields.String(required=True)
     
     @validates_schema
@@ -79,7 +102,7 @@ class ForgotPasswordSchema(Schema):
 class ResetPasswordSchema(Schema):
     """Schema for reset password requests."""
     token = fields.String(required=True)
-    new_password = fields.String(required=True, validate=validate.Length(min=8))
+    new_password = fields.String(required=True, validate=validate_strong_password)
     confirm_password = fields.String(required=True)
     
     @validates_schema

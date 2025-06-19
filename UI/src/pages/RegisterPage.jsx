@@ -18,6 +18,7 @@ const RegisterPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -33,6 +34,59 @@ const RegisterPage = () => {
         [name]: ''
       }));
     }
+  };
+
+  const handlePasswordFocus = () => {
+    setShowPasswordRequirements(true);
+  };
+
+  const handlePasswordBlur = () => {
+    // Keep showing requirements if password is not empty
+    if (!formData.password) {
+      setShowPasswordRequirements(false);
+    }
+  };
+
+  const validatePassword = (password) => {
+    const errors = [];
+    if (password.length < 8) {
+      errors.push('Mật khẩu phải có ít nhất 8 ký tự');
+    }
+    if (!/(?=.*[a-z])/.test(password)) {
+      errors.push('Phải có ít nhất 1 chữ cái thường');
+    }
+    if (!/(?=.*[A-Z])/.test(password)) {
+      errors.push('Phải có ít nhất 1 chữ cái hoa');
+    }
+    if (!/(?=.*\d)/.test(password)) {
+      errors.push('Phải có ít nhất 1 số');
+    }
+    if (!/(?=.*[@$!%*?&])/.test(password)) {
+      errors.push('Phải có ít nhất 1 ký tự đặc biệt (@$!%*?&)');
+    }
+    return errors;
+  };
+
+  const getPasswordStrength = (password) => {
+    if (!password) return { strength: 0, label: '', color: '' };
+    
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (/(?=.*[a-z])/.test(password)) score++;
+    if (/(?=.*[A-Z])/.test(password)) score++;
+    if (/(?=.*\d)/.test(password)) score++;
+    if (/(?=.*[@$!%*?&])/.test(password)) score++;
+    
+    const strengths = [
+      { strength: 0, label: '', color: '' },
+      { strength: 1, label: 'Rất yếu', color: 'bg-red-500' },
+      { strength: 2, label: 'Yếu', color: 'bg-orange-500' },
+      { strength: 3, label: 'Trung bình', color: 'bg-yellow-500' },
+      { strength: 4, label: 'Mạnh', color: 'bg-green-500' },
+      { strength: 5, label: 'Rất mạnh', color: 'bg-emerald-500' }
+    ];
+    
+    return strengths[score];
   };
 
   const validateForm = () => {
@@ -52,8 +106,11 @@ const RegisterPage = () => {
 
     if (!formData.password) {
       newErrors.password = 'Mật khẩu không được để trống';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Mật khẩu phải có ít nhất 8 ký tự';
+    } else {
+      const passwordErrors = validatePassword(formData.password);
+      if (passwordErrors.length > 0) {
+        newErrors.password = passwordErrors[0]; // Show first error
+      }
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -296,6 +353,8 @@ const RegisterPage = () => {
               required
               value={formData.password}
               onChange={handleInputChange}
+              onFocus={handlePasswordFocus}
+              onBlur={handlePasswordBlur}
               className={`pl-10 pr-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent ${
                 errors.password ? 'border-red-300' : 'border-gray-200'
               }`}
@@ -313,8 +372,48 @@ const RegisterPage = () => {
               )}
             </button>
           </div>
+          
+          {/* Password Strength Indicator */}
+          {formData.password && (
+            <div className="mt-2">
+              <div className="flex items-center space-x-2 mb-1">
+                <div className="flex-1 bg-gray-200 rounded-full h-2">
+                  <div 
+                    className={`h-2 rounded-full transition-all duration-300 ${getPasswordStrength(formData.password).color}`}
+                    style={{ width: `${(getPasswordStrength(formData.password).strength / 5) * 100}%` }}
+                  />
+                </div>
+                <span className="text-xs text-gray-600 font-medium">{getPasswordStrength(formData.password).label}</span>
+              </div>
+            </div>
+          )}
+          
           {errors.password && (
             <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+          )}
+          
+          {/* Password Requirements */}
+          {(showPasswordRequirements || formData.password) && (
+            <div className="mt-2 text-xs text-gray-600 animate-fade-in">
+              <p className="mb-1 font-medium">Mật khẩu phải có:</p>
+              <ul className="space-y-0.5 pl-3">
+                <li className={formData.password.length >= 8 ? 'text-green-600 font-medium' : ''}>
+                  • Ít nhất 8 ký tự
+                </li>
+                <li className={/(?=.*[a-z])/.test(formData.password) ? 'text-green-600 font-medium' : ''}>
+                  • Ít nhất 1 chữ cái thường
+                </li>
+                <li className={/(?=.*[A-Z])/.test(formData.password) ? 'text-green-600 font-medium' : ''}>
+                  • Ít nhất 1 chữ cái hoa
+                </li>
+                <li className={/(?=.*\d)/.test(formData.password) ? 'text-green-600 font-medium' : ''}>
+                  • Ít nhất 1 số
+                </li>
+                <li className={/(?=.*[@$!%*?&])/.test(formData.password) ? 'text-green-600 font-medium' : ''}>
+                  • Ít nhất 1 ký tự đặc biệt
+                </li>
+              </ul>
+            </div>
           )}
         </div>
 

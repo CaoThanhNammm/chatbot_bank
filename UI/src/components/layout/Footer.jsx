@@ -68,8 +68,7 @@ const Footer = () => {
           {/* Contact Info */}
           <div>
             <h4 className="text-white font-semibold mb-4">Liên hệ</h4>
-            <ul className="space-y-2 text-sm">
-              <li className="text-gray-400">
+            <ul className="space-y-2 text-sm">              <li className="text-gray-400">
                 📧 support@AGRIBANK-ai.com
               </li>
               <li className="text-gray-400">

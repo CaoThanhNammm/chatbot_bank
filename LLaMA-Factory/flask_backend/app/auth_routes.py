@@ -208,3 +208,169 @@ def get_user_profile():
         'success': True,
         'user': request.user
     }), 200
+
+@auth_bp.route('/activate', methods=['GET'])
+def activate_account():
+    """Activate user account using token from email link."""
+    token = request.args.get('token')
+    
+    if not token:
+        return """
+        <html>
+        <head>
+            <title>Lỗi kích hoạt</title>
+            <style>
+                body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                .error { color: #d32f2f; }
+            </style>
+        </head>
+        <body>
+            <h2 class="error">Lỗi kích hoạt tài khoản</h2>
+            <p>Token kích hoạt không hợp lệ.</p>
+        </body>
+        </html>
+        """, 400
+    
+    # Activate user
+    success, message = auth_manager.activate_user(token)
+    
+    if success:
+        # Redirect to login page with success message
+        frontend_url = current_app.config.get('FRONTEND_URL', 'http://localhost:3000')
+        return f"""
+        <html>
+        <head>
+            <title>Kích hoạt thành công</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; text-align: center; padding: 50px; }}
+                .success {{ color: #4CAF50; }}
+                .button {{ display: inline-block; padding: 12px 24px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }}
+            </style>
+        </head>
+        <body>
+            <h2 class="success">Kích hoạt tài khoản thành công!</h2>
+            <p>{message}</p>
+            <p>Bạn có thể đăng nhập ngay bây giờ.</p>
+            <a href="{frontend_url}/login" class="button">Đăng nhập</a>
+            <script>
+                // Auto redirect after 3 seconds
+                setTimeout(function() {{
+                    window.location.href = '{frontend_url}/login';
+                }}, 3000);
+            </script>
+        </body>
+        </html>
+        """
+    else:
+        return f"""
+        <html>
+        <head>
+            <title>Lỗi kích hoạt</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; text-align: center; padding: 50px; }}
+                .error {{ color: #d32f2f; }}
+            </style>
+        </head>
+        <body>
+            <h2 class="error">Lỗi kích hoạt tài khoản</h2>
+            <p>{message}</p>
+        </body>
+        </html>
+        """, 400
+
+@auth_bp.route('/resend-activation', methods=['POST'])
+def resend_activation():
+    """Resend activation email."""
+    data = request.json
+    if not data or not data.get('email'):
+        return jsonify({
+            'success': False,
+            'message': 'Email là bắt buộc'
+        }), 400
+    
+    email = data.get('email')
+    
+    # Find user by email
+    from .auth_models import User
+    user = User.query.filter_by(email=email).first()
+    
+    if not user:
+        # For security, don't reveal if email doesn't exist
+        return jsonify({
+            'success': True,
+            'message': 'Nếu email tồn tại và chưa được kích hoạt, email kích hoạt sẽ được gửi lại.'
+        }), 200
+    
+    if user.is_active == 1:
+        return jsonify({
+            'success': False,
+            'message': 'Tài khoản đã được kích hoạt'
+        }), 400
+    
+    if user.is_active == -1:
+        return jsonify({
+            'success': False,
+            'message': 'Tài khoản không tồn tại'
+        }), 400
+    
+    # Check throttling
+    should_resend = auth_manager._should_resend_activation_email(user)
+    if not should_resend:
+        return jsonify({
+            'success': False,
+            'message': 'Vui lòng đợi 5 phút trước khi yêu cầu gửi lại email kích hoạt'
+        }), 429
+    
+    # Resend activation email
+    try:
+        auth_manager._resend_activation_email(user)
+        return jsonify({
+            'success': True,
+            'message': 'Email kích hoạt đã được gửi lại'
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': 'Có lỗi xảy ra khi gửi email'
+        }), 500
+
+@auth_bp.route('/update-active', methods=['POST'])
+@token_required
+def update_active_status():
+    """Update user active status (admin only)."""
+    # Check if user is admin
+    if not request.user.get('is_admin', False):
+        return jsonify({
+            'success': False,
+            'message': 'Không có quyền truy cập'
+        }), 403
+    
+    data = request.json
+    if not data:
+        return jsonify({
+            'success': False,
+            'message': 'Dữ liệu không hợp lệ'
+        }), 400
+    
+    user_id = data.get('user_id')
+    status = data.get('status')
+    
+    if not user_id or status is None:
+        return jsonify({
+            'success': False,
+            'message': 'Thiếu user_id hoặc status'
+        }), 400
+    
+    # Update active status
+    success, message = auth_manager.update_active_status(user_id, status)
+    
+    if success:
+        return jsonify({
+            'success': True,
+            'message': message
+        }), 200
+    else:
+        return jsonify({
+            'success': False,
+            'message': message
+        }), 400

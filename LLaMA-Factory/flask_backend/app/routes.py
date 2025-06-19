@@ -654,3 +654,50 @@ def delete_conversation(conversation_id):
             "success": False,
             "message": message
         }), 404
+
+# Ngrok utility routes
+@api_bp.route('/ngrok/status', methods=['GET'])
+def get_ngrok_status():
+    """Get current ngrok URL and status."""
+    from .ngrok_utils import ngrok_utils
+    
+    try:
+        current_url = ngrok_utils.get_ngrok_url()
+        backend_url = ngrok_utils.get_backend_url()
+        frontend_url = ngrok_utils.get_frontend_url()
+        
+        return jsonify({
+            "success": True,
+            "data": {
+                "ngrok_url": current_url,
+                "backend_url": backend_url,
+                "frontend_url": frontend_url,
+                "is_ngrok_detected": current_url != "https://c0c5-171-247-78-59.ngrok-free.app"
+            }
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": f"Error getting ngrok status: {str(e)}"
+        }), 500
+
+@api_bp.route('/ngrok/refresh', methods=['POST'])
+def refresh_ngrok_url():
+    """Refresh and get new ngrok URL."""
+    from .ngrok_utils import ngrok_utils
+    
+    try:
+        new_url = ngrok_utils.refresh_url()
+        
+        return jsonify({
+            "success": True,
+            "data": {
+                "new_url": new_url,
+                "message": "Ngrok URL refreshed successfully"
+            }
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": f"Error refreshing ngrok URL: {str(e)}"
+        }), 500

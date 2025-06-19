@@ -52,12 +52,14 @@ def create_app(config_name=None):
     # Import and register blueprints
     from .routes import api_bp
     from .auth_routes import auth_bp
+    from .admin_routes import admin_bp
     
     app.register_blueprint(api_bp, url_prefix='/api')
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    app.register_blueprint(admin_bp, url_prefix='/api/admin')
     
     # Import all models to ensure they are registered with SQLAlchemy
-    from .auth_models import User, PasswordResetToken
+    from .auth_models import User, PasswordResetToken, ActivationToken
     from .models.conversation import Conversation, Message
     from .models.finetune import FinetuningTask
     from .models.model import ModelConfig

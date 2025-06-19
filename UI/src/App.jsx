@@ -12,7 +12,7 @@ import ProfilePage from './pages/ProfilePage';
 import AdminUsersPage from './pages/AdminUsersPage';
 import AdminFineTuningPage from './pages/AdminFineTuningPage';
 import StaffTrainingPage from './pages/StaffTrainingPage';
-import ConversationsDebugPage from './pages/ConversationsDebugPage';
+import ConversationsPage from './pages/ConversationsPage';
 import MessageFormattingTestPage from './pages/MessageFormattingTestPage';
 import ProtectedRoute from './routes/ProtectedRoute';
 import AdminRoute from './routes/AdminRoute';
@@ -79,12 +79,12 @@ function App() {
             }
           />
           
-          {/* Debug Routes */}
+          {/* Conversations Route */}
           <Route
-            path="/debug/conversations"
+            path="/conversations"
             element={
               <ProtectedRoute>
-                <ConversationsDebugPage />
+                <ConversationsPage />
               </ProtectedRoute>
             }
           />

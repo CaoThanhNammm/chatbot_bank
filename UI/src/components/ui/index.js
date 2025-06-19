@@ -9,3 +9,6 @@ export { default as UserModal } from './UserModal';
 export { default as RoleSwitcher } from './RoleSwitcher';
 export { default as CreateModelModal } from './CreateModelModal';
 export { default as UserProfile } from './UserProfile';
+export { default as ConfirmationModal } from './ConfirmationModal';
+export { default as SuccessModal } from './SuccessModal';
+export { default as Toast } from './Toast';

@@ -1,10 +1,13 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { IoMenuOutline, IoCloseOutline } from 'react-icons/io5';
-import { Button, ChatHeader, ChatWindow, ChatInput, SidePanel, SettingsModal, ChatHistoryModal, ChatPrefix } from '../components';
+import { IoMenuOutline, IoAdd, IoTrashOutline } from 'react-icons/io5';
+import { Link } from 'react-router-dom';
+import { Button, ChatWindow, ChatInput, SidePanel } from '../components';
+import { ConfirmationModal, Toast } from '../components/ui';
 import { useAuth } from '../contexts/AuthContext';
 import { useConversations } from '../hooks/useConversations';
 import { useStreamingMessage } from '../hooks/useStreamingMessage';
 import { chatApi } from '../utils/api';
+import agribankLogo from '../assets/icon.jpg';
 
 const ChatPage = () => {
   const { user, authenticated, loading } = useAuth();
@@ -24,10 +27,11 @@ const ChatPage = () => {
   } = useConversations();
   
   const [isTyping, setIsTyping] = useState(false);
-  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false); // Will be set based on screen size
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false); // Always start closed
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
+  const [showClearConfirmModal, setShowClearConfirmModal] = useState(false);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [isClearingConversation, setIsClearingConversation] = useState(false);
   
   // Use streaming message hook for optimized performance
   const { startStreaming, updateStreamingContent, finishStreaming } = useStreamingMessage();
@@ -56,25 +60,7 @@ const ChatPage = () => {
     );
   }
 
-  // Set sidebar visibility based on screen size
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) { // lg breakpoint
-        setIsSidePanelOpen(true);
-      } else {
-        setIsSidePanelOpen(false);
-      }
-    };
-
-    // Set initial state
-    handleResize();
-
-    // Add event listener
-    window.addEventListener('resize', handleResize);
-
-    // Cleanup
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  // Sidebar is always hidden by default and controlled by toggle button only
   
   // Banking-specific fallback responses
   const getBankingResponse = useCallback((message) => {
@@ -136,13 +122,7 @@ const ChatPage = () => {
             setCurrentConversation(newConversation);
             console.log('New conversation created and set as current:', newConversation);
             
-            // On mobile, briefly show sidebar to indicate new conversation was created
-            if (window.innerWidth < 1024) {
-              setIsSidePanelOpen(true);
-              setTimeout(() => {
-                setIsSidePanelOpen(false);
-              }, 2000); // Show for 2 seconds
-            }
+            // No need to show sidebar since the new chat button is now outside
           }
         } catch (convError) {
           console.warn('Failed to create conversation:', convError);
@@ -252,11 +232,8 @@ const ChatPage = () => {
       // Select the conversation and load its messages
       await selectConversation(conversation);
       
-      // Close modals and sidebar on mobile
-      setIsHistoryOpen(false);
-      if (window.innerWidth < 1024) {
-        setIsSidePanelOpen(false);
-      }
+      // Close sidebar after selecting conversation
+      setIsSidePanelOpen(false);
       
       console.log('ChatPage: Conversation selection completed');
     } catch (error) {
@@ -275,51 +252,140 @@ const ChatPage = () => {
     }
   }, [deleteConversation]);
 
+  const handleClearConversation = useCallback(() => {
+    setShowClearConfirmModal(true);
+  }, []);
+
+  const handleConfirmClear = useCallback(async () => {
+    setIsClearingConversation(true);
+    
+    try {
+      if (!currentConversation) {
+        // If no conversation, just clear current messages
+        setCurrentMessages([]);
+        setShowClearConfirmModal(false);
+        setShowSuccessToast(true);
+        return;
+      }
+
+      // Call API to clear conversation
+      const response = await chatApi.clearConversation(currentConversation.id);
+      if (response.success) {
+        // Clear messages in UI
+        setCurrentMessages([]);
+        setShowClearConfirmModal(false);
+        setShowSuccessToast(true);
+        console.log('Conversation cleared successfully');
+      } else {
+        console.error('Failed to clear conversation:', response.error);
+        alert('Có lỗi xảy ra khi xóa tin nhắn. Vui lòng thử lại.');
+        setShowClearConfirmModal(false);
+      }
+    } catch (error) {
+      console.error('Error clearing conversation:', error);
+      alert('Có lỗi xảy ra khi xóa tin nhắn. Vui lòng thử lại.');
+      setShowClearConfirmModal(false);
+    } finally {
+      setIsClearingConversation(false);
+    }
+  }, [currentConversation, setCurrentMessages]);
+
   // Simple chat mode - no auto-save needed
 
   return (
     <div className="flex h-screen bg-off-white">
-      {/* Side Panel - Always visible on desktop, toggleable on mobile */}
-      <div className={`${isSidePanelOpen ? 'block' : 'hidden'} lg:block`}>
-        <SidePanel
-          isOpen={isSidePanelOpen}
-          onClose={() => setIsSidePanelOpen(false)}
-          onNewChat={handleNewChat}
-          onSelectConversation={handleSelectConversation}
-          onDeleteConversation={handleDeleteConversation}
-          conversations={conversations}
-          currentConversation={currentConversation}
-          loading={conversationsLoading || isCreatingConversation}
-        />
-      </div>
+      {/* Side Panel - Always hidden by default, slides out when toggled */}
+      <SidePanel
+        isOpen={isSidePanelOpen}
+        onClose={() => setIsSidePanelOpen(false)}
+        onSelectConversation={handleSelectConversation}
+        onDeleteConversation={handleDeleteConversation}
+        conversations={conversations}
+        currentConversation={currentConversation}
+        loading={conversationsLoading || isCreatingConversation}
+      />
       
       {/* Main Chat Area */}
       <div className="flex flex-col flex-1 min-w-0">
-        {/* Header */}
-        <div className="relative">
-          <ChatHeader 
-            variant="chat"
-            onSettingsClick={() => setIsSettingsOpen(true)}
-            onHistoryClick={() => setIsHistoryOpen(true)}
-          />
+        {/* Header Area - Minimal */}
+        <div className="relative bg-white border-b border-gray-200 p-4">
+          {/* Left side buttons */}
+          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 flex items-center space-x-1 z-10">
+            {/* Menu toggle button */}
+            <div className="relative group">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsSidePanelOpen(!isSidePanelOpen)}
+                className={`p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-105 ${
+                  isSidePanelOpen ? 'text-primary bg-blue-50' : 'text-gray-600'
+                }`}
+                aria-label={isSidePanelOpen ? "Đóng menu" : "Mở menu"}
+              >
+                <IoMenuOutline size={20} className={`transition-transform duration-200 ${isSidePanelOpen ? 'rotate-90' : ''}`} />
+              </Button>
+              {/* Tooltip */}
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+                {isSidePanelOpen ? "Đóng menu" : "Mở menu"}
+              </div>
+            </div>
+            
+            {/* New chat button */}
+            <div className="relative group">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleNewChat}
+                className="p-2 rounded-lg transition-all duration-200 hover:bg-blue-100 hover:scale-105 text-blue-600 hover:text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Tạo cuộc trò chuyện mới"
+                disabled={isCreatingConversation}
+              >
+                {isCreatingConversation ? (
+                  <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <IoAdd size={20} />
+                )}
+              </Button>
+              {/* Tooltip */}
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+                {isCreatingConversation ? "Đang tạo..." : "Tạo cuộc trò chuyện mới"}
+              </div>
+            </div>
+            
+            {/* Clear conversation button */}
+            <div className="relative group">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClearConversation}
+                className="p-2 rounded-lg transition-all duration-200 hover:bg-red-100 hover:scale-105 text-red-600 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Xóa tất cả tin nhắn"
+                disabled={currentMessages.length === 0}
+              >
+                <IoTrashOutline size={20} />
+              </Button>
+              {/* Tooltip */}
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+                Xóa tất cả tin nhắn
+              </div>
+            </div>
+          </div>
           
-          {/* User Welcome Message */}
-          <ChatPrefix user={user} />
-          
-          {/* Menu toggle button - visible on mobile and desktop */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsSidePanelOpen(!isSidePanelOpen)}
-            className="absolute p-2 transform -translate-y-1/2 left-4 top-1/2"
-            aria-label="Toggle menu"
-          >
-            {isSidePanelOpen ? (
-              <IoCloseOutline size={20} />
-            ) : (
-              <IoMenuOutline size={20} />
-            )}
-          </Button>
+          {/* Logo area */}
+          <div className="flex items-center justify-center px-20">
+            <Link 
+              to="/" 
+              className="flex items-center space-x-3 hover:opacity-80 transition-all duration-200 hover:scale-105 px-2 py-1 rounded-lg"
+              aria-label="Về trang chủ"
+            >
+              <img 
+                src={agribankLogo} 
+                alt="AGRIBANK Logo" 
+                className="h-8 w-auto object-contain rounded shadow-sm"
+              />
+              <span className="text-lg font-semibold text-gray-800 hidden sm:block">AGRIBANK</span>
+            </Link>
+          </div>
         </div>
         
         {/* Chat Window */}
@@ -335,20 +401,33 @@ const ChatPage = () => {
           disabled={isTyping}
         />
       </div>
-      
-      {/* Settings Modal */}
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showClearConfirmModal}
+        onClose={() => setShowClearConfirmModal(false)}
+        onConfirm={handleConfirmClear}
+        title="Xóa tất cả tin nhắn"
+        message={
+          currentConversation 
+            ? "Bạn có chắc chắn muốn xóa tất cả tin nhắn trong cuộc trò chuyện này không? Hành động này không thể hoàn tác."
+            : "Bạn có chắc chắn muốn xóa tất cả tin nhắn hiện tại không?"
+        }
+        confirmText="Xóa tất cả"
+        cancelText="Hủy"
+        type="danger"
+        loading={isClearingConversation}
       />
-      
-      {/* Chat History Modal */}
-      <ChatHistoryModal
-        isOpen={isHistoryOpen}
-        onClose={() => setIsHistoryOpen(false)}
-        onSelectConversation={handleSelectConversation}
-        conversations={conversations}
-        onDeleteConversation={handleDeleteConversation}
+
+      {/* Success Toast */}
+      <Toast
+        isOpen={showSuccessToast}
+        onClose={() => setShowSuccessToast(false)}
+        title="Xóa thành công!"
+        message="Tất cả tin nhắn đã được xóa thành công."
+        type="success"
+        duration={3000}
+        position="top-right"
       />
     </div>
   );

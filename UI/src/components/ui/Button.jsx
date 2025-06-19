@@ -16,7 +16,9 @@ const Button = ({
     primary: 'bg-charcoal text-white hover:bg-gray-800 disabled:bg-gray-400',
     secondary: 'bg-white text-charcoal border border-gray-200 hover:bg-gray-50 disabled:bg-gray-100',
     ghost: 'bg-transparent text-charcoal hover:bg-gray-100 disabled:text-gray-400',
-    accent: 'bg-pastel-lavender text-charcoal hover:bg-purple-200 disabled:bg-gray-200'
+    accent: 'bg-pastel-lavender text-charcoal hover:bg-purple-200 disabled:bg-gray-200',
+    danger: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-400',
+    warning: 'bg-yellow-600 text-white hover:bg-yellow-700 disabled:bg-yellow-400'
   };
   
   const sizes = {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IoSearch, IoAdd, IoEllipsisVertical, IoPerson, IoMail, IoCalendar, IoCheckmarkCircle, IoCloseCircle } from 'react-icons/io5';
+import { IoSearch, IoAdd, IoEllipsisVertical, IoPerson, IoMail, IoCalendar, IoCheckmarkCircle, IoCloseCircle, IoLockClosed, IoEye } from 'react-icons/io5';
 import { ChatHeader } from '../components';
 import { Button, UserModal } from '../components';
 import { mockUsers, STATUS_COLORS } from '../data/adminData';
@@ -15,7 +15,7 @@ const AdminUsersPage = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
-  const [deleteConfirm, setDeleteConfirm] = useState(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -31,7 +31,11 @@ const AdminUsersPage = () => {
         const response = await api.admin.getUsers();
         
         if (response.success) {
-          setUsers(response.data);
+          // Handle different response formats
+          const usersData = Array.isArray(response.data) ? response.data : 
+                           (response.data && Array.isArray(response.data.data)) ? response.data.data :
+                           [];
+          setUsers(usersData);
         } else {
           // Fallback to mock data for development
           console.warn('API failed, using mock data:', response.error);
@@ -52,13 +56,19 @@ const AdminUsersPage = () => {
 
   // Filter users based on search and filters
   useEffect(() => {
+    if (!Array.isArray(users)) {
+      setFilteredUsers([]);
+      return;
+    }
+
     let filtered = users;
 
     if (searchQuery) {
       filtered = filtered.filter(user =>
-        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.department?.toLowerCase().includes(searchQuery.toLowerCase())
+        user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (user.first_name && user.first_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (user.last_name && user.last_name.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
 
@@ -75,6 +85,7 @@ const AdminUsersPage = () => {
     try {
       const user = users.find(u => u.id === userId);
       const newStatus = user.status === 'active' ? 'inactive' : 'active';
+      const newIsActive = newStatus === 'active' ? 1 : -1; // Cập nhật isActive = -1 khi khóa
       
       let response;
       if (newStatus === 'active') {
@@ -86,7 +97,7 @@ const AdminUsersPage = () => {
       if (response.success) {
         setUsers(prev => prev.map(user =>
           user.id === userId
-            ? { ...user, status: newStatus }
+            ? { ...user, status: newStatus, isActive: newIsActive }
             : user
         ));
         setSuccessMessage('Cập nhật trạng thái người dùng thành công!');
@@ -104,43 +115,17 @@ const AdminUsersPage = () => {
     }, 3000);
   };
 
-  const handleDeleteUser = (userId) => {
-    setDeleteConfirm(userId);
-  };
 
-  const confirmDelete = async () => {
-    if (deleteConfirm) {
-      try {
-        const response = await api.admin.deleteUser(deleteConfirm);
-        
-        if (response.success) {
-          setUsers(prev => prev.filter(user => user.id !== deleteConfirm));
-          setSuccessMessage('Xóa người dùng thành công!');
-        } else {
-          setError(response.error || 'Failed to delete user');
-        }
-      } catch (error) {
-        console.error('Error deleting user:', error);
-        setError('Đã xảy ra lỗi khi xóa người dùng');
-      }
-      
-      setTimeout(() => {
-        setSuccessMessage('');
-        setError('');
-      }, 3000);
-      setDeleteConfirm(null);
-    }
-  };
 
   const handleSaveUser = (userData) => {
     if (editingUser) {
-      // Update existing user
+      // Update existing user with data from API
       setUsers(prev => prev.map(user => 
         user.id === editingUser.id ? userData : user
       ));
       setSuccessMessage('Cập nhật thông tin người dùng thành công!');
     } else {
-      // Add new user
+      // Add new user (for future implementation)
       setUsers(prev => [userData, ...prev]);
       setSuccessMessage('Thêm người dùng mới thành công!');
     }
@@ -149,7 +134,38 @@ const AdminUsersPage = () => {
   };
 
   const formatDate = (date) => {
-    return date.toLocaleDateString('vi-VN');
+    if (!date) return 'Chưa có';
+    
+    // Handle both Date objects and ISO strings
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    
+    if (isNaN(dateObj.getTime())) return 'Không hợp lệ';
+    
+    const now = new Date();
+    const diffTime = Math.abs(now - dateObj);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    // Nếu trong vòng 7 ngày, hiển thị tương đối
+    if (diffDays <= 7) {
+      if (diffDays === 0) return 'Hôm nay';
+      if (diffDays === 1) return 'Hôm qua';
+      return `${diffDays} ngày trước`;
+    }
+    
+    // Nếu cùng năm, bỏ năm
+    if (dateObj.getFullYear() === now.getFullYear()) {
+      return dateObj.toLocaleDateString('vi-VN', {
+        month: '2-digit',
+        day: '2-digit'
+      });
+    }
+    
+    // Hiển thị đầy đủ nhưng ngắn gọn
+    return dateObj.toLocaleDateString('vi-VN', {
+      year: '2-digit',
+      month: '2-digit',
+      day: '2-digit'
+    });
   };
 
   const getStatusBadge = (status) => {
@@ -168,7 +184,6 @@ const AdminUsersPage = () => {
   const getRoleBadge = (role) => {
     const roleMap = {
       admin: { text: 'Quản trị viên', color: 'bg-red-100 text-red-800' },
-      staff: { text: 'Nhân viên', color: 'bg-blue-100 text-blue-800' },
       user: { text: 'Khách hàng', color: 'bg-gray-100 text-gray-800' }
     };
 
@@ -240,7 +255,6 @@ const AdminUsersPage = () => {
                 >
                   <option value="all">Tất cả vai trò</option>
                   <option value="admin">Quản trị viên</option>
-                  <option value="staff">Nhân viên</option>
                   <option value="user">Khách hàng</option>
                 </select>
 
@@ -276,22 +290,19 @@ const AdminUsersPage = () => {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/6">
                       Người dùng
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
                       Vai trò
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Phòng ban
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
                       Trạng thái
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
                       Đăng nhập cuối
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
                       Thao tác
                     </th>
                   </tr>
@@ -299,68 +310,75 @@ const AdminUsersPage = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredUsers.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 py-3 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                          <IoPerson size={20} className="text-gray-500" />
+                        <div className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <IoPerson size={14} className="text-gray-500" />
                         </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {user.name}
+                        <div className="ml-2 min-w-0 flex-1">
+                          <div className="text-sm font-medium text-gray-900 truncate">
+                            {user.first_name && user.last_name 
+                              ? `${user.first_name} ${user.last_name}` 
+                              : user.name || user.username}
                           </div>
-                          <div className="text-sm text-gray-500 flex items-center">
-                            <IoMail size={14} className="mr-1" />
-                            {user.email}
+                          <div className="text-xs text-gray-500 flex items-center truncate">
+                            <IoMail size={10} className="mr-1 flex-shrink-0" />
+                            <span className="truncate">{user.email}</span>
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 py-3 whitespace-nowrap">
                       {getRoleBadge(user.role)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {user.department || '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 py-3 whitespace-nowrap">
                       {getStatusBadge(user.status)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-2 py-3 whitespace-nowrap text-sm text-gray-500">
                       <div className="flex items-center">
-                        <IoCalendar size={14} className="mr-1" />
-                        {formatDate(user.lastLogin)}
+                        <IoCalendar size={10} className="mr-1 flex-shrink-0" />
+                        <span className="truncate text-xs" title={user.lastLogin ? new Date(user.lastLogin).toLocaleString('vi-VN') : 'Chưa có'}>
+                          {formatDate(user.lastLogin)}
+                        </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end space-x-2">
-                        <button
-                          onClick={() => handleStatusToggle(user.id)}
-                          className={`p-2 rounded-full ${
-                            user.status === 'active'
-                              ? 'text-red-600 hover:bg-red-50'
-                              : 'text-green-600 hover:bg-green-50'
-                          }`}
-                          title={user.status === 'active' ? 'Vô hiệu hóa' : 'Kích hoạt'}
-                        >
-                          {user.status === 'active' ? (
-                            <IoCloseCircle size={18} />
-                          ) : (
-                            <IoCheckmarkCircle size={18} />
-                          )}
-                        </button>
-                        <button
-                          onClick={() => handleDeleteUser(user.id)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-full"
-                          title="Xóa người dùng"
-                        >
-                          <IoCloseCircle size={18} />
-                        </button>
-                        <button
-                          onClick={() => setEditingUser(user)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
-                          title="Chỉnh sửa"
-                        >
-                          <IoEllipsisVertical size={18} />
-                        </button>
+                    <td className="px-2 py-3 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center justify-end space-x-1">
+                        {/* Button khóa/kích hoạt tài khoản */}
+                        <div className="relative group">
+                          <button
+                            onClick={() => handleStatusToggle(user.id)}
+                            className={`p-1.5 rounded-full transition-all duration-200 hover:scale-105 ${
+                              user.status === 'active'
+                                ? 'text-red-600 hover:bg-red-100 bg-red-50'
+                                : 'text-green-600 hover:bg-green-50'
+                            }`}
+                          >
+                            {user.status === 'active' ? (
+                              <IoLockClosed size={16} />
+                            ) : (
+                              <IoCheckmarkCircle size={16} />
+                            )}
+                          </button>
+                          {/* Tooltip */}
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10">
+                            {user.status === 'active' ? 'Khóa tài khoản' : 'Kích hoạt tài khoản'}
+                          </div>
+                        </div>
+                        
+                        {/* Button xem chi tiết */}
+                        <div className="relative group">
+                          <button
+                            onClick={() => setEditingUser(user)}
+                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-200 hover:scale-105"
+                          >
+                            <IoEye size={16} />
+                          </button>
+                          {/* Tooltip */}
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10">
+                            Xem chi tiết
+                          </div>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -387,25 +405,25 @@ const AdminUsersPage = () => {
         <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="text-2xl font-bold text-gray-900">
-              {users.length}
+              {Array.isArray(users) ? users.length : 0}
             </div>
             <div className="text-sm text-gray-600">Tổng người dùng</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="text-2xl font-bold text-green-600">
-              {users.filter(u => u.status === 'active').length}
+              {Array.isArray(users) ? users.filter(u => u.status === 'active').length : 0}
             </div>
             <div className="text-sm text-gray-600">Đang hoạt động</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="text-2xl font-bold text-blue-600">
-              {users.filter(u => u.role === 'staff').length}
+              {Array.isArray(users) ? users.filter(u => u.role === 'user').length : 0}
             </div>
-            <div className="text-sm text-gray-600">Nhân viên</div>
+            <div className="text-sm text-gray-600">Khách hàng</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="text-2xl font-bold text-red-600">
-              {users.filter(u => u.role === 'admin').length}
+              {Array.isArray(users) ? users.filter(u => u.role === 'admin').length : 0}
             </div>
             <div className="text-sm text-gray-600">Quản trị viên</div>          </div>
         </div>
@@ -417,67 +435,7 @@ const AdminUsersPage = () => {
           </div>
         )}
 
-        {/* Delete Confirmation */}
-        {deleteConfirm && (
-          <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Xác nhận xóa người dùng
-              </h3>
-              <p className="text-gray-500 mb-4">
-                Bạn có chắc chắn muốn xóa người dùng này? Hành động này không thể hoàn tác.
-              </p>
-              <div className="flex justify-end space-x-2">
-                <Button
-                  onClick={() => setDeleteConfirm(null)}
-                  className="flex-1"
-                  variant="outline"
-                >
-                  Hủy
-                </Button>
-                <Button
-                  onClick={() => {
-                    handleDeleteUser(deleteConfirm);
-                    setDeleteConfirm(null);
-                    setSuccessMessage('Đã xóa người dùng thành công');
-                  }}
-                  className="flex-1"
-                >
-                  Xóa người dùng
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
-
-      {/* Delete Confirmation Modal */}
-      {deleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Xác nhận xóa người dùng
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Bạn có chắc chắn muốn xóa người dùng này? Hành động này không thể hoàn tác.
-            </p>
-            <div className="flex justify-end space-x-2">
-              <Button
-                onClick={() => setDeleteConfirm(null)}
-                variant="outline"
-              >
-                Hủy
-              </Button>
-              <Button
-                onClick={confirmDelete}
-                className="bg-red-600 hover:bg-red-700 text-white"
-              >
-                Xóa
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* User Modal */}
       <UserModal

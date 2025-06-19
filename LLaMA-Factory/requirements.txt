@@ -36,3 +36,4 @@ cryptography==41.0.4
 werkzeug==2.3.7
 python-dotenv==1.0.0
 pyngrok>=7.2.11
+requests>=2.25.0

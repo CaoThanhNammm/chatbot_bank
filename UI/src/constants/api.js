@@ -82,6 +82,7 @@ export const API_ENDPOINTS = {
 
   // Fine-tuning
   FINE_TUNING: {
+    MODELS: '/api/finetune/models', // New endpoint for getting all models
     JOBS: '/fine-tuning/jobs',
     CREATE_JOB: '/fine-tuning/jobs',
     GET_JOB: (id) => `/fine-tuning/jobs/${id}`,

@@ -37,6 +37,7 @@ export const modelApi = {
 
 // Fine-tuning API - using new ApiService
 export const fineTuningApi = {
+  getModels: () => apiService.getFineTuningModels(), // New method for getting models
   getJobs: () => apiService.getFineTuningJobs(),
   createJob: (jobData) => apiService.createFineTuningJob(jobData),
   getJob: (jobId) => apiService.getFineTuningJob(jobId),
@@ -52,6 +53,7 @@ export const fineTuningApi = {
 export const adminApi = {
   getUsers: () => apiService.getUsers(),
   getUser: (userId) => apiService.getUser(userId),
+  createUser: (userData) => apiService.createUser(userData),
   updateUser: (userId, userData) => apiService.updateUser(userId, userData),
   deleteUser: (userId) => apiService.deleteUser(userId),
   activateUser: (userId) => apiService.activateUser(userId),

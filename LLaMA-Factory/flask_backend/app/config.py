@@ -45,6 +45,9 @@ class Config:
     # Frontend URL
     FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
     
+    # Backend URL
+    BACKEND_URL = os.environ.get('BACKEND_URL', 'http://localhost:5000')
+    
     # File Upload Configuration
     UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', 'uploads')
     MAX_CONTENT_LENGTH = int(os.environ.get('MAX_CONTENT_LENGTH', 16 * 1024 * 1024))  # 16MB

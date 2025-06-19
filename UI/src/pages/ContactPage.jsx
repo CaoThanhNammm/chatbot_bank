@@ -17,7 +17,7 @@ const ContactPage = () => {
     {
       icon: <IoCall size={24} />,
       title: 'Hotline 24/7',
-      content: '1800 588 888',
+      content: '0354 487 785',
       description: 'Miễn phí từ điện thoại cố định'
     },
     {
@@ -29,8 +29,8 @@ const ContactPage = () => {
     {
       icon: <IoLocation size={24} />,
       title: 'Địa chỉ văn phòng',
-      content: '123 Đường Lê Lợi, Quận 1, TP.HCM',
-      description: 'Thứ 2 - Thứ 6: 8:00 - 17:00'
+      content: '307 Bà Triệu, TT Nông Cống, Thanh Hoá',
+      description: 'Thứ 2 - Thứ 6: 8:00 - 16:30'
     },
     {
       icon: <IoTime size={24} />,
@@ -236,7 +236,7 @@ const ContactPage = () => {
                     <IoLocation size={20} className="text-blue-600 mt-1" />
                     <div>
                       <p className="font-medium text-gray-900">Địa chỉ</p>
-                      <p className="text-gray-600">123 Đường Lê Lợi, Quận 1, TP.HCM</p>
+                      <p className="text-gray-600">307 Bà Triệu, TT Nông Cống, Thanh Hoá</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">

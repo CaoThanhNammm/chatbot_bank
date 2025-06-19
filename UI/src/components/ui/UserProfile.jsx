@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiUser, FiLogOut, FiSettings, FiUsers, FiCpu } from 'react-icons/fi';
-import { IoChevronDown } from 'react-icons/io5';
+import { FiUser, FiLogOut, FiUsers, FiCpu } from 'react-icons/fi';
+import { IoChevronDown, IoDocument } from 'react-icons/io5';
 import { useAuth } from '../../contexts/AuthContext';
 
 const UserProfile = () => {
@@ -115,15 +115,6 @@ const UserProfile = () => {
               Hồ sơ cá nhân
             </Link>
             
-            <Link
-              to="/settings"
-              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-              onClick={() => setIsDropdownOpen(false)}
-            >
-              <FiSettings className="w-4 h-4 mr-3" />
-              Cài đặt
-            </Link>
-            
             {/* Admin Menu */}
             {userData.is_admin && (
               <>
@@ -147,7 +138,15 @@ const UserProfile = () => {
                   onClick={() => setIsDropdownOpen(false)}
                 >
                   <FiCpu className="w-4 h-4 mr-3" />
-                  Fine-tuning Model
+                  Quản lý Fine-tuning
+                </Link>
+                <Link
+                  to="/admin/training"
+                  className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  onClick={() => setIsDropdownOpen(false)}
+                >
+                  <IoDocument className="w-4 h-4 mr-3" />
+                  Huấn luyện mô hình
                 </Link>
               </>
             )}

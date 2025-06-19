@@ -557,6 +557,13 @@ class ApiService {
   // ==================== FINE-TUNING METHODS ====================
 
   /**
+   * Get fine-tuning models
+   */
+  async getFineTuningModels() {
+    return this.get(this.endpoints.FINE_TUNING.MODELS);
+  }
+
+  /**
    * Get fine-tuning jobs
    */
   async getFineTuningJobs() {
@@ -633,6 +640,13 @@ class ApiService {
    */
   async getUser(userId) {
     return this.get(this.endpoints.ADMIN.GET_USER(userId));
+  }
+
+  /**
+   * Create new user (admin only)
+   */
+  async createUser(userData) {
+    return this.post(this.endpoints.ADMIN.CREATE_USER, userData);
   }
 
   /**
