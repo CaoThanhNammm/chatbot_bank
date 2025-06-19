@@ -13,12 +13,14 @@ const Button = ({
   const baseClasses = 'inline-flex items-center justify-center font-medium transition-all duration-200 focus-ring rounded-lg p-2';
   
   const variants = {
-    primary: 'bg-charcoal text-white hover:bg-gray-800 disabled:bg-gray-400',
-    secondary: 'bg-white text-charcoal border border-gray-200 hover:bg-gray-50 disabled:bg-gray-100',
-    ghost: 'bg-transparent text-charcoal hover:bg-gray-100 disabled:text-gray-400',
-    accent: 'bg-pastel-lavender text-charcoal hover:bg-purple-200 disabled:bg-gray-200',
-    danger: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-400',
-    warning: 'bg-yellow-600 text-white hover:bg-yellow-700 disabled:bg-yellow-400'
+    primary: 'bg-primary-600 text-white hover:bg-primary-700 disabled:bg-neutral-400 shadow-sm',
+    secondary: 'bg-white text-neutral-700 border border-neutral-300 hover:bg-neutral-50 disabled:bg-neutral-100 shadow-sm',
+    outline: 'bg-transparent text-primary-600 border border-primary-600 hover:bg-primary-50 disabled:text-neutral-400 disabled:border-neutral-300',
+    ghost: 'bg-transparent text-neutral-700 hover:bg-neutral-100 disabled:text-neutral-400',
+    accent: 'bg-burgundy-600 text-white hover:bg-burgundy-700 disabled:bg-neutral-400 shadow-sm',
+    danger: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-400 shadow-sm',
+    warning: 'bg-yellow-600 text-white hover:bg-yellow-700 disabled:bg-yellow-400 shadow-sm',
+    success: 'bg-sage-600 text-white hover:bg-sage-700 disabled:bg-neutral-400 shadow-sm'
   };
   
   const sizes = {

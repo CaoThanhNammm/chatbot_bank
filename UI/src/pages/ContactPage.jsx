@@ -236,8 +236,7 @@ const ContactPage = () => {
                     <IoTime size={20} className="text-red-600 mt-1" />
                     <div>
                       <p className="font-medium text-gray-900">Giờ làm việc</p>
-                      <p className="text-gray-600">Thứ 2 - Thứ 6: 8:00 - 17:00</p>
-                      <p className="text-gray-600">Thứ 7: 8:00 - 12:00</p>
+                      <p className="text-gray-600">Thứ 2 - Thứ 6: 8:00 - 16:30</p>
                     </div>
                   </div>
                 </div>
@@ -248,7 +247,7 @@ const ContactPage = () => {
                 <div className="text-center">
                   <IoLocation size={48} className="text-gray-400 mx-auto mb-2" />
                   <p className="text-gray-500">Bản đồ văn phòng</p>
-                  <p className="text-sm text-gray-400">123 Đường Lê Lợi, Q1, TP.HCM</p>
+                  <p className="text-sm text-gray-400">307 Bà Triệu, TT Nông Cống, Thanh Hoá</p>
                 </div>
               </div>
             </div>

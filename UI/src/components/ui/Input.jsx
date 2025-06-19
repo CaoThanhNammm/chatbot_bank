@@ -12,11 +12,12 @@ const Input = ({
   ...props 
 }) => {
   const baseClasses = `
-    w-full px-4 py-3 border border-gray-200 rounded-lg 
-    bg-white text-charcoal placeholder-gray-500 
+    w-full px-4 py-3 border border-neutral-300 rounded-lg 
+    bg-white text-neutral-900 placeholder-neutral-500 
     transition-all duration-200 resize-none
-    focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-transparent
-    disabled:bg-gray-50 disabled:cursor-not-allowed
+    focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500
+    disabled:bg-neutral-50 disabled:cursor-not-allowed disabled:text-neutral-500
+    hover:border-neutral-400
   `.trim().replace(/\s+/g, ' ');
   
   const classes = `${baseClasses} ${className}`;

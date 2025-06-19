@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { IoMenuOutline, IoAdd, IoTrashOutline } from 'react-icons/io5';
+import { IoMenuOutline, IoAdd, IoTrashOutline, IoChevronDown } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { Button, ChatWindow, ChatInput, SidePanel } from '../components';
 import { ConfirmationModal, Toast } from '../components/ui';
@@ -8,6 +8,9 @@ import { useConversations } from '../hooks/useConversations';
 import { useStreamingMessage } from '../hooks/useStreamingMessage';
 import { chatApi } from '../utils/api';
 import agribankLogo from '../assets/icon.jpg';
+import axios from 'axios';
+import { testResponseParsing } from '../utils/textFormatter';
+import apiUrlManager from '../config/ApiUrlManager';
 
 const ChatPage = () => {
   const { user, authenticated, loading } = useAuth();
@@ -33,8 +36,67 @@ const ChatPage = () => {
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [isClearingConversation, setIsClearingConversation] = useState(false);
   
+  // Model selection state
+  const [availableModels, setAvailableModels] = useState([]);
+  const [selectedModel, setSelectedModel] = useState('');
+  const [isLoadingModels, setIsLoadingModels] = useState(false);
+  const [showModelDropdown, setShowModelDropdown] = useState(false);
+  
   // Use streaming message hook for optimized performance
   const { startStreaming, updateStreamingContent, finishStreaming } = useStreamingMessage();
+
+  // Fetch available models from API
+  const fetchAvailableModels = useCallback(async () => {
+    setIsLoadingModels(true);
+    try {
+      const response = await axios.get(apiUrlManager.getFineTuningTasksUrl(), {
+        headers: apiUrlManager.getNgrokHeaders()
+      });
+
+      if (response.data.success && response.data.tasks) {
+        // Filter only completed tasks and extract unique model names using output_dir
+        const completedTasks = response.data.tasks.filter(task => task.status === 'completed');
+        const modelNames = [...new Set(completedTasks.map(task => task.args.output_dir))];
+        
+        setAvailableModels(modelNames);
+        
+        // Set default model if none selected
+        if (modelNames.length > 0 && !selectedModel) {
+          setSelectedModel(modelNames[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching models:', error);
+    } finally {
+      setIsLoadingModels(false);
+    }
+  }, [selectedModel]);
+
+  // Load models on component mount
+  useEffect(() => {
+    if (user && authenticated) {
+      fetchAvailableModels();
+    }
+    
+    // Test response parsing in development
+    if (process.env.NODE_ENV === 'development') {
+      testResponseParsing('{"success": true, "response": "Chào bạn! 😊\\n\\nTôi có thể giúp gì?"}');
+    }
+  }, [user, authenticated, fetchAvailableModels]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showModelDropdown && !event.target.closest('.model-dropdown')) {
+        setShowModelDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showModelDropdown]);
 
   // Show loading while authentication is being checked
   if (loading) {
@@ -69,7 +131,7 @@ const ChatPage = () => {
     const userBalance = user?.balance || '125,750,000';
     
     if (lowerMessage.includes('số dư') || lowerMessage.includes('kiểm tra tài khoản')) {
-      return `Xin chào ${userName}! Số dư tài khoản hiện tại của bạn là ${userBalance} VNĐ. Bạn có thể kiểm tra chi tiết giao dịch qua ứng dụng AGRIBANK Mobile hoặc Internet Banking.`;
+      return `Xin chào ${userName}! 😊\n\nSố dư tài khoản hiện tại của bạn là ${userBalance} VNĐ. Bạn có thể kiểm tra chi tiết giao dịch qua ứng dụng AGRIBANK Mobile hoặc Internet Banking.`;
     }
     
     if (lowerMessage.includes('chuyển khoản') || lowerMessage.includes('chuyển tiền')) {
@@ -81,7 +143,7 @@ const ChatPage = () => {
     }
     
     // Default response
-    return `Xin chào ${userName}! Tôi là trợ lý ảo của AGRIBANK. Tôi có thể giúp bạn kiểm tra số dư, hướng dẫn chuyển khoản, tư vấn sản phẩm và nhiều dịch vụ khác. Bạn cần hỗ trợ gì?`;
+    return `Xin chào ${userName}! 😊\n\nTôi là trợ lý ảo của AGRIBANK. Tôi có thể giúp bạn:\n\n• Kiểm tra số dư tài khoản\n• Hướng dẫn chuyển khoản\n• Tư vấn sản phẩm tiết kiệm\n• Giải đáp các thắc mắc khác\n\nBạn cần hỗ trợ gì hôm nay? 🏦`;
   }, [user]);
 
   const handleSendMessage = useCallback(async (messageText) => {
@@ -158,14 +220,23 @@ const ChatPage = () => {
 
       try {
         // Handle streaming response
+        console.log('Sending message with model:', selectedModel);
         const response = await chatApi.sendSimpleMessage(messageText, (chunk) => {
+          // Log chunk for debugging
+          console.log('Received chunk:', JSON.stringify(chunk));
           // Update bot message with new chunk using optimized hook
           updateStreamingContent(chunk, setCurrentMessages);
           botResponseText += chunk;
-        });
+        }, selectedModel);
         
         if (!response.success) {
           throw new Error(response.error || 'No AI response received');
+        }
+
+        // Check if this is a mock response and show notification
+        if (response.data && response.data.isMockResponse) {
+          console.warn('Using offline mode - API server unavailable');
+          // You could show a toast notification here
         }
         
         // Ensure we have the complete response and mark as finished
@@ -212,7 +283,7 @@ const ChatPage = () => {
     } finally {
       setIsTyping(false);
     }
-  }, [getBankingResponse, setCurrentMessages, currentConversation, authenticated, createConversation, conversations, selectConversation, addMessageToConversation]);
+  }, [getBankingResponse, setCurrentMessages, currentConversation, authenticated, createConversation, conversations, selectConversation, addMessageToConversation, selectedModel, startStreaming, updateStreamingContent, finishStreaming]);
 
   const handleNewChat = useCallback(() => {
     // Start a new conversation
@@ -386,6 +457,62 @@ const ChatPage = () => {
               <span className="text-lg font-semibold text-gray-800 hidden sm:block">AGRIBANK</span>
             </Link>
           </div>
+
+          {/* Right side - Model selector */}
+          <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+            <div className="relative model-dropdown">
+              <button
+                onClick={() => setShowModelDropdown(!showModelDropdown)}
+                className="flex items-center space-x-2 px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-sm"
+                disabled={isLoadingModels}
+              >
+                {isLoadingModels ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-gray-600">Đang tải...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-gray-700 max-w-48 truncate">
+                      {selectedModel || 'Chọn model'}
+                    </span>
+                    <IoChevronDown 
+                      className={`text-gray-500 transition-transform duration-200 ${showModelDropdown ? 'rotate-180' : ''}`} 
+                      size={16} 
+                    />
+                  </>
+                )}
+              </button>
+
+              {/* Dropdown menu */}
+              {showModelDropdown && !isLoadingModels && (
+                <div className="absolute right-0 top-full mt-1 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                  {availableModels.length === 0 ? (
+                    <div className="px-4 py-3 text-sm text-gray-500 text-center">
+                      Không có model nào khả dụng
+                    </div>
+                  ) : (
+                    availableModels.map((model, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          setSelectedModel(model);
+                          setShowModelDropdown(false);
+                        }}
+                        className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-50 transition-colors duration-200 ${
+                          selectedModel === model ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+                        } ${index === 0 ? 'rounded-t-lg' : ''} ${index === availableModels.length - 1 ? 'rounded-b-lg' : ''}`}
+                      >
+                        <div className="truncate" title={model}>
+                          {model}
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
         
         {/* Chat Window */}
@@ -394,6 +521,21 @@ const ChatPage = () => {
           isTyping={isTyping} 
           loading={conversationsLoading}
         />
+        
+        {/* Model indicator */}
+        {selectedModel && (
+          <div className="px-4 py-2 bg-gray-50 border-t border-gray-200">
+            <div className="flex items-center justify-center space-x-4">
+              <span className="text-xs text-gray-600">
+                Đang sử dụng model: <span className="font-medium text-blue-600">{selectedModel}</span>
+              </span>
+              <div className="flex items-center space-x-1">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-xs text-gray-500">Online</span>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Chat Input */}
         <ChatInput 

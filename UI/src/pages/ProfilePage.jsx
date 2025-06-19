@@ -162,10 +162,10 @@ const ProfilePage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Đang tải thông tin hồ sơ...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-neutral-600">Đang tải thông tin hồ sơ...</p>
         </div>
       </div>
     );
@@ -173,10 +173,10 @@ const ProfilePage = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 mb-4">Không thể tải thông tin hồ sơ</p>
-          <Link to="/chat" className="text-blue-600 hover:underline">
+          <p className="text-primary-600 mb-4">Không thể tải thông tin hồ sơ</p>
+          <Link to="/chat" className="text-primary-600 hover:underline">
             Quay lại trang chính
           </Link>
         </div>
@@ -184,38 +184,38 @@ const ProfilePage = () => {
     );
   }
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-neutral-50">
       {/* Header - Same as ChatPage */}
       <ChatHeader onSettingsClick={() => setIsSettingsOpen(true)} />
 
       <div className="max-w-3xl mx-auto px-4 py-8">
         {/* Error Message */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <span className="text-red-800">{error}</span>
+          <div className="mb-6 p-4 bg-primary-50 border border-primary-200 rounded-lg">
+            <span className="text-primary-800">{error}</span>
           </div>
         )}
 
         {/* Success Message */}
         {successMessage && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <span className="text-green-800">{successMessage}</span>
+          <div className="mb-6 p-4 bg-sage-50 border border-sage-200 rounded-lg">
+            <span className="text-sage-800">{successMessage}</span>
           </div>
         )}
 
         {/* Profile Header */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div className="bg-white rounded-lg shadow-sm border border-neutral-200 mb-6">
           <div className="px-6 py-8 text-center">
-            <div className="w-20 h-20 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl font-semibold text-gray-900">
+            <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl font-semibold text-primary-700">
                 {user.fullName ? user.fullName.split(' ').map(n => n[0]).join('').slice(0, 2) : 'U'}
               </span>
             </div>
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+            <h1 className="text-2xl font-semibold text-neutral-900 mb-2">
               {user.fullName || user.name || 'Người dùng'}
             </h1>
-            <p className="text-gray-600">Khách hàng AGRIBANK</p>
-            <p className="text-sm text-gray-500 mt-1">Thành viên từ {user.joinDate || 'N/A'}</p>                
+            <p className="text-neutral-600">Khách hàng AGRIBANK</p>
+            <p className="text-sm text-neutral-500 mt-1">Thành viên từ {user.joinDate || 'N/A'}</p>                
             {/* Edit Button */}
             <div className="mt-4">
               {!isEditing ? (
@@ -243,16 +243,16 @@ const ProfilePage = () => {
         {/* Main Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Personal Information */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">
+          <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
+            <div className="px-6 py-4 border-b border-neutral-200">
+              <h2 className="text-lg font-semibold text-neutral-900">
                 Thông tin cá nhân
               </h2>
             </div>
             
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
                   Họ và tên
                 </label>
                 {isEditing ? (
@@ -262,12 +262,12 @@ const ProfilePage = () => {
                     placeholder="Nhập họ và tên"
                   />
                 ) : (
-                  <p className="text-gray-900">{user.fullName || user.name || 'Chưa cập nhật'}</p>
+                  <p className="text-neutral-900">{user.fullName || user.name || 'Chưa cập nhật'}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
                   Email
                 </label>
                 {isEditing ? (
@@ -278,12 +278,12 @@ const ProfilePage = () => {
                     placeholder="Nhập địa chỉ email"
                   />
                 ) : (
-                  <p className="text-gray-900">{user.email || 'Chưa cập nhật'}</p>
+                  <p className="text-neutral-900">{user.email || 'Chưa cập nhật'}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
                   Số điện thoại
                 </label>
                 {isEditing ? (
@@ -293,12 +293,12 @@ const ProfilePage = () => {
                     placeholder="Nhập số điện thoại"
                   />
                 ) : (
-                  <p className="text-gray-900">{user.phone || 'Chưa cập nhật'}</p>
+                  <p className="text-neutral-900">{user.phone || 'Chưa cập nhật'}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
                   Địa chỉ
                 </label>
                 {isEditing ? (
@@ -308,37 +308,37 @@ const ProfilePage = () => {
                     placeholder="Nhập địa chỉ"
                   />
                 ) : (
-                  <p className="text-gray-900">{user.address || 'Chưa cập nhật'}</p>
+                  <p className="text-neutral-900">{user.address || 'Chưa cập nhật'}</p>
                 )}
               </div>
             </div>
           </div>
 
           {/* Account Information */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">
+          <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
+            <div className="px-6 py-4 border-b border-neutral-200">
+              <h3 className="text-lg font-semibold text-neutral-900">
                 Thông tin tài khoản
               </h3>
             </div>
             
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
                   Số tài khoản
                 </label>
-                <p className="text-gray-900 font-mono text-sm">{user.accountNumber || 'Chưa cập nhật'}</p>
+                <p className="text-neutral-900 font-mono text-sm">{user.accountNumber || 'Chưa cập nhật'}</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
                   Loại tài khoản
                 </label>
-                <p className="text-gray-900">{user.accountType || 'Tài khoản cá nhân'}</p>
+                <p className="text-neutral-900">{user.accountType || 'Tài khoản cá nhân'}</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
                   Số dư khả dụng
                 </label>
                 <p className="text-sage-600 font-semibold text-lg">
@@ -347,39 +347,31 @@ const ProfilePage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
                   Ngày mở tài khoản
                 </label>
-                <p className="text-gray-900">{user.joinDate || user.created_at || 'Chưa cập nhật'}</p>
+                <p className="text-neutral-900">{user.joinDate || user.created_at || 'Chưa cập nhật'}</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mt-6">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">
+        <div className="bg-white rounded-lg shadow-sm border border-neutral-200 mt-6">
+          <div className="px-6 py-4 border-b border-neutral-200">
+            <h3 className="text-lg font-semibold text-neutral-900">
               Thao tác nhanh
             </h3>
           </div>
           
           <div className="p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Button
                 variant="outline"
                 className="w-full"
                 onClick={() => setIsChangePasswordOpen(true)}
               >
                 Đổi mật khẩu
-              </Button>
-              
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => alert('Tính năng đang phát triển')}
-              >
-                Lịch sử giao dịch
               </Button>
               
               <Link to="/chat" className="w-full">

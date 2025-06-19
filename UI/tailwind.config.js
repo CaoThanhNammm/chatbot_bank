@@ -5,17 +5,59 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {      colors: {
-        'charcoal': '#111827',
-        'pastel-lavender': '#d6ccf2',
-        'sky-blue': '#c3e0f0',
-        'off-white': '#800020', // Màu đỏ booc đô chủ đạo
-        'soft-beige': '#A0001C', // Màu đỏ booc đô đậm
-        'reddish-brown': '#800020', // Màu đỏ booc đô
-        'light-reddish-brown': '#B22B47', // Màu đỏ booc đô nhạt
-        'burgundy': '#800020', // Burgundy chính
-        'light-burgundy': '#B22B47', // Burgundy nhạt
-        'dark-burgundy': '#5D001A', // Burgundy đậm
+    extend: {
+      colors: {
+        // Màu chủ đạo trắng đỏ
+        'primary': {
+          50: '#fef2f2',   // Trắng hồng rất nhạt
+          100: '#fee2e2',  // Trắng hồng nhạt
+          200: '#fecaca',  // Hồng nhạt
+          300: '#fca5a5',  // Hồng
+          400: '#f87171',  // Đỏ nhạt
+          500: '#ef4444',  // Đỏ
+          600: '#dc2626',  // Đỏ đậm
+          700: '#b91c1c',  // Đỏ rất đậm
+          800: '#991b1b',  // Đỏ tối
+          900: '#7f1d1d',  // Đỏ rất tối
+        },
+        // Màu burgundy/maroon cho accent
+        'burgundy': {
+          50: '#fdf2f2',
+          100: '#fce7e7',
+          200: '#f9d5d5',
+          300: '#f4b5b5',
+          400: '#ec8888',
+          500: '#e15d5d',
+          600: '#d13d3d',
+          700: '#b91c1c',
+          800: '#800020',  // Màu burgundy chính
+          900: '#5d001a',  // Burgundy đậm
+        },
+        // Màu xám cho text và background
+        'neutral': {
+          50: '#fafafa',
+          100: '#f5f5f5',
+          200: '#e5e5e5',
+          300: '#d4d4d4',
+          400: '#a3a3a3',
+          500: '#737373',
+          600: '#525252',
+          700: '#404040',
+          800: '#262626',
+          900: '#171717',
+        },
+        // Giữ lại một số màu cũ để tương thích
+        'charcoal': '#262626',
+        'sage': {
+          50: '#f0f9f0',
+          100: '#dcf2dc',
+          200: '#bae6ba',
+          300: '#86d186',
+          400: '#4ade80',
+          500: '#22c55e',
+          600: '#16a34a',
+          700: '#15803d',
+        },
       },
       fontFamily: {
         'display': ['Playfair Display', 'serif'],

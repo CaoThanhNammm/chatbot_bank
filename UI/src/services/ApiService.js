@@ -4,6 +4,7 @@
  */
 
 import { API_CONSTANTS } from '../constants/api';
+import { formatStreamingChunk } from '../utils/textFormatter.js';
 
 class ApiService {
   constructor() {
@@ -279,7 +280,7 @@ class ApiService {
   /**
    * Send simple chat message (new API)
    */
-  async sendSimpleMessage(message, onChunk = null) {
+  async sendSimpleMessage(message, onChunk = null, model = null) {
     const endpoint = this.endpoints.CHAT.SIMPLE_CHAT;
     
     // If using ngrok endpoint, use specialized ngrok service
@@ -287,7 +288,7 @@ class ApiService {
       try {
         // Import ngrok service dynamically to avoid circular dependency
         const { default: ngrokChatService } = await import('./NgrokChatService.js');
-        const result = await ngrokChatService.sendMessage(message, onChunk);
+        const result = await ngrokChatService.sendMessage(message, onChunk, model);
         
         // Convert to our standard response format
         return {
@@ -303,11 +304,16 @@ class ApiService {
     }
     
     // Default behavior for non-ngrok endpoints - handle streaming
+    const requestData = { 
+      message,
+      ...(model && { model })
+    };
+    
     if (onChunk && typeof onChunk === 'function') {
-      return this.postStream(endpoint, { message }, onChunk);
+      return this.postStream(endpoint, requestData, onChunk);
     }
     
-    return this.post(endpoint, { message });
+    return this.post(endpoint, requestData);
   }
 
   /**
@@ -354,24 +360,40 @@ class ApiService {
           for (let line of lines) {
             if (line.trim()) {
               try {
+                // Try to parse as complete JSON first
+                if (line.includes('"success": true') && line.includes('"response":')) {
+                  const jsonMatch = line.match(/\{"success":\s*true,\s*"response":\s*"(.*?)"\}/);
+                  if (jsonMatch) {
+                    // Complete JSON in one line
+                    const content = jsonMatch[1];
+                    const cleanContent = formatStreamingChunk(content);
+                    chunkBuffer += cleanContent;
+                    fullResponse += cleanContent;
+                    isFirstChunk = false;
+                    continue;
+                  }
+                }
+                
+                // Handle streaming JSON
                 if (isFirstChunk && line.includes('"success": true, "response": "')) {
                   const startIndex = line.indexOf('"response": "') + 13;
                   const content = line.substring(startIndex);
-                  if (content && content !== '"') {
-                    const cleanContent = content.replace(/\\n/g, '\n').replace(/\\"/g, '"');
+                  if (content && content !== '"' && !content.endsWith('"}')) {
+                    const cleanContent = formatStreamingChunk(content);
                     chunkBuffer += cleanContent;
                     fullResponse += cleanContent;
                   }
                   isFirstChunk = false;
-                } else if (!isFirstChunk && line !== '"}') {
-                  const cleanContent = line.replace(/\\n/g, '\n').replace(/\\"/g, '"');
+                } else if (!isFirstChunk && line !== '"}' && !line.includes('"success"')) {
+                  const cleanContent = formatStreamingChunk(line);
                   chunkBuffer += cleanContent;
                   fullResponse += cleanContent;
                 }
               } catch (parseError) {
                 if (!isFirstChunk) {
-                  chunkBuffer += line;
-                  fullResponse += line;
+                  const cleanContent = formatStreamingChunk(line);
+                  chunkBuffer += cleanContent;
+                  fullResponse += cleanContent;
                 }
               }
             }
@@ -388,10 +410,22 @@ class ApiService {
 
         // Process remaining buffer
         if (buffer.trim() && buffer.trim() !== '"}') {
-          const cleanContent = buffer.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/"}$/, '');
-          if (cleanContent) {
-            fullResponse += cleanContent;
-            chunkBuffer += cleanContent;
+          // Check if buffer contains complete JSON
+          const jsonMatch = buffer.match(/\{"success":\s*true,\s*"response":\s*"(.*?)"\}/);
+          if (jsonMatch) {
+            const content = jsonMatch[1];
+            const cleanContent = formatStreamingChunk(content);
+            if (cleanContent) {
+              fullResponse += cleanContent;
+              chunkBuffer += cleanContent;
+            }
+          } else {
+            // Handle as streaming content
+            const cleanContent = formatStreamingChunk(buffer.replace(/"}$/, ''));
+            if (cleanContent) {
+              fullResponse += cleanContent;
+              chunkBuffer += cleanContent;
+            }
           }
         }
 

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { IoSearch, IoDownload, IoTrendingUp, IoCheckmarkCircle, IoCloseCircle, IoTime } from 'react-icons/io5';
+import { IoSearch, IoDownload, IoTrendingUp, IoCheckmarkCircle, IoCloseCircle, IoTime, IoSettings, IoPlay } from 'react-icons/io5';
 import { ChatHeader } from '../components';
 import { Button } from '../components';
 import { mockFineTuningModels, STATUS_COLORS } from '../data/adminData';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../utils/api';
+import apiUrlManager from '../config/ApiUrlManager';
 
 const AdminFineTuningPage = () => {
   const [models, setModels] = useState([]);
@@ -14,6 +15,7 @@ const AdminFineTuningPage = () => {
   const [filteredModels, setFilteredModels] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [loadingModels, setLoadingModels] = useState(new Set());
+  const [loadingModelLoad, setLoadingModelLoad] = useState(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -29,17 +31,19 @@ const AdminFineTuningPage = () => {
         const response = await api.fineTuning.getModels();
         
         if (response.success) {
-          setModels(response.data);
+          // Ensure response.data is an array
+          const modelsData = Array.isArray(response.data) ? response.data : [];
+          setModels(modelsData);
         } else {
           // Fallback to mock data for development
           console.warn('Fine-tuning models API failed, using mock data:', response.error);
-          setModels(mockFineTuningModels);
+          setModels(mockFineTuningModels || []);
         }
       } catch (error) {
         console.error('Error loading fine-tuning models:', error);
         setError('Failed to load fine-tuning models');
         // Fallback to mock data
-        setModels(mockFineTuningModels);
+        setModels(mockFineTuningModels || []);
       } finally {
         setIsLoading(false);
       }
@@ -50,13 +54,15 @@ const AdminFineTuningPage = () => {
 
   // Filter models based on search and filters
   useEffect(() => {
-    let filtered = models;
+    // Ensure models is always an array
+    const modelsArray = Array.isArray(models) ? models : [];
+    let filtered = modelsArray;
 
     if (searchQuery) {
       filtered = filtered.filter(model =>
-        model.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        model.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        model.creator.toLowerCase().includes(searchQuery.toLowerCase())
+        model.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        model.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        model.creator?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -71,11 +77,14 @@ const AdminFineTuningPage = () => {
     setLoadingModels(prev => new Set(prev).add(modelId));
     
     setTimeout(() => {
-      setModels(prev => prev.map(model =>
-        model.id === modelId
-          ? { ...model, status: 'active', updatedAt: new Date() }
-          : model
-      ));
+      setModels(prev => {
+        if (!Array.isArray(prev)) return [];
+        return prev.map(model =>
+          model.id === modelId
+            ? { ...model, status: 'active', updatedAt: new Date() }
+            : model
+        );
+      });
       setLoadingModels(prev => {
         const newSet = new Set(prev);
         newSet.delete(modelId);
@@ -84,6 +93,40 @@ const AdminFineTuningPage = () => {
       setSuccessMessage('Kích hoạt mô hình thành công!');
       setTimeout(() => setSuccessMessage(''), 3000);
     }, 1000);
+  };
+
+  const handleLoadModel = async (model) => {
+    setLoadingModelLoad(prev => new Set(prev).add(model.id));
+    
+    try {
+      const response = await fetch(apiUrlManager.getLoadModelUrl(), {
+        method: 'POST',
+        headers: apiUrlManager.getNgrokHeaders(),
+        body: JSON.stringify({
+          model: model.name || model.id
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setSuccessMessage(`Load mô hình ${model.name} thành công!`);
+        setTimeout(() => setSuccessMessage(''), 3000);
+      } else {
+        setError(`Lỗi load mô hình: ${data.message}`);
+        setTimeout(() => setError(''), 5000);
+      }
+    } catch (error) {
+      console.error('Error loading model:', error);
+      setError(`Lỗi kết nối API: ${error.message}`);
+      setTimeout(() => setError(''), 5000);
+    } finally {
+      setLoadingModelLoad(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(model.id);
+        return newSet;
+      });
+    }
   };
 
 
@@ -96,6 +139,7 @@ const AdminFineTuningPage = () => {
       training: { text: 'Đang huấn luyện', color: 'bg-blue-100 text-blue-800' },
       inactive: { text: 'Đã tải', color: 'bg-gray-100 text-gray-800' },
       pending: { text: 'Chờ xử lý', color: 'bg-yellow-100 text-yellow-800' },
+      completed: { text: 'Hoàn thành', color: 'bg-purple-100 text-purple-800' },
       failed: { text: 'Thất bại', color: 'bg-red-100 text-red-800' }
     };
 
@@ -116,6 +160,8 @@ const AdminFineTuningPage = () => {
         return <IoCheckmarkCircle className="text-red-600" size={20} />;
       case 'training':
         return <IoTime className="text-red-600" size={20} />;
+      case 'completed':
+        return <IoCheckmarkCircle className="text-purple-600" size={20} />;
       case 'failed':
         return <IoCloseCircle className="text-red-500" size={20} />;
       default:
@@ -185,10 +231,11 @@ const AdminFineTuningPage = () => {
                 <select
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                 >
                   <option value="all">Tất cả trạng thái</option>
                   <option value="training">Đang huấn luyện</option>
+                  <option value="completed">Hoàn thành</option>
                   <option value="inactive">Đã tải</option>
                   <option value="active">Đã kích hoạt</option>
                 </select>
@@ -256,6 +303,16 @@ const AdminFineTuningPage = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-2">
+                        {model.status === 'completed' && (
+                          <button
+                            onClick={() => handleLoadModel(model)}
+                            className="p-2 text-green-600 hover:bg-green-50 rounded-full"
+                            title="Load mô hình"
+                            disabled={loadingModelLoad.has(model.id)}
+                          >
+                            {loadingModelLoad.has(model.id) ? <IoTime className="animate-spin" /> : <IoPlay size={18} />}
+                          </button>
+                        )}
                         {(model.status === 'inactive' || model.status === 'pending') && (
                           <button
                             onClick={() => handleActivateModel(model.id)}
@@ -294,29 +351,51 @@ const AdminFineTuningPage = () => {
         </div>
 
         {/* Stats */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="text-2xl font-bold text-gray-900">
-              {models.length}
+              {Array.isArray(models) ? models.length : 0}
             </div>
             <div className="text-sm text-gray-600">Tổng mô hình</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="text-2xl font-bold text-red-600">
-              {models.filter(m => m.status === 'active').length}
+              {Array.isArray(models) ? models.filter(m => m.status === 'active').length : 0}
             </div>
             <div className="text-sm text-gray-600">Đã kích hoạt</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="text-2xl font-bold text-red-600">
-              {models.filter(m => m.status === 'training').length}
+              {Array.isArray(models) ? models.filter(m => m.status === 'training').length : 0}
             </div>
             <div className="text-sm text-gray-600">Đang huấn luyện</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="text-2xl font-bold text-green-600">
+              {Array.isArray(models) ? models.filter(m => m.status === 'active' || m.status === 'inactive').length : 0}
+            </div>
+            <div className="text-sm text-gray-600">Thành công</div>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="text-2xl font-bold text-red-500">
+              {Array.isArray(models) ? models.filter(m => m.status === 'failed').length : 0}
+            </div>
+            <div className="text-sm text-gray-600">Thất bại</div>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="text-2xl font-bold text-purple-600">
-              {Math.round(models.filter(m => m.accuracy).reduce((sum, m) => sum + m.accuracy, 0) / models.filter(m => m.accuracy).length) || 0}%            </div>
-            <div className="text-sm text-gray-600">Độ chính xác TB</div>          </div>
+              {(() => {
+                if (!Array.isArray(models)) return '0%';
+                const modelsWithAccuracy = models.filter(m => m.accuracy);
+                if (modelsWithAccuracy.length === 0) return '0%';
+                const avgAccuracy = Math.round(
+                  modelsWithAccuracy.reduce((sum, m) => sum + m.accuracy, 0) / modelsWithAccuracy.length
+                );
+                return `${avgAccuracy}%`;
+              })()}
+            </div>
+            <div className="text-sm text-gray-600">Độ chính xác TB</div>
+          </div>
         </div>
 
         {/* Success Message */}

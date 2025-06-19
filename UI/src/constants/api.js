@@ -4,6 +4,7 @@
  */
 
 import { getCurrentConfig, CHAT_CONFIG } from '../config/environment.js';
+import apiUrlManager from '../config/ApiUrlManager.js';
 
 // Get current environment configuration
 const envConfig = getCurrentConfig();
@@ -40,110 +41,122 @@ export const HTTP_STATUS = {
   SERVICE_UNAVAILABLE: 503,
 };
 
-// API Endpoints
+// API Endpoints - Now using ApiUrlManager for centralized URL management
 export const API_ENDPOINTS = {
-  // Authentication
+  // Authentication - localhost endpoints
   AUTH: {
-    LOGIN: '/auth/login',
-    REGISTER: '/auth/register',
-    LOGOUT: '/logout',
-    PROFILE: '/auth/me',
-    UPDATE_PROFILE: '/profile',
-    CHANGE_PASSWORD: '/auth/change-password',
-    REFRESH_TOKEN: '/auth/refresh',
-    FORGOT_PASSWORD: '/auth/forgot-password',
-    RESET_PASSWORD: '/auth/reset-password',
+    LOGIN: apiUrlManager.getAuthUrls().login,
+    REGISTER: apiUrlManager.getAuthUrls().register,
+    LOGOUT: apiUrlManager.getAuthUrls().logout,
+    PROFILE: apiUrlManager.getAuthUrls().profile,
+    UPDATE_PROFILE: apiUrlManager.getAuthUrls().updateProfile,
+    CHANGE_PASSWORD: apiUrlManager.getAuthUrls().changePassword,
+    REFRESH_TOKEN: apiUrlManager.getAuthUrls().refreshToken,
+    FORGOT_PASSWORD: apiUrlManager.getAuthUrls().forgotPassword,
+    RESET_PASSWORD: apiUrlManager.getAuthUrls().resetPassword,
   },
 
-  // Chat
+  // Chat - mixed endpoints (ngrok for chat, localhost for conversations)
   CHAT: {
-    SEND_MESSAGE: '/chat',
-    SIMPLE_CHAT: envConfig.CHAT_ENDPOINT || CHAT_CONFIG.NGROK_ENDPOINT, // Use environment-specific chat endpoint
-    EXTERNAL_CHAT: CHAT_CONFIG.NGROK_ENDPOINT, // External ngrok chat API
-    CONVERSATIONS: '/conversations', // Updated to use new API endpoint
-    CONVERSATION: (id) => `/conversations/${id}`,
-    DELETE_CONVERSATION: (id) => `/conversations/${id}`,
-    CLEAR_CONVERSATION: (id) => `/conversations/${id}/clear`,
-    CONVERSATION_MESSAGES: (id) => `/conversations/${id}/messages`,
+    SEND_MESSAGE: apiUrlManager.getConversationUrls().create, // localhost for conversation management
+    SIMPLE_CHAT: apiUrlManager.getChatUrl(), // ngrok for actual chat
+    EXTERNAL_CHAT: apiUrlManager.getChatUrl(), // ngrok for external chat
+    GUEST_CHAT: apiUrlManager.getGuestChatUrl(), // ngrok for guest chat
+    CONVERSATIONS: apiUrlManager.getConversationUrls().list, // localhost
+    CONVERSATION: (id) => apiUrlManager.getConversationUrls().get(id), // localhost
+    DELETE_CONVERSATION: (id) => apiUrlManager.getConversationUrls().delete(id), // localhost
+    CLEAR_CONVERSATION: (id) => apiUrlManager.getConversationUrls().clear(id), // localhost
+    CONVERSATION_MESSAGES: (id) => apiUrlManager.getConversationUrls().messages(id), // localhost
   },
 
-  // Models
+  // Models - localhost endpoints
   MODELS: {
-    LIST: '/models',
-    CREATE: '/models',
-    GET: (id) => `/models/${id}`,
-    UPDATE: (id) => `/models/${id}`,
-    DELETE: (id) => `/models/${id}`,
-    ACTIVE: '/models/active',
-    ACTIVATE: (id) => `/models/${id}/activate`,
-    DEACTIVATE: (id) => `/models/${id}/deactivate`,
-    CLONE: (id) => `/models/${id}/clone`,
+    LIST: apiUrlManager.getModelUrls().list,
+    CREATE: apiUrlManager.getModelUrls().create,
+    GET: (id) => apiUrlManager.getModelUrls().get(id),
+    UPDATE: (id) => apiUrlManager.getModelUrls().update(id),
+    DELETE: (id) => apiUrlManager.getModelUrls().delete(id),
+    ACTIVE: apiUrlManager.getModelUrls().active,
+    ACTIVATE: (id) => apiUrlManager.getModelUrls().activate(id),
+    DEACTIVATE: (id) => apiUrlManager.getModelUrls().deactivate(id),
+    CLONE: (id) => apiUrlManager.getModelUrls().clone(id),
+    // Ngrok endpoint for loading models
+    LOAD_MODEL: apiUrlManager.getLoadModelUrl(),
   },
 
-  // Fine-tuning
+  // Fine-tuning - mixed endpoints
   FINE_TUNING: {
-    MODELS: '/api/finetune/models', // New endpoint for getting all models
-    JOBS: '/fine-tuning/jobs',
-    CREATE_JOB: '/fine-tuning/jobs',
-    GET_JOB: (id) => `/fine-tuning/jobs/${id}`,
-    UPDATE_JOB: (id) => `/fine-tuning/jobs/${id}`,
-    DELETE_JOB: (id) => `/fine-tuning/jobs/${id}`,
-    START_JOB: (id) => `/fine-tuning/jobs/${id}/start`,
-    STOP_JOB: (id) => `/fine-tuning/jobs/${id}/stop`,
-    PAUSE_JOB: (id) => `/fine-tuning/jobs/${id}/pause`,
-    RESUME_JOB: (id) => `/fine-tuning/jobs/${id}/resume`,
-    JOB_LOGS: (id) => `/fine-tuning/jobs/${id}/logs`,
+    // Localhost endpoints for management
+    MODELS: apiUrlManager.getFineTuningManagementUrls().models,
+    JOBS: apiUrlManager.getFineTuningManagementUrls().jobs,
+    CREATE_JOB: apiUrlManager.getFineTuningManagementUrls().createJob,
+    GET_JOB: (id) => apiUrlManager.getFineTuningManagementUrls().getJob(id),
+    UPDATE_JOB: (id) => apiUrlManager.getFineTuningManagementUrls().updateJob(id),
+    DELETE_JOB: (id) => apiUrlManager.getFineTuningManagementUrls().deleteJob(id),
+    START_JOB: (id) => apiUrlManager.getFineTuningManagementUrls().startJob(id),
+    STOP_JOB: (id) => apiUrlManager.getFineTuningManagementUrls().stopJob(id),
+    PAUSE_JOB: (id) => apiUrlManager.getFineTuningManagementUrls().pauseJob(id),
+    RESUME_JOB: (id) => apiUrlManager.getFineTuningManagementUrls().resumeJob(id),
+    JOB_LOGS: (id) => apiUrlManager.getFineTuningManagementUrls().jobLogs(id),
     
-    // Datasets
-    DATASETS: '/fine-tuning/datasets',
-    UPLOAD_DATASET: '/fine-tuning/datasets',
-    GET_DATASET: (id) => `/fine-tuning/datasets/${id}`,
-    DELETE_DATASET: (id) => `/fine-tuning/datasets/${id}`,
-    VALIDATE_DATASET: (id) => `/fine-tuning/datasets/${id}/validate`,
-    DATASET_PREVIEW: (id) => `/fine-tuning/datasets/${id}/preview`,
+    // Datasets - localhost
+    DATASETS: apiUrlManager.getFineTuningManagementUrls().datasets,
+    UPLOAD_DATASET: apiUrlManager.getFineTuningManagementUrls().uploadDataset,
+    GET_DATASET: (id) => apiUrlManager.getFineTuningManagementUrls().getDataset(id),
+    DELETE_DATASET: (id) => apiUrlManager.getFineTuningManagementUrls().deleteDataset(id),
+    VALIDATE_DATASET: (id) => apiUrlManager.getFineTuningManagementUrls().validateDataset(id),
+    DATASET_PREVIEW: (id) => apiUrlManager.getFineTuningManagementUrls().datasetPreview(id),
+    
+    // Ngrok endpoints for actual fine-tuning operations
+    RUN_TASK: apiUrlManager.getRunFineTuningTaskUrl(),
+    START_FINETUNING: apiUrlManager.getStartFineTuningUrl(),
+    TASK_STATUS: (id) => apiUrlManager.getTaskStatusUrl(id),
+    ALL_TASKS: apiUrlManager.getAllTasksUrl(),
+    FINETUNE: apiUrlManager.getFineTuningUrl(),
+    FINETUNE_TASKS: apiUrlManager.getFineTuningTasksUrl(),
   },
 
-  // Admin
+  // Admin - localhost endpoints
   ADMIN: {
     // User Management
-    USERS: '/admin/users',
-    GET_USER: (id) => `/admin/users/${id}`,
-    CREATE_USER: '/admin/users',
-    UPDATE_USER: (id) => `/admin/users/${id}`,
-    DELETE_USER: (id) => `/admin/users/${id}`,
-    ACTIVATE_USER: (id) => `/admin/users/${id}/activate`,
-    DEACTIVATE_USER: (id) => `/admin/users/${id}/deactivate`,
-    RESET_USER_PASSWORD: (id) => `/admin/users/${id}/reset-password`,
+    USERS: apiUrlManager.getAdminUrls().users,
+    GET_USER: (id) => apiUrlManager.getAdminUrls().getUser(id),
+    CREATE_USER: apiUrlManager.getAdminUrls().createUser,
+    UPDATE_USER: (id) => apiUrlManager.getAdminUrls().updateUser(id),
+    DELETE_USER: (id) => apiUrlManager.getAdminUrls().deleteUser(id),
+    ACTIVATE_USER: (id) => apiUrlManager.getAdminUrls().activateUser(id),
+    DEACTIVATE_USER: (id) => apiUrlManager.getAdminUrls().deactivateUser(id),
+    RESET_USER_PASSWORD: (id) => apiUrlManager.getAdminUrls().resetUserPassword(id),
     
     // System Management
-    SYSTEM_SETTINGS: '/admin/system/settings',
-    UPDATE_SYSTEM_SETTINGS: '/admin/system/settings',
-    SYSTEM_LOGS: '/admin/system/logs',
-    CLEAR_SYSTEM_LOGS: '/admin/system/logs/clear',
+    SYSTEM_SETTINGS: apiUrlManager.getAdminUrls().systemSettings,
+    UPDATE_SYSTEM_SETTINGS: apiUrlManager.getAdminUrls().updateSystemSettings,
+    SYSTEM_LOGS: apiUrlManager.getAdminUrls().systemLogs,
+    CLEAR_SYSTEM_LOGS: apiUrlManager.getAdminUrls().clearSystemLogs,
     
     // Analytics
-    ANALYTICS: '/admin/analytics',
-    USER_ANALYTICS: '/admin/analytics/users',
-    CHAT_ANALYTICS: '/admin/analytics/chats',
-    MODEL_ANALYTICS: '/admin/analytics/models',
+    ANALYTICS: apiUrlManager.getAdminUrls().analytics,
+    USER_ANALYTICS: apiUrlManager.getAdminUrls().userAnalytics,
+    CHAT_ANALYTICS: apiUrlManager.getAdminUrls().chatAnalytics,
+    MODEL_ANALYTICS: apiUrlManager.getAdminUrls().modelAnalytics,
   },
 
-  // System
+  // System - localhost endpoints
   SYSTEM: {
-    STATUS: '/system/status',
-    HEALTH: '/system/health',
-    VERSION: '/system/version',
-    METRICS: '/system/metrics',
-    PING: '/system/ping',
+    STATUS: apiUrlManager.getSystemUrls().status,
+    HEALTH: apiUrlManager.getSystemUrls().health,
+    VERSION: apiUrlManager.getSystemUrls().version,
+    METRICS: apiUrlManager.getSystemUrls().metrics,
+    PING: apiUrlManager.getSystemUrls().ping,
   },
 
-  // Files
+  // Files - localhost endpoints
   FILES: {
-    UPLOAD: '/files/upload',
-    DOWNLOAD: (id) => `/files/${id}/download`,
-    DELETE: (id) => `/files/${id}`,
-    LIST: '/files',
-    GET_INFO: (id) => `/files/${id}/info`,
+    UPLOAD: apiUrlManager.getFileUrls().upload,
+    DOWNLOAD: (id) => apiUrlManager.getFileUrls().download(id),
+    DELETE: (id) => apiUrlManager.getFileUrls().delete(id),
+    LIST: apiUrlManager.getFileUrls().list,
+    GET_INFO: (id) => apiUrlManager.getFileUrls().getInfo(id),
   },
 };
 

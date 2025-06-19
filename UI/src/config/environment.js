@@ -1,7 +1,10 @@
 /**
  * Environment Configuration
  * Centralized configuration for different environments
+ * Note: URL management is now handled by ApiUrlManager.js
  */
+
+import apiUrlManager from './ApiUrlManager.js';
 
 // Environment types
 export const ENVIRONMENTS = {
@@ -13,25 +16,25 @@ export const ENVIRONMENTS = {
 // Current environment (can be set via environment variable)
 export const CURRENT_ENV = import.meta.env.MODE || ENVIRONMENTS.DEVELOPMENT;
 
-// API Configurations for different environments
+// API Configurations for different environments - Now using ApiUrlManager
 export const API_CONFIGS = {
   [ENVIRONMENTS.DEVELOPMENT]: {
-    BASE_URL: 'http://localhost:5000/api',
-    CHAT_ENDPOINT: 'http://localhost:5000/api/chat', // Using local backend for development
+    BASE_URL: apiUrlManager.LOCALHOST_BASE,
+    CHAT_ENDPOINT: apiUrlManager.getChatUrl(),
     TIMEOUT: 30000,
     USE_EXTERNAL_CHAT: false
   },
   
   [ENVIRONMENTS.STAGING]: {
-    BASE_URL: 'http://localhost:5000/api',
-    CHAT_ENDPOINT: 'http://localhost:5000/api/chat',
+    BASE_URL: apiUrlManager.LOCALHOST_BASE,
+    CHAT_ENDPOINT: apiUrlManager.getChatUrl(),
     TIMEOUT: 30000,
     USE_EXTERNAL_CHAT: false
   },
   
   [ENVIRONMENTS.PRODUCTION]: {
-    BASE_URL: 'https://e04e-171-247-78-59.ngrok-free.app/api',
-    CHAT_ENDPOINT: 'https://b12a-34-57-198-14.ngrok-free.app/api/chat',
+    BASE_URL: apiUrlManager.LOCALHOST_BASE,
+    CHAT_ENDPOINT: apiUrlManager.getChatUrl(),
     TIMEOUT: 30000,
     USE_EXTERNAL_CHAT: false
   }
@@ -42,27 +45,22 @@ export const getCurrentConfig = () => {
   return API_CONFIGS[CURRENT_ENV] || API_CONFIGS[ENVIRONMENTS.DEVELOPMENT];
 };
 
-// Chat API Configuration
+// Chat API Configuration - Now using ApiUrlManager
 export const CHAT_CONFIG = {
   // Local endpoint for chat (primary)
-  LOCAL_ENDPOINT: 'http://localhost:5000/api/chat',
+  LOCAL_ENDPOINT: apiUrlManager.getLocalhostUrl('/chat'),
   
-  // Guest chat endpoint (same as local for now)
-  GUEST_CHAT_ENDPOINT: 'http://localhost:5000/api/chat',
+  // Guest chat endpoint (ngrok)
+  GUEST_CHAT_ENDPOINT: apiUrlManager.getGuestChatUrl(),
   
-  // Ngrok endpoint for external chat (backup)
-  NGROK_ENDPOINT: 'https://b12a-34-57-198-14.ngrok-free.app/api/chat',
+  // Ngrok endpoint for external chat
+  NGROK_ENDPOINT: apiUrlManager.getChatUrl(),
   
   // Headers for ngrok requests
-  NGROK_HEADERS: {
-    'ngrok-skip-browser-warning': 'true',
-    'Content-Type': 'application/json'
-  },
+  NGROK_HEADERS: apiUrlManager.getNgrokHeaders(),
   
   // Default headers
-  DEFAULT_HEADERS: {
-    'Content-Type': 'application/json'
-  }
+  DEFAULT_HEADERS: apiUrlManager.getLocalhostHeaders()
 };
 
 // Feature flags
