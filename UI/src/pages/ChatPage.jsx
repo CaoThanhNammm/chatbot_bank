@@ -49,85 +49,39 @@ const ChatPage = () => {
   const fetchAvailableModels = useCallback(async () => {
     setIsLoadingModels(true);
     try {
-      // Use a different approach to avoid CORS issues
-      // Instead of directly using axios.get, we'll use fetch with no-cors mode
-      // This won't give us the actual response data, but it will bypass CORS preflight
-      
-      // First, try the fetch with no-cors approach
-      const fetchUrl = apiUrlManager.getFineTuningTasksUrl();
+      const fetchUrl = apiUrlManager.getOutputFoldersUrl();
       console.log('Fetching models from:', fetchUrl);
       
-      // Try multiple CORS bypass approaches
       let response;
       
       try {
-        // Approach 1: Try using a public CORS proxy
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(fetchUrl)}`;
-        console.log('Using public proxy URL:', proxyUrl);
-        
-        response = await axios.get(proxyUrl, {
+        // Direct API call with minimal headers to avoid CORS preflight
+        response = await axios.get(fetchUrl, {
           headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-          }
+            'ngrok-skip-browser-warning': 'true'
+          },
+          timeout: 10000
         });
-      } catch (proxyError) {
-        console.warn('Public proxy failed, trying local proxy:', proxyError);
+        console.log('API response success:', response.data);
+      } catch (error) {
+        console.warn('API call failed, using fallback data:', error.message);
         
-        try {
-          // Approach 2: Try using our local CORS proxy (if running)
-          const localProxyUrl = `http://localhost:8080/proxy?url=${encodeURIComponent(fetchUrl)}`;
-          console.log('Using local proxy URL:', localProxyUrl);
-          
-          response = await axios.get(localProxyUrl);
-        } catch (localProxyError) {
-          console.warn('Local proxy failed, using mock data:', localProxyError);
-          
-          // Approach 3: Use mock data as fallback
-          response = {
-            data: {
-              success: true,
-              tasks: [
-                { status: 'completed', args: { output_dir: 'llama3_lora_qa_human_hybrid' } },
-                { status: 'completed', args: { output_dir: 'llama3_lora_banking_assistant' } }
-              ]
-            }
-          };
-        }
-      }
-
-      // Process the response data based on its format
-      let tasksData;
-      
-      // Case 1: Public proxy response format (api.allorigins.win)
-      if (response.data && response.data.contents) {
-        try {
-          tasksData = JSON.parse(response.data.contents);
-        } catch (parseError) {
-          console.error('Error parsing public proxy response:', parseError);
-        }
-      } 
-      // Case 2: Local proxy or direct response format
-      else if (response.data && response.data.tasks) {
-        tasksData = response.data;
-      }
-      // Case 3: Unknown format - use mock data
-      else {
-        console.warn('Unknown response format, using mock data');
-        tasksData = {
-          success: true,
-          tasks: [
-            { status: 'completed', args: { output_dir: 'llama3_lora_qa_human_hybrid' } },
-            { status: 'completed', args: { output_dir: 'llama3_lora_banking_assistant' } }
-          ]
+        // Use fallback data that matches expected API response
+        response = {
+          data: {
+            success: true,
+            folders: ['llama3_lora']
+          }
         };
       }
+
+      // Process the response data
+      const foldersData = response.data;
+      console.log('Folders data:', foldersData);
       
-      // Process the tasks data
-      if (tasksData && tasksData.tasks) {
-        // Filter only completed tasks and extract unique model names
-        const completedTasks = tasksData.tasks.filter(task => task.status === 'completed');
-        const modelNames = [...new Set(completedTasks.map(task => task.args.output_dir))];
+      // Process the folders data
+      if (foldersData && foldersData.success && foldersData.folders) {
+        const modelNames = foldersData.folders;
         
         if (modelNames.length > 0) {
           console.log('Found models:', modelNames);
@@ -138,16 +92,16 @@ const ChatPage = () => {
             setSelectedModel(modelNames[0]);
           }
         } else {
-          console.warn('No completed tasks found, using mock models');
-          const mockModelNames = ['llama3_lora_qa_human_hybrid', 'llama3_lora_banking_assistant'];
+          console.warn('No folders found, using mock models');
+          const mockModelNames = ['llama3_lora'];
           setAvailableModels(mockModelNames);
           if (!selectedModel) {
             setSelectedModel(mockModelNames[0]);
           }
         }
       } else {
-        console.warn('No tasks data found, using mock models');
-        const mockModelNames = ['llama3_lora_qa_human_hybrid', 'llama3_lora_banking_assistant'];
+        console.warn('No folders data found, using mock models');
+        const mockModelNames = ['llama3_lora'];
         setAvailableModels(mockModelNames);
         if (!selectedModel) {
           setSelectedModel(mockModelNames[0]);
@@ -155,6 +109,12 @@ const ChatPage = () => {
       }
     } catch (error) {
       console.error('Error fetching models:', error);
+      // Use fallback models on error
+      const mockModelNames = ['llama3_lora'];
+      setAvailableModels(mockModelNames);
+      if (!selectedModel) {
+        setSelectedModel(mockModelNames[0]);
+      }
     } finally {
       setIsLoadingModels(false);
     }

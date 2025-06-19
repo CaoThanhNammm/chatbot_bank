@@ -6,33 +6,19 @@
 class ApiUrlManager {
   constructor() {
     // Base URLs
-    this.NGROK_BASE = 'https://4484-35-237-117-77.ngrok-free.app/api';
+    this.NGROK_BASE = 'https://808d-34-63-177-106.ngrok-free.app/api';
     this.LOCALHOST_BASE = 'https://c790-171-247-78-59.ngrok-free.app/api';
     
-    // Common headers for ngrok requests - Enhanced CORS bypass
+    // Common headers for ngrok requests - Only safe headers to avoid CORS preflight
     this.NGROK_HEADERS = {
       'ngrok-skip-browser-warning': 'true',
-      'Content-Type': 'application/json',
-      'Accept': 'application/json, text/plain, */*',
-      'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache',
-      // Additional headers to bypass CORS
-      'X-Requested-With': 'XMLHttpRequest',
-      'Origin': typeof window !== 'undefined' ? window.location.origin : 'https://chatbot-bank.vercel.app',
-      'Referer': typeof window !== 'undefined' ? window.location.href : 'https://chatbot-bank.vercel.app'
+      'Content-Type': 'application/json'
     };
     
-    // Common headers for localhost requests - Enhanced CORS bypass
+    // Common headers for localhost requests - Only safe headers to avoid CORS preflight
     this.LOCALHOST_HEADERS = {
       'ngrok-skip-browser-warning': 'true',
-      'Content-Type': 'application/json',
-      'Accept': 'application/json, text/plain, */*',
-      'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache',
-      // Additional headers to bypass CORS
-      'X-Requested-With': 'XMLHttpRequest',
-      'Origin': typeof window !== 'undefined' ? window.location.origin : 'https://chatbot-bank.vercel.app',
-      'Referer': typeof window !== 'undefined' ? window.location.href : 'https://chatbot-bank.vercel.app'
+      'Content-Type': 'application/json'
     };
   }
 
@@ -78,6 +64,13 @@ class ApiUrlManager {
    */
   getLoadModelUrl() {
     return this.getNgrokUrl('/load-model');
+  }
+
+  /**
+   * Unload model endpoint
+   */
+  getUnloadModelUrl() {
+    return this.getNgrokUrl('/unload-model');
   }
 
   /**
@@ -135,6 +128,20 @@ class ApiUrlManager {
    */
   getFineTuningTasksUrl() {
     return this.getNgrokUrl('/finetune/tasks');
+  }
+
+  /**
+   * Get output folders endpoint
+   */
+  getOutputFoldersUrl() {
+    return this.getNgrokUrl('/get_output_folders');
+  }
+
+  /**
+   * Check if model is loaded endpoint
+   */
+  getIsLoadUrl() {
+    return this.getNgrokUrl('/isLoad');
   }
 
   // ==================== LOCALHOST ENDPOINTS ====================
@@ -280,6 +287,7 @@ class ApiUrlManager {
       // Ngrok-based endpoints
       ngrok: {
         loadModel: this.getLoadModelUrl(),
+        unloadModel: this.getUnloadModelUrl(),
         chat: this.getChatUrl(),
         guestChat: this.getGuestChatUrl(),
         runFineTuningTask: this.getRunFineTuningTaskUrl(),
@@ -287,7 +295,8 @@ class ApiUrlManager {
         taskStatus: this.getTaskStatusUrl(),
         allTasks: this.getAllTasksUrl(),
         fineTuning: this.getFineTuningUrl(),
-        fineTuningTasks: this.getFineTuningTasksUrl()
+        fineTuningTasks: this.getFineTuningTasksUrl(),
+        outputFolders: this.getOutputFoldersUrl()
       },
       
       // Localhost-based endpoints (also using ngrok)
@@ -388,53 +397,61 @@ class ApiUrlManager {
    */
   async makeCorsRequest(url, options = {}) {
     const isNgrok = url.includes('ngrok');
-    const headers = isNgrok ? this.getNgrokHeaders() : this.getLocalhostHeaders();
+    const baseHeaders = isNgrok ? this.getNgrokHeaders() : this.getLocalhostHeaders();
+    
+    // Clean headers - remove any unsafe headers
+    const safeHeaders = { ...baseHeaders };
+    delete safeHeaders['Origin'];
+    delete safeHeaders['Referer'];
     
     // Merge with provided options
     const requestOptions = {
       mode: 'cors',
-      credentials: 'omit', // Avoid credentials for CORS
+      credentials: 'omit',
       ...options,
       headers: {
-        ...headers,
+        ...safeHeaders,
         ...options.headers
       }
     };
 
+    // For ngrok, we need to handle the warning page
+    if (isNgrok && !url.includes('ngrok-skip-browser-warning')) {
+      const separator = url.includes('?') ? '&' : '?';
+      url = `${url}${separator}ngrok-skip-browser-warning=true`;
+    }
+
     try {
-      // First try the original request
+      console.log(`Making request to: ${url}`);
+      console.log('Request options:', requestOptions);
+      
+      // First attempt with CORS
       const response = await fetch(url, requestOptions);
       
       if (response.ok) {
         return response;
       }
       
-      // If failed, try with proxied URL
-      if (response.status === 0 || response.status >= 400) {
-        console.warn(`CORS issue detected for ${url}, trying with proxy parameters...`);
-        const proxiedUrl = this.getProxiedUrl(url.replace(/\?.*$/, '').replace(this.NGROK_BASE, '').replace(this.LOCALHOST_BASE, ''));
-        
-        return await fetch(proxiedUrl, {
-          ...requestOptions,
-          mode: 'no-cors' // Fallback to no-cors mode
-        });
+      // If we get a 404, the endpoint might not exist
+      if (response.status === 404) {
+        console.error(`Endpoint not found: ${url}`);
+        throw new Error(`Endpoint not found: ${response.status} ${response.statusText}`);
       }
       
-      return response;
+      // For other errors, try with different approach
+      console.warn(`Request failed with status ${response.status}, trying alternative approach...`);
+      
+      // Try with no-cors mode as fallback
+      const noCorsResponse = await fetch(url, {
+        ...requestOptions,
+        mode: 'no-cors'
+      });
+      
+      return noCorsResponse;
+      
     } catch (error) {
-      console.error(`Request failed for ${url}:`, error);
-      
-      // Try one more time with no-cors mode
-      try {
-        const proxiedUrl = this.getProxiedUrl(url.replace(/\?.*$/, '').replace(this.NGROK_BASE, '').replace(this.LOCALHOST_BASE, ''));
-        return await fetch(proxiedUrl, {
-          ...requestOptions,
-          mode: 'no-cors'
-        });
-      } catch (fallbackError) {
-        console.error(`Fallback request also failed:`, fallbackError);
-        throw error; // Throw original error
-      }
+      console.error(`All request attempts failed for ${url}:`, error);
+      throw error;
     }
   }
 
@@ -496,6 +513,122 @@ class ApiUrlManager {
       body: data ? JSON.stringify(data) : null,
       ...options
     });
+  }
+
+  // ==================== DEBUG & TESTING METHODS ====================
+  
+  /**
+   * Test connection to server endpoints
+   */
+  async testConnection() {
+    const results = {
+      ngrok: { base: this.NGROK_BASE, endpoints: {} },
+      localhost: { base: this.LOCALHOST_BASE, endpoints: {} }
+    };
+
+    // Test endpoints
+    const testEndpoints = [
+      '/health',
+      '/finetune/tasks',
+      '/models/loaded'
+    ];
+
+    for (const endpoint of testEndpoints) {
+      // Test ngrok
+      try {
+        const ngrokUrl = `${this.NGROK_BASE}${endpoint}`;
+        console.log(`Testing ngrok endpoint: ${ngrokUrl}`);
+        
+        const response = await fetch(ngrokUrl, {
+          method: 'GET',
+          headers: this.getNgrokHeaders(),
+          mode: 'cors',
+          credentials: 'omit'
+        });
+        
+        results.ngrok.endpoints[endpoint] = {
+          status: response.status,
+          ok: response.ok,
+          statusText: response.statusText
+        };
+      } catch (error) {
+        results.ngrok.endpoints[endpoint] = {
+          error: error.message
+        };
+      }
+
+      // Test localhost
+      try {
+        const localhostUrl = `${this.LOCALHOST_BASE}${endpoint}`;
+        console.log(`Testing localhost endpoint: ${localhostUrl}`);
+        
+        const response = await fetch(localhostUrl, {
+          method: 'GET',
+          headers: this.getLocalhostHeaders(),
+          mode: 'cors',
+          credentials: 'omit'
+        });
+        
+        results.localhost.endpoints[endpoint] = {
+          status: response.status,
+          ok: response.ok,
+          statusText: response.statusText
+        };
+      } catch (error) {
+        results.localhost.endpoints[endpoint] = {
+          error: error.message
+        };
+      }
+    }
+
+    console.log('Connection test results:', results);
+    return results;
+  }
+
+  /**
+   * Debug method to check if endpoints are accessible
+   */
+  async debugEndpoint(endpoint) {
+    const url = this.getUrl(endpoint);
+    console.log(`\n=== DEBUG: Testing endpoint ${endpoint} ===`);
+    console.log(`Full URL: ${url}`);
+    
+    const headers = this.getHeaders(endpoint);
+    console.log('Headers:', headers);
+    
+    try {
+      // Try with different approaches
+      const approaches = [
+        { name: 'CORS with credentials omit', options: { mode: 'cors', credentials: 'omit' } },
+        { name: 'CORS with credentials include', options: { mode: 'cors', credentials: 'include' } },
+        { name: 'No-CORS mode', options: { mode: 'no-cors' } }
+      ];
+      
+      for (const approach of approaches) {
+        try {
+          console.log(`\nTrying: ${approach.name}`);
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: headers,
+            ...approach.options
+          });
+          
+          console.log(`✓ ${approach.name} - Status: ${response.status}, OK: ${response.ok}`);
+          
+          if (response.ok && response.status !== 0) {
+            console.log('✓ This approach works!');
+            return { success: true, approach: approach.name, response };
+          }
+        } catch (error) {
+          console.log(`✗ ${approach.name} - Error: ${error.message}`);
+        }
+      }
+      
+      return { success: false, message: 'All approaches failed' };
+    } catch (error) {
+      console.error('Debug failed:', error);
+      return { success: false, error: error.message };
+    }
   }
 }
 

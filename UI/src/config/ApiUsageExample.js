@@ -176,16 +176,23 @@ export const exampleWithErrorHandling = async () => {
  * Helper function to check if CORS is working
  */
 export const testCorsConnection = async () => {
+  console.log('🔍 Starting CORS connection test...');
+  
+  // First, test basic connectivity
+  const connectivityResults = await apiUrlManager.testConnection();
+  
+  // Then test specific endpoints
   const endpoints = [
-    '/system/health',
-    '/finetune',
-    '/auth/me'
+    '/health',
+    '/finetune/tasks',
+    '/models/loaded'
   ];
 
   const results = {};
 
   for (const endpoint of endpoints) {
     try {
+      console.log(`Testing endpoint: ${endpoint}`);
       const response = await apiUrlManager.get(endpoint);
       results[endpoint] = {
         status: 'success',
@@ -201,8 +208,59 @@ export const testCorsConnection = async () => {
     }
   }
 
-  console.log('CORS Test Results:', results);
-  return results;
+  console.log('🔍 CORS Test Results:', results);
+  console.log('🔍 Connectivity Results:', connectivityResults);
+  return { corsResults: results, connectivityResults };
+};
+
+/**
+ * Debug a specific endpoint
+ */
+export const debugEndpoint = async (endpoint) => {
+  console.log(`🐛 Debugging endpoint: ${endpoint}`);
+  const result = await apiUrlManager.debugEndpoint(endpoint);
+  console.log('🐛 Debug result:', result);
+  return result;
+};
+
+/**
+ * Test the finetune endpoint specifically
+ */
+export const testFinetuneEndpoint = async () => {
+  console.log('🧪 Testing finetune endpoint specifically...');
+  
+  // First debug the endpoint
+  const debugResult = await debugEndpoint('/finetune/tasks');
+  
+  // Then try to make actual requests
+  try {
+    // Test GET request to finetune tasks
+    console.log('Testing GET /finetune/tasks...');
+    const tasksResponse = await apiUrlManager.get('/finetune/tasks');
+    console.log('✓ GET /finetune/tasks successful:', tasksResponse.status);
+    
+    // Test POST request to finetune (with minimal data)
+    console.log('Testing POST /finetune...');
+    const postResponse = await apiUrlManager.post('/finetune', {
+      model_name_or_path: "test-model",
+      dataset: "test-dataset"
+    });
+    console.log('✓ POST /finetune response:', postResponse.status);
+    
+    return {
+      success: true,
+      debugResult,
+      tasksResponse: tasksResponse.status,
+      postResponse: postResponse.status
+    };
+  } catch (error) {
+    console.error('❌ Finetune endpoint test failed:', error);
+    return {
+      success: false,
+      debugResult,
+      error: error.message
+    };
+  }
 };
 
 /**

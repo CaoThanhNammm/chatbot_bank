@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { IoCloudUpload, IoDocument, IoCheckmarkCircle, IoCloseCircle, IoTime, IoTrash, IoDownload, IoEye, IoWarning, IoPlay, IoSettings, IoInformationCircle, IoCloudDownload } from 'react-icons/io5';
+import { IoCloudUpload, IoDocument, IoCheckmarkCircle, IoCloseCircle, IoTime, IoTrash, IoDownload, IoEye, IoWarning, IoPlay, IoSettings, IoInformationCircle, IoCloudDownload, IoStop } from 'react-icons/io5';
 import { ChatHeader } from '../components';
 import { Button } from '../components';
 import { mockTrainingFiles, TRAINING_DOMAINS, STATUS_COLORS } from '../data/adminData';
@@ -63,6 +63,7 @@ const StaffTrainingPage = () => {
   const [trainingError, setTrainingError] = useState('');
   const [trainingResult, setTrainingResult] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
+  const [loadingModelUnload, setLoadingModelUnload] = useState(false);
   const fileInputRef = useRef(null);
   const { user } = useAuth();
 
@@ -142,6 +143,37 @@ const StaffTrainingPage = () => {
       } else {
         alert(`Lỗi: ${error.message}`);
       }
+    }
+  };
+
+  // Handle unload model
+  const handleUnloadModel = async () => {
+    setLoadingModelUnload(true);
+    
+    try {
+      const response = await axios.post(apiUrlManager.getUnloadModelUrl(), {}, {
+        headers: apiUrlManager.getNgrokHeaders()
+      });
+
+      if (response.data.success) {
+        setSuccessMessage('Unload mô hình thành công! GPU memory đã được giải phóng.');
+        setTimeout(() => setSuccessMessage(''), 3000);
+      } else {
+        setTrainingError(`Lỗi unload mô hình: ${response.data.message || 'Unknown error'}`);
+        setTimeout(() => setTrainingError(''), 5000);
+      }
+    } catch (error) {
+      console.error('Error unloading model:', error);
+      if (error.response) {
+        setTrainingError(`Lỗi server: ${error.response.data?.message || error.response.status}`);
+      } else if (error.request) {
+        setTrainingError('Không thể kết nối đến server. Vui lòng kiểm tra kết nối.');
+      } else {
+        setTrainingError(`Lỗi: ${error.message}`);
+      }
+      setTimeout(() => setTrainingError(''), 5000);
+    } finally {
+      setLoadingModelUnload(false);
     }
   };
 

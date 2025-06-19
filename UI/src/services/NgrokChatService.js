@@ -11,11 +11,7 @@ class NgrokChatService {
     this.endpoint = CHAT_CONFIG.NGROK_ENDPOINT;
     this.headers = {
       'Content-Type': 'application/json',
-      'ngrok-skip-browser-warning': 'true',
-      'Accept': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization, ngrok-skip-browser-warning'
+      'ngrok-skip-browser-warning': 'true'
     };
   }
 
@@ -81,10 +77,7 @@ class NgrokChatService {
       credentials: 'omit',
       headers: {
         'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true',
-        'Accept': 'application/json',
-        'Origin': window.location.origin,
-        'X-Requested-With': 'XMLHttpRequest'
+        'ngrok-skip-browser-warning': 'true'
       },
       body: JSON.stringify({ 
         message,
