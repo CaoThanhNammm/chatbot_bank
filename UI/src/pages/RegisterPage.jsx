@@ -238,10 +238,8 @@ const RegisterPage = () => {
               id="username"
               name="username"
               type="text"
-              required
-              value={formData.username}
-              onChange={handleInputChange}
-              className={`pl-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent ${
+              required              value={formData.username}
+              onChange={handleInputChange}              className={`pl-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-transparent text-gray-900 text-gray-900 ${
                 errors.username ? 'border-red-300' : 'border-gray-200'
               }`}
               placeholder="Nhập tên đăng nhập"
@@ -271,7 +269,7 @@ const RegisterPage = () => {
                 type="text"
                 value={formData.firstName}
                 onChange={handleInputChange}
-                className={`pl-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent ${
+                className={`pl-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-transparent text-gray-900 ${
                   errors.firstName ? 'border-red-300' : 'border-gray-200'
                 }`}
                 placeholder="Nhập tên"
@@ -296,7 +294,7 @@ const RegisterPage = () => {
                 type="text"
                 value={formData.lastName}
                 onChange={handleInputChange}
-                className={`pl-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent ${
+                className={`pl-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-transparent text-gray-900 ${
                   errors.lastName ? 'border-red-300' : 'border-gray-200'
                 }`}
                 placeholder="Nhập họ"
@@ -324,7 +322,7 @@ const RegisterPage = () => {
               required
               value={formData.email}
               onChange={handleInputChange}
-              className={`pl-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent ${
+              className={`pl-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-transparent text-gray-900 ${
                 errors.email ? 'border-red-300' : 'border-gray-200'
               }`}
               placeholder="Nhập địa chỉ email"
@@ -433,7 +431,7 @@ const RegisterPage = () => {
               required
               value={formData.confirmPassword}
               onChange={handleInputChange}
-              className={`pl-10 pr-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent ${
+              className={`pl-10 pr-10 w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-transparent text-gray-900 ${
                 errors.confirmPassword ? 'border-red-300' : 'border-gray-200'
               }`}
               placeholder="Nhập lại mật khẩu"

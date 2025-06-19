@@ -30,7 +30,7 @@ const Header = ({
   // Chat page header style
   if (variant === 'chat') {
     return (
-      <header className="sticky top-0 z-10 px-4 py-4 bg-white border-b border-neutral-200">
+      <header className="sticky top-0 z-10 px-4 py-4 bg-red-50 border-b border-red-200">
         <div className="flex items-center justify-between max-w-6xl mx-auto">
           {/* Logo & Title */}
           <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-all duration-200 hover:scale-105 px-2 py-1 rounded-lg">
@@ -43,7 +43,7 @@ const Header = ({
               <h1 className="text-xl font-semibold font-playfair text-neutral-800">
                 AGRIBANK
               </h1>
-              <p className="-mt-1 text-xs text-neutral-500">
+              <p className="-mt-1 text-xs text-red-700">
                 Trợ lý AI ngân hàng
               </p>
             </div>
@@ -62,10 +62,10 @@ const Header = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="p-2 rounded-full hover:bg-neutral-100"
+                    className="p-2 rounded-full hover:bg-red-100"
                     aria-label="Hồ sơ"
                   >
-                    <FiUser size={18} className="text-neutral-600" />
+                    <FiUser size={18} className="text-red-600" />
                   </Button>
                 </Link>
                 
@@ -75,10 +75,10 @@ const Header = ({
                     variant="ghost"
                     size="sm"
                     onClick={onHistoryClick}
-                    className="p-2 rounded-full hover:bg-neutral-100"
+                    className="p-2 rounded-full hover:bg-red-100"
                     aria-label="Lịch sử chat"
                   >
-                    <IoTimeOutline size={18} className="text-neutral-600" />
+                    <IoTimeOutline size={18} className="text-red-600" />
                   </Button>
                 )}
                 
@@ -87,24 +87,23 @@ const Header = ({
                   variant="ghost"
                   size="sm"
                   onClick={handleLogout}
-                  className="p-2 rounded-full hover:bg-neutral-100"
+                  className="p-2 rounded-full hover:bg-red-100"
                   aria-label="Đăng xuất"
                 >
-                  <FiLogOut size={18} className="text-neutral-600" />
+                  <FiLogOut size={18} className="text-red-600" />
                 </Button>
               </>
             )}
-            
-            {/* Settings Button - Available for both guest and authenticated users */}
+              {/* Settings Button - Available for both guest and authenticated users */}
             {onSettingsClick && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onSettingsClick}
-                className="p-2 rounded-full hover:bg-neutral-100"
+                className="p-2 rounded-full hover:bg-red-100"
                 aria-label="Cài đặt"
               >
-                <IoSettingsOutline size={18} className="text-neutral-600" />
+                <IoSettingsOutline size={18} className="text-red-600" />
               </Button>
             )}
           </div>
@@ -112,10 +111,9 @@ const Header = ({
       </header>
     );
   }
-
   // Default homepage header style
   return (
-    <header className="bg-white shadow-sm border-b border-gray-100">
+    <header className="bg-red-50 shadow-sm border-b border-red-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-6">
           {/* Logo */}
@@ -129,22 +127,22 @@ const Header = ({
               <h1 className="text-xl font-display font-bold text-gray-900">
                 AGRIBANK
               </h1>
-              <p className="text-xs text-gray-500">Chatbot Ngân hàng</p>
+              <p className="text-xs text-red-600">Chatbot Ngân hàng</p>
             </div>
           </Link>
           
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-600 hover:text-blue-600 transition-colors">
+            <Link to="/" className="text-red-700 hover:text-red-600 transition-colors">
               Trang chủ
             </Link>
-            <Link to="/about" className="text-gray-600 hover:text-blue-600 transition-colors">
+            <Link to="/about" className="text-red-700 hover:text-red-600 transition-colors">
               Giới thiệu
             </Link>
-            <Link to="/contact" className="text-gray-600 hover:text-blue-600 transition-colors">
+            <Link to="/contact" className="text-red-700 hover:text-red-600 transition-colors">
               Liên hệ
             </Link>
-            <Link to="/chat" className="text-gray-600 hover:text-blue-600 transition-colors">
+            <Link to="/chat" className="text-red-700 hover:text-red-600 transition-colors">
               Chat AI
             </Link>
           </nav>

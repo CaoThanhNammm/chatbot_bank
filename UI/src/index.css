@@ -18,8 +18,8 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: #fafafa;
-  color: #111827;
+  background-color: #800020; /* Màu đỏ booc đô chủ đạo */
+  color: #fafafa; /* Màu chữ sáng để tương phản */
 }
 
 /* Custom scrollbar */
@@ -42,7 +42,7 @@ body {
 
 /* Focus styles for accessibility */
 .focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2;
+  @apply focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2;
 }
 
 /* Message animations */

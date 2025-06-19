@@ -57,25 +57,22 @@ const ChatInput = ({ onSendMessage, disabled = false }) => {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
     }
-  };
-  return (
-    <div className="bg-white border-t border-neutral-200 px-4 py-4 sticky bottom-0">
+  };  return (
+    <div className="bg-red-50 border-t border-red-200 px-4 py-4 sticky bottom-0">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-3">
-          {/* Voice input button */}
-          <Button
+          {/* Voice input button */}          <Button
             variant="ghost"
             size="sm"
-            className="p-3 hover:bg-neutral-100 rounded-full flex-shrink-0"
+            className="p-3 hover:bg-red-100 rounded-full flex-shrink-0"
             aria-label="Nhập bằng giọng nói"
             disabled={disabled}
           >
-            <IoMicOutline size={18} className="text-neutral-600" />
+            <IoMicOutline size={18} className="text-red-700" />
           </Button>
           
                     {/* Text input container */}
-          <div className="flex-1 relative">
-            <div className="relative flex items-center bg-neutral-50 border border-neutral-200 rounded-2xl px-4 py-3 focus-within:border-sage-300 focus-within:bg-white transition-all duration-200">
+          <div className="flex-1 relative">            <div className="relative flex items-center bg-red-100 border border-red-300 rounded-2xl px-4 py-3 focus-within:border-red-500 focus-within:bg-white transition-all duration-200">
               <textarea
                 ref={textareaRef}
                 value={message}
@@ -83,27 +80,24 @@ const ChatInput = ({ onSendMessage, disabled = false }) => {
                 onKeyPress={handleKeyPress}
                 placeholder="Nhập câu hỏi về dịch vụ ngân hàng..."
                 disabled={disabled}
-                className="flex-1 bg-transparent text-neutral-800 placeholder-neutral-500 resize-none border-none outline-none min-h-[24px] max-h-[120px] disabled:cursor-not-allowed"
+                className="flex-1 bg-transparent text-red-900 placeholder-red-600 resize-none border-none outline-none min-h-[24px] max-h-[120px] disabled:cursor-not-allowed"
                 rows={1}
               />
               
-              {/* Send button */}
-              <Button
+              {/* Send button */}              <Button
                 onClick={handleSend}
                 disabled={!message.trim() || disabled}
                 variant="primary"
                 size="sm"
-                className="ml-3 p-2 rounded-xl flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-sage-600 to-ocean-600 hover:from-sage-700 hover:to-ocean-700 text-white border-none"
+                className="ml-3 p-2 rounded-xl flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 text-white border-none"
                 aria-label="Gửi tin nhắn"
               >
                 <IoSend size={16} />
               </Button>
             </div>
           </div>
-        </div>
-        
-        {/* Helper text */}
-        <div className="text-xs text-neutral-500 text-center mt-2">
+        </div>        {/* Helper text */}
+        <div className="text-xs text-red-700 text-center mt-2">
           Nhấn Enter để gửi, Shift+Enter để xuống dòng
         </div>
       </div>

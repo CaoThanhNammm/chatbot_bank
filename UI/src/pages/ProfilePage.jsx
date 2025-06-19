@@ -207,7 +207,7 @@ const ProfilePage = () => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
           <div className="px-6 py-8 text-center">
             <div className="w-20 h-20 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl font-semibold text-sage-700">
+              <span className="text-2xl font-semibold text-gray-900">
                 {user.fullName ? user.fullName.split(' ').map(n => n[0]).join('').slice(0, 2) : 'U'}
               </span>
             </div>

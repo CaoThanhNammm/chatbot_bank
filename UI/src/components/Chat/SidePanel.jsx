@@ -107,9 +107,7 @@ const SidePanel = ({
           className="fixed inset-0 z-40 bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out"
           onClick={onClose}
         />
-      )}
-      
-      {/* Side panel */}
+      )}      {/* Side panel */}
       <div className={`
         fixed top-0 left-0 z-50 h-full transition-all duration-300 ease-in-out transform bg-white shadow-2xl w-80
         ${isOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}
@@ -134,7 +132,7 @@ const SidePanel = ({
         <div className="p-4 flex-1 overflow-y-auto">
           {/* Recent Chats - Show for all users */}
           <div>
-            <h3 className="flex items-center mb-3 text-sm font-semibold text-gray-700">
+            <h3 className="flex items-center mb-3 text-sm font-semibold text-red-800">
               <IoChatbubbleOutline size={16} className="mr-2" />
               Cuộc trò chuyện
               {loading && (
