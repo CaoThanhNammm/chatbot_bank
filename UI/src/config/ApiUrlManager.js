@@ -7,7 +7,7 @@ class ApiUrlManager {
   constructor() {
     // Base URLs
     this.NGROK_BASE = 'https://a936-171-247-78-59.ngrok-free.app/api';
-    this.LOCALHOST_BASE = 'http://localhost:5000/api';
+    this.LOCALHOST_BASE = 'https://c790-171-247-78-59.ngrok-free.app/api';
     
     // Common headers for ngrok requests
     this.NGROK_HEADERS = {
@@ -15,8 +15,9 @@ class ApiUrlManager {
       'Content-Type': 'application/json'
     };
     
-    // Common headers for localhost requests
+    // Common headers for localhost requests (also using ngrok, so include ngrok headers)
     this.LOCALHOST_HEADERS = {
+      'ngrok-skip-browser-warning': 'true',
       'Content-Type': 'application/json'
     };
   }
@@ -123,7 +124,7 @@ class ApiUrlManager {
   }
 
   // ==================== LOCALHOST ENDPOINTS ====================
-  // These endpoints use the localhost base URL
+  // These endpoints use the localhost base URL (also ngrok-based)
 
   /**
    * Authentication endpoints
@@ -275,7 +276,7 @@ class ApiUrlManager {
         fineTuningTasks: this.getFineTuningTasksUrl()
       },
       
-      // Localhost-based endpoints
+      // Localhost-based endpoints (also using ngrok)
       localhost: {
         auth: this.getAuthUrls(),
         conversations: this.getConversationUrls(),
