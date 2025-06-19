@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { IoCloudUpload, IoDocument, IoCheckmarkCircle, IoCloseCircle, IoTime, IoTrash, IoDownload, IoEye, IoWarning, IoPlay, IoSettings, IoInformationCircle } from 'react-icons/io5';
+import { IoCloudUpload, IoDocument, IoCheckmarkCircle, IoCloseCircle, IoTime, IoTrash, IoDownload, IoEye, IoWarning, IoPlay, IoSettings, IoInformationCircle, IoCloudDownload } from 'react-icons/io5';
 import { ChatHeader } from '../components';
 import { Button } from '../components';
 import { mockTrainingFiles, TRAINING_DOMAINS, STATUS_COLORS } from '../data/adminData';
@@ -99,6 +99,51 @@ const StaffTrainingPage = () => {
       fetchFineTuningTasks();
     }
   }, [user]);
+
+  // Handle load model
+  const handleLoadModel = async (task) => {
+    try {
+      // Chỉ load model nếu task đã completed
+      if (task.status !== 'completed') {
+        alert('Chỉ có thể load model từ task đã hoàn thành');
+        return;
+      }
+
+      const modelName = task.args?.output_dir;
+      if (!modelName) {
+        alert('Không tìm thấy thông tin model');
+        return;
+      }
+
+      // Hiển thị loading
+      const loadingMessage = `Đang load model ${modelName}...`;
+      console.log(loadingMessage);
+
+      // Call API load-model
+      const response = await axios.post(apiUrlManager.getLoadModelUrl(), {
+        model: modelName
+      }, {
+        headers: apiUrlManager.getNgrokHeaders()
+      });
+
+      if (response.data.success) {
+        alert(`Model ${modelName} đã được load thành công!`);
+        console.log('Model loaded successfully:', response.data);
+      } else {
+        alert(`Lỗi khi load model: ${response.data.message}`);
+        console.error('Load model failed:', response.data);
+      }
+    } catch (error) {
+      console.error('Error loading model:', error);
+      if (error.response) {
+        alert(`Lỗi server: ${error.response.data?.message || error.response.status}`);
+      } else if (error.request) {
+        alert('Không thể kết nối đến server. Vui lòng kiểm tra kết nối.');
+      } else {
+        alert(`Lỗi: ${error.message}`);
+      }
+    }
+  };
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -910,29 +955,19 @@ const StaffTrainingPage = () => {
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center space-x-2">
-                            <Tooltip text="Xem chi tiết">
+                            <Tooltip text={task.status === 'completed' ? 'Load Model' : 'Chỉ có thể load model đã hoàn thành'}>
                               <button
-                                onClick={() => {
-                                  console.log('Task details:', task);
-                                  alert(JSON.stringify(task, null, 2));
-                                }}
-                                className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                                onClick={() => handleLoadModel(task)}
+                                disabled={task.status !== 'completed'}
+                                className={`p-1 transition-colors ${
+                                  task.status === 'completed' 
+                                    ? 'text-gray-400 hover:text-blue-600 cursor-pointer' 
+                                    : 'text-gray-300 cursor-not-allowed'
+                                }`}
                               >
-                                <IoEye size={16} />
+                                <IoCloudDownload size={16} />
                               </button>
                             </Tooltip>
-                            {task.error && (
-                              <Tooltip text="Xem lỗi">
-                                <button
-                                  onClick={() => {
-                                    alert(`Error: ${task.error}`);
-                                  }}
-                                  className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                                >
-                                  <IoWarning size={16} />
-                                </button>
-                              </Tooltip>
-                            )}
                           </div>
                         </td>
                       </tr>

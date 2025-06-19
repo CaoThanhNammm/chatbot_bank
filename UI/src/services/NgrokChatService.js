@@ -529,22 +529,7 @@ class NgrokChatService {
    * Generate mock response based on message content
    */
   generateMockResponse(message) {
-    const lowerMessage = message.toLowerCase();
-    
-    if (lowerMessage.includes('số dư') || lowerMessage.includes('balance')) {
-      return 'Xin chào! 😊\n\nSố dư tài khoản hiện tại của bạn là 125,750,000 VNĐ. Bạn có thể kiểm tra chi tiết giao dịch qua ứng dụng AGRIBANK Mobile.';
-    }
-    
-    if (lowerMessage.includes('chuyển khoản') || lowerMessage.includes('transfer')) {
-      return 'Để chuyển khoản, bạn có thể:\n\n• Sử dụng AGRIBANK Mobile\n• Internet Banking\n• Đến quầy giao dịch\n\nBạn cần hỗ trợ thêm về chuyển khoản không? 💳';
-    }
-    
-    if (lowerMessage.includes('lãi suất') || lowerMessage.includes('interest')) {
-      return 'Lãi suất tiết kiệm hiện tại của AGRIBANK:\n\n• Không kỳ hạn: 0.5%/năm\n• 1-3 tháng: 4.5%/năm\n• 6-12 tháng: 5.8%/năm\n• Trên 12 tháng: 6.8%/năm\n\nBạn muốn mở sổ tiết kiệm không? 💰';
-    }
-    
-    // Default response
-    return 'Xin chào! 😊\n\nTôi là trợ lý AI của AGRIBANK. Hiện tại tôi đang hoạt động ở chế độ offline, nhưng vẫn có thể hỗ trợ bạn một số thông tin cơ bản.\n\nBạn cần hỗ trợ gì hôm nay? 🏦';
+    return 'Xin chào! 😊\n\nTôi là trợ lý AI của AGRIBANK. Hiện tại tôi đang hoạt động ở chế độ offline, vui lòng quay lại lúc khác';
   }
 
   /**
