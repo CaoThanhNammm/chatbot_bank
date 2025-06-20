@@ -19,21 +19,21 @@ export const CURRENT_ENV = import.meta.env.MODE || ENVIRONMENTS.DEVELOPMENT;
 // API Configurations for different environments - Now using ApiUrlManager
 export const API_CONFIGS = {
   [ENVIRONMENTS.DEVELOPMENT]: {
-    BASE_URL: apiUrlManager.LOCALHOST_BASE,
+    BASE_URL: apiUrlManager.NGROK_BASE_BE,
     CHAT_ENDPOINT: apiUrlManager.getChatUrl(),
     TIMEOUT: 30000,
     USE_EXTERNAL_CHAT: false
   },
   
   [ENVIRONMENTS.STAGING]: {
-    BASE_URL: apiUrlManager.LOCALHOST_BASE,
+    BASE_URL: apiUrlManager.NGROK_BASE_BE,
     CHAT_ENDPOINT: apiUrlManager.getChatUrl(),
     TIMEOUT: 30000,
     USE_EXTERNAL_CHAT: false
   },
   
   [ENVIRONMENTS.PRODUCTION]: {
-    BASE_URL: apiUrlManager.LOCALHOST_BASE,
+    BASE_URL: apiUrlManager.NGROK_BASE_BE,
     CHAT_ENDPOINT: apiUrlManager.getChatUrl(),
     TIMEOUT: 30000,
     USE_EXTERNAL_CHAT: false

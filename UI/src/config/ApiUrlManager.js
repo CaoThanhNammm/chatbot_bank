@@ -6,8 +6,8 @@
 class ApiUrlManager {
   constructor() {
     // Base URLs
-    this.NGROK_BASE = 'https://2ab7-34-31-37-139.ngrok-free.app/api';
-    this.LOCALHOST_BASE = 'https://c790-171-247-78-59.ngrok-free.app/api';
+    this.NGROK_BASE = 'https://6c70-34-70-90-58.ngrok-free.app/api';
+    this.NGROK_BASE_BE = 'https://8657-171-247-78-59.ngrok-free.app/api';
     
     // Common headers for ngrok requests - Only safe headers to avoid CORS preflight
     this.NGROK_HEADERS = {
@@ -33,7 +33,7 @@ class ApiUrlManager {
    * Get URL for localhost-based endpoints
    */
   getLocalhostUrl(endpoint) {
-    return `${this.LOCALHOST_BASE}${endpoint}`;
+    return `${this.NGROK_BASE_BE}${endpoint}`;
   }
 
   /**
@@ -377,7 +377,7 @@ class ApiUrlManager {
    * Update localhost base URL
    */
   updateLocalhostBase(newLocalhostBase) {
-    this.LOCALHOST_BASE = newLocalhostBase.endsWith('/api') ? newLocalhostBase : `${newLocalhostBase}/api`;
+    this.NGROK_BASE_BE = newLocalhostBase.endsWith('/api') ? newLocalhostBase : `${newLocalhostBase}/api`;
   }
 
   /**
@@ -523,7 +523,7 @@ class ApiUrlManager {
   async testConnection() {
     const results = {
       ngrok: { base: this.NGROK_BASE, endpoints: {} },
-      localhost: { base: this.LOCALHOST_BASE, endpoints: {} }
+      localhost: { base: this.NGROK_BASE_BE, endpoints: {} }
     };
 
     // Test endpoints
@@ -559,7 +559,7 @@ class ApiUrlManager {
 
       // Test localhost
       try {
-        const localhostUrl = `${this.LOCALHOST_BASE}${endpoint}`;
+        const localhostUrl = `${this.NGROK_BASE_BE}${endpoint}`;
         console.log(`Testing localhost endpoint: ${localhostUrl}`);
         
         const response = await fetch(localhostUrl, {
