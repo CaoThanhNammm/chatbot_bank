@@ -219,44 +219,7 @@ const LoginPage = () => {
           </span>
         </div>
 
-        {/* Demo credentials */}
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <p className="text-sm text-blue-700 font-medium mb-3">Tài khoản demo:</p>
-          
-          {/* Admin Account */}
-          <div className="mb-3 p-3 bg-white rounded border border-blue-200">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded">ADMIN</span>
-              <button
-                type="button"
-                onClick={() => setFormData({usernameOrEmail: DEMO_ACCOUNTS.admin.email, password: DEMO_ACCOUNTS.admin.password})}
-                className="text-xs text-blue-600 hover:text-blue-800"
-              >
-                Sử dụng
-              </button>
-            </div>
-            <p className="text-xs text-gray-600">Email: {DEMO_ACCOUNTS.admin.email}</p>
-            <p className="text-xs text-gray-600">Password: {DEMO_ACCOUNTS.admin.password}</p>
-            <p className="text-xs text-gray-500 mt-1">Quản lý người dùng & Fine-tuning</p>
-          </div>
-
-          {/* User Account */}
-          <div className="p-3 bg-white rounded border border-blue-200">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded">USER</span>
-              <button
-                type="button"
-                onClick={() => setFormData({usernameOrEmail: DEMO_ACCOUNTS.user.email, password: DEMO_ACCOUNTS.user.password})}
-                className="text-xs text-blue-600 hover:text-blue-800"
-              >
-                Sử dụng
-              </button>
-            </div>
-            <p className="text-xs text-gray-600">Email: {DEMO_ACCOUNTS.user.email}</p>
-            <p className="text-xs text-gray-600">Password: {DEMO_ACCOUNTS.user.password}</p>
-            <p className="text-xs text-gray-500 mt-1">Khách hàng thông thường</p>
-          </div>
-        </div>
+      
       </form>
     </AuthLayout>
   );
