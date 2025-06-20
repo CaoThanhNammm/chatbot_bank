@@ -39,7 +39,7 @@ const Footer = () => {  return (
               </li>
               <li>
                 <Link to="/chat" className="text-red-200 hover:text-white transition-colors">
-                  Chat AI
+                  Chat
                 </Link>
               </li>
             </ul>
@@ -85,7 +85,7 @@ const Footer = () => {  return (
         {/* Bottom Bar */}
         <div className="border-t border-red-800 mt-8 pt-8 text-center">
           <p className="text-sm text-red-300">
-            © 2025 AGRIBANK AI. Tất cả quyền được bảo lưu. | 
+            © 2025 AGRIBANK. Tất cả quyền được bảo lưu. | 
             <span className="mx-2">Chính sách bảo mật</span> | 
             <span className="mx-2">Điều khoản sử dụng</span>
           </p>

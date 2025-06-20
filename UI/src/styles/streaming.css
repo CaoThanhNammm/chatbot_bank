@@ -35,4 +35,40 @@
 /* Optimize re-renders */
 .message-bubble-content {
   contain: layout;
+  line-height: 1.6;
+}
+
+/* Enhanced formatting styles */
+.message-bubble-content strong {
+  font-weight: 600;
+}
+
+.message-bubble-content em {
+  font-style: italic;
+}
+
+.message-bubble-content code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+/* Bullet point styling */
+.message-bubble-content .flex.items-start {
+  margin-bottom: 8px;
+}
+
+.message-bubble-content .flex.items-start:last-child {
+  margin-bottom: 4px;
+}
+
+/* Spacing for special content */
+.message-bubble-content div[class*="mt-3"] {
+  margin-top: 12px;
+}
+
+/* Better text flow */
+.message-bubble-content {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }

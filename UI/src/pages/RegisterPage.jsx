@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { IoEye, IoEyeOff, IoMail, IoLockClosed, IoPersonOutline } from 'react-icons/io5';
 import { AuthLayout, Button } from '../components';
+import { EmailVerificationModal } from '../components/ui';
 import { USER_ROLES, register } from '../utils/auth';
 
 const RegisterPage = () => {
@@ -19,6 +20,8 @@ const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
+  const [showEmailVerificationModal, setShowEmailVerificationModal] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -119,6 +122,18 @@ const RegisterPage = () => {
 
     return newErrors;
   };
+
+  const handleEmailVerificationModalClose = () => {
+    setShowEmailVerificationModal(false);
+    // Navigate to login page after closing modal
+    navigate('/login', { 
+      state: { 
+        message: 'Vui lòng kiểm tra email và kích hoạt tài khoản trước khi đăng nhập.',
+        email: registeredEmail 
+      } 
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -146,13 +161,9 @@ const RegisterPage = () => {
       console.log('Received user data:', userData); // Debug log
       
       if (userData) {
-        // Registration successful, navigate to login page
-        navigate('/login', { 
-          state: { 
-            message: 'Đăng ký thành công! Vui lòng đăng nhập để tiếp tục.',
-            email: formData.email 
-          } 
-        });
+        // Registration successful, show email verification modal
+        setRegisteredEmail(formData.email);
+        setShowEmailVerificationModal(true);
       }
     } catch (error) {
       console.error('Registration error:', error);
@@ -499,6 +510,13 @@ const RegisterPage = () => {
           </span>
         </div>
       </form>
+
+      {/* Email Verification Modal */}
+      <EmailVerificationModal
+        isOpen={showEmailVerificationModal}
+        onClose={handleEmailVerificationModalClose}
+        email={registeredEmail}
+      />
     </AuthLayout>
   );
 };

@@ -54,10 +54,22 @@ export const formatStreamingChunk = (chunk) => {
   }
 
   // For streaming, we want to preserve the raw format but clean up escape sequences
-  return chunk
+  let formatted = chunk
+    // Handle escaped newlines first
     .replace(/\\n/g, '\n')
+    // Handle escaped quotes
     .replace(/\\"/g, '"')
     .replace(/\\'/g, "'")
+    // Handle Unicode escape sequences (for emojis and special characters)
+    // Support both \uXXXX and \u{XXXXX} formats
+    .replace(/\\u\{([0-9a-fA-F]+)\}/g, (match, code) => {
+      try {
+        const codePoint = parseInt(code, 16);
+        return String.fromCodePoint(codePoint);
+      } catch (e) {
+        return match;
+      }
+    })
     .replace(/\\u([0-9a-fA-F]{4})/g, (match, code) => {
       try {
         return String.fromCharCode(parseInt(code, 16));
@@ -65,9 +77,34 @@ export const formatStreamingChunk = (chunk) => {
         return match;
       }
     })
+    // Handle other escape sequences
     .replace(/\\t/g, '\t')
     .replace(/\\r/g, '\r')
-    .replace(/\\\\/g, '\\');
+    .replace(/\\b/g, '\b')
+    .replace(/\\f/g, '\f')
+    .replace(/\\v/g, '\v')
+    // Handle escaped backslashes (should be last)
+    .replace(/\\\\/g, '\\')
+    // Clean up JSON artifacts that might appear in streaming
+    .replace(/^"/, '')
+    .replace(/"$/, '')
+    .replace(/"}$/, '')
+    // Remove any trailing commas or JSON syntax that might leak through
+    .replace(/,$/, '');
+
+  // Additional cleanup - trim but preserve intentional spacing
+  formatted = formatted.trim();
+
+  // Debug logging in development
+  if (process.env.NODE_ENV === 'development' && chunk !== formatted) {
+    console.log('Formatting applied:', {
+      original: chunk,
+      formatted: formatted,
+      hasEmojis: /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(formatted)
+    });
+  }
+
+  return formatted;
 };
 
 /**

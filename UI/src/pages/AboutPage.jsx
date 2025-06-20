@@ -75,7 +75,7 @@ const AboutPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-6">
-              Về AGRIBANK AI
+              Về AGRIBANK
             </h1>
             <p className="text-xl text-red-100 mb-8 max-w-3xl mx-auto">
               Chúng tôi đang cách mạng hóa ngành ngân hàng Việt Nam bằng công nghệ 
@@ -94,7 +94,7 @@ const AboutPage = () => {
                 Sứ mệnh của chúng tôi
               </h2>
               <p className="text-lg text-red-800 mb-6 leading-relaxed">
-                AGRIBANK AI được sinh ra với sứ mệnh democratize việc tiếp cận dịch vụ ngân hàng 
+                AGRIBANK được sinh ra với sứ mệnh democratize việc tiếp cận dịch vụ ngân hàng 
                 chất lượng cao cho mọi người dân Việt Nam. Chúng tôi tin rằng mọi ai cũng xứng đáng
                 có được sự hỗ trợ tài chính thông minh và kịp thời.
               </p>              <p className="text-lg text-red-800 mb-8 leading-relaxed">

@@ -12,3 +12,4 @@ export { default as UserProfile } from './UserProfile';
 export { default as ConfirmationModal } from './ConfirmationModal';
 export { default as SuccessModal } from './SuccessModal';
 export { default as Toast } from './Toast';
+export { default as EmailVerificationModal } from './EmailVerificationModal';

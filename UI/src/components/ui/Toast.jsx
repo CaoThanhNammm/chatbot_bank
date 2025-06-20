@@ -68,6 +68,8 @@ const Toast = ({
     switch (position) {
       case 'top-right':
         return 'top-4 right-4';
+      case 'top-right-below-header':
+        return 'top-16 right-4'; // Dưới header nhưng trên model selector
       case 'top-left':
         return 'top-4 left-4';
       case 'bottom-right':
@@ -84,7 +86,7 @@ const Toast = ({
   return (
     <div 
       className={`
-        fixed z-50 max-w-sm w-full mx-4 p-4 rounded-lg shadow-lg border
+        fixed z-[75] max-w-sm w-full mx-4 p-4 rounded-lg shadow-lg border
         ${getBackgroundColor()}
         ${getPositionClasses()}
         transform transition-all duration-300 ease-in-out

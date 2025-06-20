@@ -4,7 +4,6 @@
  */
 
 import { API_CONSTANTS } from '../constants/api';
-import { formatStreamingChunk } from '../utils/textFormatter.js';
 
 class ApiService {
   constructor() {
@@ -364,36 +363,32 @@ class ApiService {
                 if (line.includes('"success": true') && line.includes('"response":')) {
                   const jsonMatch = line.match(/\{"success":\s*true,\s*"response":\s*"(.*?)"\}/);
                   if (jsonMatch) {
-                    // Complete JSON in one line
+                    // Complete JSON in one line - store raw content for streaming
                     const content = jsonMatch[1];
-                    const cleanContent = formatStreamingChunk(content);
-                    chunkBuffer += cleanContent;
-                    fullResponse += cleanContent;
+                    chunkBuffer += content;
+                    fullResponse += content;
                     isFirstChunk = false;
                     continue;
                   }
                 }
                 
-                // Handle streaming JSON
+                // Handle streaming JSON - store raw content
                 if (isFirstChunk && line.includes('"success": true, "response": "')) {
                   const startIndex = line.indexOf('"response": "') + 13;
                   const content = line.substring(startIndex);
                   if (content && content !== '"' && !content.endsWith('"}')) {
-                    const cleanContent = formatStreamingChunk(content);
-                    chunkBuffer += cleanContent;
-                    fullResponse += cleanContent;
+                    chunkBuffer += content;
+                    fullResponse += content;
                   }
                   isFirstChunk = false;
                 } else if (!isFirstChunk && line !== '"}' && !line.includes('"success"')) {
-                  const cleanContent = formatStreamingChunk(line);
-                  chunkBuffer += cleanContent;
-                  fullResponse += cleanContent;
+                  chunkBuffer += line;
+                  fullResponse += line;
                 }
               } catch (parseError) {
                 if (!isFirstChunk) {
-                  const cleanContent = formatStreamingChunk(line);
-                  chunkBuffer += cleanContent;
-                  fullResponse += cleanContent;
+                  chunkBuffer += line;
+                  fullResponse += line;
                 }
               }
             }
@@ -408,23 +403,22 @@ class ApiService {
           }
         }
 
-        // Process remaining buffer
+        // Process remaining buffer - store raw content
         if (buffer.trim() && buffer.trim() !== '"}') {
           // Check if buffer contains complete JSON
           const jsonMatch = buffer.match(/\{"success":\s*true,\s*"response":\s*"(.*?)"\}/);
           if (jsonMatch) {
             const content = jsonMatch[1];
-            const cleanContent = formatStreamingChunk(content);
-            if (cleanContent) {
-              fullResponse += cleanContent;
-              chunkBuffer += cleanContent;
+            if (content) {
+              fullResponse += content;
+              chunkBuffer += content;
             }
           } else {
-            // Handle as streaming content
-            const cleanContent = formatStreamingChunk(buffer.replace(/"}$/, ''));
-            if (cleanContent) {
-              fullResponse += cleanContent;
-              chunkBuffer += cleanContent;
+            // Handle as streaming content - store raw
+            const content = buffer.replace(/"}$/, '');
+            if (content) {
+              fullResponse += content;
+              chunkBuffer += content;
             }
           }
         }

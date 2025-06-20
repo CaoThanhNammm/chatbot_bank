@@ -88,12 +88,23 @@ class NgrokChatService {
     if (!response.ok) {
       // Try to get error details
       let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      let serverErrorDetails = null;
+      
       try {
         const errorText = await response.text();
         if (errorText) {
           console.error('Server error details:', errorText);
           console.error('Full response:', response);
-          errorMessage += ` - ${errorText}`;
+          
+          // Try to parse JSON error response
+          try {
+            serverErrorDetails = JSON.parse(errorText);
+            if (serverErrorDetails.message) {
+              errorMessage = serverErrorDetails.message;
+            }
+          } catch (parseError) {
+            errorMessage += ` - ${errorText}`;
+          }
         }
       } catch (e) {
         console.error('Error reading error response:', e);
@@ -116,8 +127,8 @@ class NgrokChatService {
       const text = await response.text();
       try {
         const data = JSON.parse(text);
-        // Extract only the response content if it exists
-        const responseContent = data.response ? formatStreamingChunk(data.response) : text;
+        // Extract and format the response content
+        const responseContent = data.response ? formatStreamingChunk(data.response) : formatStreamingChunk(text);
         return {
           success: data.success || true,
           data: { response: responseContent },
@@ -210,7 +221,7 @@ class NgrokChatService {
         const text = await response.text();
         try {
           const data = JSON.parse(text);
-          const responseContent = data.response ? formatStreamingChunk(data.response) : text;
+          const responseContent = data.response ? formatStreamingChunk(data.response) : formatStreamingChunk(text);
           return {
             success: data.success || true,
             data: { response: responseContent },
@@ -275,11 +286,10 @@ class NgrokChatService {
               if (line.includes('"success": true') && line.includes('"response":')) {
                 const jsonMatch = line.match(/\{"success":\s*true,\s*"response":\s*"(.*?)"\}/);
                 if (jsonMatch) {
-                  // Complete JSON in one line
-                  const content = jsonMatch[1];
-                  const cleanContent = formatStreamingChunk(content);
-                  chunkBuffer += cleanContent;
-                  fullResponse += cleanContent;
+                  // Complete JSON in one line - format the content properly
+                  const content = formatStreamingChunk(jsonMatch[1]);
+                  chunkBuffer += content;
+                  fullResponse += content;
                   isFirstChunk = false;
                   continue;
                 }

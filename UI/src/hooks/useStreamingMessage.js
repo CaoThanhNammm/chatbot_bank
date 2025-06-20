@@ -2,6 +2,7 @@
  * Custom hook for optimized streaming message handling
  */
 import { useCallback, useRef } from 'react';
+import { formatResponseText, formatStreamingChunk } from '../utils/textFormatter';
 
 export const useStreamingMessage = () => {
   const streamingRef = useRef({
@@ -21,7 +22,9 @@ export const useStreamingMessage = () => {
   const updateStreamingContent = useCallback((chunk, setMessages) => {
     if (!streamingRef.current.isStreaming) return;
 
-    streamingRef.current.content += chunk;
+    // Format the chunk before adding to content
+    const formattedChunk = formatStreamingChunk(chunk);
+    streamingRef.current.content += formattedChunk;
     const { messageId, content } = streamingRef.current;
 
     // Optimized state update - only update the last message if it matches
@@ -41,14 +44,17 @@ export const useStreamingMessage = () => {
     if (!streamingRef.current.isStreaming) return;
 
     const { messageId, content } = streamingRef.current;
-    const finalText = finalContent || content;
+    const rawText = finalContent || content;
+    
+    // Format the final text after streaming is complete
+    const formattedText = formatResponseText(rawText);
 
     setMessages(prev => {
       const lastMessage = prev[prev.length - 1];
       if (lastMessage && lastMessage.id === messageId) {
         return [
           ...prev.slice(0, -1),
-          { ...lastMessage, text: finalText, isStreaming: false }
+          { ...lastMessage, text: formattedText, isStreaming: false }
         ];
       }
       return prev;

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { IoMenuOutline, IoAdd, IoTrashOutline, IoChevronDown } from 'react-icons/io5';
+import { IoMenuOutline, IoAdd, IoTrashOutline, IoChevronDown, IoClose } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { Button, ChatWindow, ChatInput, SidePanel } from '../components';
 import { ConfirmationModal, Toast } from '../components/ui';
@@ -41,6 +41,7 @@ const ChatPage = () => {
   const [selectedModel, setSelectedModel] = useState('');
   const [isLoadingModels, setIsLoadingModels] = useState(false);
   const [showModelDropdown, setShowModelDropdown] = useState(false);
+  const [modelNotLoadedError, setModelNotLoadedError] = useState(false);
   
   // Use streaming message hook for optimized performance
   const { startStreaming, updateStreamingContent, finishStreaming } = useStreamingMessage();
@@ -272,7 +273,7 @@ const ChatPage = () => {
         const response = await chatApi.sendSimpleMessage(messageText, (chunk) => {
           // Log chunk for debugging
           console.log('Received chunk:', JSON.stringify(chunk));
-          // Update bot message with new chunk using optimized hook
+          // Update bot message with raw chunk (no formatting during streaming)
           updateStreamingContent(chunk, setCurrentMessages);
           botResponseText += chunk;
         }, selectedModel);
@@ -292,16 +293,24 @@ const ChatPage = () => {
           botResponseText = response.data.response;
         }
         
-        // Mark streaming as finished using optimized hook
+        // Mark streaming as finished - formatting will be done in finishStreaming
         finishStreaming(setCurrentMessages, botResponseText);
         
       } catch (apiError) {
         console.warn('AI API failed, using fallback response:', apiError);
         
+        // Check if error is related to model not loaded
+        const errorMessage = apiError.message || '';
+        if (errorMessage.includes('Model not loaded') || errorMessage.includes('Please load model first')) {
+          setModelNotLoadedError(true);
+          // Hide error after 5 seconds
+          setTimeout(() => setModelNotLoadedError(false), 5000);
+        }
+        
         // Use fallback banking response
         botResponseText = getBankingResponse(messageText);
         
-        // Update the bot message with fallback response using optimized hook
+        // Update the bot message with fallback response - formatting will be done in finishStreaming
         finishStreaming(setCurrentMessages, botResponseText);
       }
 
@@ -427,7 +436,7 @@ const ChatPage = () => {
       {/* Main Chat Area */}
       <div className="flex flex-col flex-1 min-w-0">
         {/* Header Area - Minimal */}
-        <div className="relative bg-white border-b border-gray-200 p-4">
+        <div className={`relative bg-white border-b border-gray-200 p-4 ${isSidePanelOpen ? 'z-30' : 'z-auto'}`}>
           {/* Left side buttons */}
           <div className="absolute left-4 top-1/2 transform -translate-y-1/2 flex items-center space-x-1 z-10">
             {/* Menu toggle button */}
@@ -507,7 +516,7 @@ const ChatPage = () => {
           </div>
 
           {/* Right side - Model selector */}
-          <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+          <div className={`absolute right-4 top-1/2 transform -translate-y-1/2 ${isSidePanelOpen ? 'z-30' : 'z-[100]'}`}>
             <div className="relative model-dropdown">
               <button
                 onClick={() => setShowModelDropdown(!showModelDropdown)}
@@ -534,7 +543,7 @@ const ChatPage = () => {
 
               {/* Dropdown menu */}
               {showModelDropdown && !isLoadingModels && (
-                <div className="absolute right-0 top-full mt-1 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                <div className="absolute right-0 top-full mt-1 w-80 bg-white border border-gray-200 rounded-lg shadow-2xl z-[9999] max-h-60 overflow-y-auto backdrop-blur-sm">
                   {availableModels.length === 0 ? (
                     <div className="px-4 py-3 text-sm text-gray-500 text-center">
                       Không có model nào khả dụng
@@ -563,6 +572,39 @@ const ChatPage = () => {
           </div>
         </div>
         
+        {/* Model not loaded notification */}
+        {((!selectedModel || availableModels.length === 0) && !isLoadingModels || modelNotLoadedError) && (
+          <div className="absolute top-20 right-4 z-50">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 shadow-lg max-w-xs animate-fade-in relative">
+              {/* Close button */}
+              <button
+                onClick={() => setModelNotLoadedError(false)}
+                className="absolute top-2 right-2 text-yellow-600 hover:text-yellow-800 transition-colors"
+                aria-label="Đóng thông báo"
+              >
+                <IoClose className="w-4 h-4" />
+              </button>
+              
+              <div className="flex items-start space-x-2 pr-6">
+                <div className="w-5 h-5 bg-yellow-400 rounded-full flex-shrink-0 mt-0.5 animate-pulse"></div>
+                <div>
+                  <p className="text-sm font-medium text-yellow-800">
+                    Model chưa được load
+                  </p>
+                  <p className="text-xs text-yellow-700 mt-1">
+                    Hãy đợi Admin load nhé
+                  </p>
+                  {modelNotLoadedError && (
+                    <p className="text-xs text-red-600 mt-1 font-medium">
+                      Server: Model not loaded. Please load model first.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Chat Window */}
         <ChatWindow 
           messages={currentMessages} 
@@ -617,7 +659,7 @@ const ChatPage = () => {
         message="Tất cả tin nhắn đã được xóa thành công."
         type="success"
         duration={3000}
-        position="top-right"
+        position="top-right-below-header"
       />
     </div>
   );

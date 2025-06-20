@@ -36,28 +36,11 @@ const ContactPage = () => {
       icon: <IoTime size={24} />,
       title: 'Giờ hoạt động',
       content: '24/7 - Không ngừng nghỉ',
-      description: 'AI chatbot luôn sẵn sàng'
+      description: 'Chat luôn sẵn sàng'
     }
   ];
 
-  const faqItems = [
-    {
-      question: 'AGRIBANK AI có miễn phí không?',
-      answer: 'Có, AGRIBANK AI hoàn toàn miễn phí cho khách hàng. Bạn chỉ cần đăng ký tài khoản để sử dụng.'
-    },
-    {
-      question: 'Tôi có thể hỏi những gì với AGRIBANK AI?',
-      answer: 'Bạn có thể hỏi về mọi dịch vụ ngân hàng: mở tài khoản, chuyển tiền, vay vốn, đầu tư, bảo hiểm, và nhiều hơn nữa.'
-    },
-    {
-      question: 'Thông tin của tôi có được bảo mật không?',
-      answer: 'Tuyệt đối. Chúng tôi sử dụng mã hóa cấp ngân hàng và tuân thủ các tiêu chuẩn bảo mật quốc tế nghiêm ngặt.'
-    },
-    {
-      question: 'AGRIBANK AI có thể thực hiện giao dịch không?',
-      answer: 'Hiện tại AGRIBANK AI chỉ tư vấn và hướng dẫn. Mọi giao dịch cần được thực hiện qua kênh chính thức của ngân hàng.'
-    }
-  ];
+  const faqItems = [];
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({

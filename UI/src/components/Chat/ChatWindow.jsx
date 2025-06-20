@@ -56,7 +56,7 @@ const ChatWindow = ({ messages, isTyping, loading = false }) => {
               <span className="text-2xl">🏦</span>
             </div>
             <h2 className="text-2xl font-playfair font-semibold text-red-900 mb-2">
-              Chào mừng đến với AGRIBANK AI
+              Chào mừng đến với AGRIBANK
             </h2>
             <p className="text-red-800 max-w-md mx-auto">
               Tôi là trợ lý AI của AGRIBANK, sẵn sàng hỗ trợ bạn về các dịch vụ ngân hàng, 

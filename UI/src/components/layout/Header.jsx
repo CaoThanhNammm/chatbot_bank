@@ -143,7 +143,7 @@ const Header = ({
               Liên hệ
             </Link>
             <Link to="/chat" className="text-neutral-700 hover:text-primary-600 transition-colors font-medium">
-              Chat AI
+              Chat
             </Link>
           </nav>
           
