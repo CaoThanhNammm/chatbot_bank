@@ -332,7 +332,13 @@ const StaffTrainingPage = () => {
     
     let dateObj;
     if (typeof date === 'string') {
-      dateObj = new Date(date);
+      // Nếu chuỗi thời gian không có timezone info, coi như là UTC
+      if (date.includes('T') && !date.includes('Z') && !date.includes('+') && !date.includes('-', 10)) {
+        // Thêm 'Z' để đánh dấu là UTC
+        dateObj = new Date(date + 'Z');
+      } else {
+        dateObj = new Date(date);
+      }
     } else if (date instanceof Date) {
       dateObj = date;
     } else {
@@ -344,17 +350,18 @@ const StaffTrainingPage = () => {
       return 'N/A';
     }
     
-    // Sử dụng toLocaleString để hiển thị cả ngày và giờ theo múi giờ hệ thống
-    return dateObj.toLocaleString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-      timeZone: 'Asia/Ho_Chi_Minh' // Múi giờ Việt Nam
-    });
+    // Chuyển đổi từ UTC sang giờ Việt Nam (UTC+7)
+    const vietnamTime = new Date(dateObj.getTime() + (7 * 60 * 60 * 1000));
+    
+    // Format thủ công để đảm bảo định dạng chính xác
+    const year = vietnamTime.getUTCFullYear();
+    const month = String(vietnamTime.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(vietnamTime.getUTCDate()).padStart(2, '0');
+    const hours = String(vietnamTime.getUTCHours()).padStart(2, '0');
+    const minutes = String(vietnamTime.getUTCMinutes()).padStart(2, '0');
+    const seconds = String(vietnamTime.getUTCSeconds()).padStart(2, '0');
+    
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
   };
 
   const getTaskStatusBadge = (status) => {
