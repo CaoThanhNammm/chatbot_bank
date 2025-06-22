@@ -328,23 +328,32 @@ const StaffTrainingPage = () => {
   };
 
   const formatDate = (date) => {
+    if (!date) return 'N/A';
+    
+    let dateObj;
     if (typeof date === 'string') {
-      return new Date(date).toLocaleDateString('vi-VN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      });
+      dateObj = new Date(date);
+    } else if (date instanceof Date) {
+      dateObj = date;
+    } else {
+      return 'N/A';
     }
-    return date.toLocaleDateString('vi-VN', {
+    
+    // Kiểm tra nếu date không hợp lệ
+    if (isNaN(dateObj.getTime())) {
+      return 'N/A';
+    }
+    
+    // Sử dụng toLocaleString để hiển thị cả ngày và giờ theo múi giờ hệ thống
+    return dateObj.toLocaleString('vi-VN', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
-      hour12: false
+      second: '2-digit',
+      hour12: false,
+      timeZone: 'Asia/Ho_Chi_Minh' // Múi giờ Việt Nam
     });
   };
 
