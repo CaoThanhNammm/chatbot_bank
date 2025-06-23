@@ -141,8 +141,10 @@ const MessageBubble = memo(({ message, isBot, timestamp, isStreaming = false }) 
         // Handle other emojis that should have proper spacing
         .replace(/(🚀|📄|📑|📈|🏡|💵|📆|🏦|📞|🚚|📝|📊|🕒|🌞|🌐|💻)\s*/g, '$1 ');
       
-      // Define formatting patterns with priority order (longer patterns first to avoid conflicts)
+      // Define formatting patterns with priority order (URLs first to avoid conflicts)
       const patterns = [
+        // URL pattern - should be processed first to avoid conflicts with other formatting
+        { regex: /(https?:\/\/[^\s<>"{}|\\^`[\]]+)/g, tag: 'link', className: 'text-blue-600 hover:text-blue-800 underline break-all' },
         { regex: /\*\*\*(.*?)\*\*\*/g, tag: 'strongem', className: 'font-bold italic text-red-800' },  // ***bold italic***
         { regex: /\*\*(.*?)\*\*/g, tag: 'strong', className: 'font-bold text-red-800' },              // **bold**
         { regex: /__(.*?)__/g, tag: 'u', className: 'underline' },                       // __underline__
@@ -226,6 +228,24 @@ const MessageBubble = memo(({ message, isBot, timestamp, isStreaming = false }) 
             break;
           case 'code':
             result.push(<code key={key} className={match.className}>{match.content}</code>);
+            break;
+          case 'link':
+            result.push(
+              <a 
+                key={key} 
+                href={match.content} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className={match.className}
+                onClick={(e) => {
+                  // Ensure the link opens in a new tab
+                  e.preventDefault();
+                  window.open(match.content, '_blank', 'noopener,noreferrer');
+                }}
+              >
+                {match.content}
+              </a>
+            );
             break;
           default:
             result.push(match.content);
@@ -323,6 +343,10 @@ const MessageBubble = memo(({ message, isBot, timestamp, isStreaming = false }) 
       .replace(/([📑🏡🚚📈📝📄📊📞🏦🕒🌞🌐💻🚀])\s*([📑🏡🚚📈📝📄📊📞🏦🕒🌞🌐💻🚀])/g, '$1 $2')
       // Fix website URLs that got broken
       .replace(/\[Website chính thức của Agribank\]\(http: \/\/www\.agribank\.com\.vn\)/g, '[Website chính thức của Agribank](http://www.agribank.com.vn)')
+      // Fix URLs with broken spacing (e.g., "https: //www.google.com" -> "https://www.google.com")
+      .replace(/(https?): \/\//g, '$1://')
+      // Fix URLs wrapped in parentheses with spaces (e.g., "(https: //www.google.com)" -> "https://www.google.com")
+      .replace(/\(\s*(https?): \/\/([^)]+)\s*\)/g, '$1://$2')
       .replace(/www\.agribank\.com\.vn\*\*/g, 'www.agribank.com.vn')
       // Fix phone numbers with formatting issues
       .replace(/1900 55 88 18\*\*/g, '1900 55 88 18')
