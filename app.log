@@ -814,3 +814,45 @@
 2025-06-26 07:54:08,067 - app - INFO - Database tables created successfully
 2025-06-26 07:54:08,076 - werkzeug - WARNING -  * Debugger is active!
 2025-06-26 07:54:08,083 - werkzeug - INFO -  * Debugger PIN: 666-068-108
+2025-06-26 08:05:38,926 - pyngrok.process.ngrok - INFO - t=2025-06-26T08:05:38+0700 lvl=info msg="join connections" obj=join id=110fa1dc0fdd l=127.0.0.1:5000 r=34.38.147.151:37656
+2025-06-26 08:05:38,929 - werkzeug - INFO - 127.0.0.1 - - [26/Jun/2025 08:05:38] "[33mGET / HTTP/1.1[0m" 404 -
+2025-06-26 10:54:38,500 - pyngrok.process.ngrok - INFO - t=2025-06-26T10:54:38+0700 lvl=info msg="received stop request" obj=app stopReq="{err:<nil> restart:false}"
+2025-06-26 10:54:38,502 - pyngrok.process.ngrok - INFO - t=2025-06-26T10:54:38+0700 lvl=info msg="session closing" obj=tunnels.session err=nil
+2025-06-26 10:54:38,503 - pyngrok.process.ngrok - INFO - t=2025-06-26T10:54:38+0700 lvl=info msg="accept failed" obj=tunnels.session obj=csess id=5033ac51ace2 err="reconnecting session closed"
+2025-06-26 10:54:38,503 - pyngrok.process.ngrok - INFO - t=2025-06-26T10:54:38+0700 lvl=info msg="failed to accept connection: Listener closed" obj=tunnels.session clientid=17d15877f4c9a1189454ddedee7641a7
+2025-06-26 10:54:38,503 - pyngrok.process.ngrok - WARNING - t=2025-06-26T10:54:38+0700 lvl=warn msg="Stopping forwarder" name=http-5000-f1ff9a71-8280-40df-aaed-32c075ba54fc acceptErr="failed to accept connection: Listener closed"
+2025-06-26 10:54:38,503 - pyngrok.process.ngrok - INFO - t=2025-06-26T10:54:38+0700 lvl=info msg="no more state changes" obj=tunnels.session
+2025-06-26 14:48:38,347 - app.database - INFO - Database initialized with URI: mysql+pymysql://root:@localhost:3306/llama_factory
+2025-06-26 14:48:38,348 - app.mail_config - INFO - Mail service initialized
+2025-06-26 14:48:54,721 - datasets - INFO - PyTorch version 2.7.0+cu118 available.
+2025-06-26 14:49:23,739 - app - INFO - Database tables created successfully
+2025-06-26 14:49:30,904 - pyngrok.process - INFO - Updating authtoken for default "config_path" of "ngrok_path": C:\Users\Nam\AppData\Local\ngrok\ngrok.exe
+2025-06-26 14:49:31,717 - pyngrok.ngrok - INFO - Opening tunnel named: http-5000-34fc4832-6784-49bd-a98d-430880804f86
+2025-06-26 14:49:31,749 - pyngrok.process.ngrok - INFO - t=2025-06-26T14:49:31+0700 lvl=info msg="no configuration paths supplied"
+2025-06-26 14:49:31,749 - pyngrok.process.ngrok - INFO - t=2025-06-26T14:49:31+0700 lvl=info msg="using configuration at default config path" path=C:\\Users\\Nam\\AppData\\Local/ngrok/ngrok.yml
+2025-06-26 14:49:31,749 - pyngrok.process.ngrok - INFO - t=2025-06-26T14:49:31+0700 lvl=info msg="open config file" path=C:\\Users\\Nam\\AppData\\Local\\ngrok\\ngrok.yml err=nil
+2025-06-26 14:49:31,751 - pyngrok.process.ngrok - INFO - t=2025-06-26T14:49:31+0700 lvl=info msg="starting web service" obj=web addr=127.0.0.1:4040 allow_hosts=[]
+2025-06-26 14:49:32,033 - pyngrok.process.ngrok - INFO - t=2025-06-26T14:49:32+0700 lvl=info msg="client session established" obj=tunnels.session
+2025-06-26 14:49:32,034 - pyngrok.process.ngrok - INFO - t=2025-06-26T14:49:32+0700 lvl=info msg="tunnel session started" obj=tunnels.session
+2025-06-26 14:49:32,064 - pyngrok.process.ngrok - INFO - t=2025-06-26T14:49:32+0700 lvl=info msg=start pg=/api/tunnels id=c6154bff3e29b827
+2025-06-26 14:49:32,064 - pyngrok.process.ngrok - INFO - t=2025-06-26T14:49:32+0700 lvl=info msg=end pg=/api/tunnels id=c6154bff3e29b827 status=200 dur=0s
+2025-06-26 14:49:32,065 - pyngrok.process.ngrok - INFO - t=2025-06-26T14:49:32+0700 lvl=info msg=start pg=/api/tunnels id=904588d8b34d1734
+2025-06-26 14:49:32,065 - pyngrok.process.ngrok - INFO - t=2025-06-26T14:49:32+0700 lvl=info msg=end pg=/api/tunnels id=904588d8b34d1734 status=200 dur=0s
+2025-06-26 14:49:32,066 - pyngrok.process.ngrok - INFO - t=2025-06-26T14:49:32+0700 lvl=info msg=start pg=/api/tunnels id=16fea6e764c6f96c
+2025-06-26 14:49:32,066 - pyngrok.process.ngrok - INFO - t=2025-06-26T14:49:32+0700 lvl=info msg=end pg=/api/tunnels id=16fea6e764c6f96c status=200 dur=0s
+2025-06-26 14:49:32,067 - pyngrok.process.ngrok - INFO - t=2025-06-26T14:49:32+0700 lvl=info msg=start pg=/api/tunnels id=941c0f09d86a603b
+2025-06-26 14:49:32,112 - pyngrok.process.ngrok - INFO - t=2025-06-26T14:49:32+0700 lvl=info msg="started tunnel" obj=tunnels name=http-5000-34fc4832-6784-49bd-a98d-430880804f86 addr=http://localhost:5000 url=https://efd9-171-247-78-59.ngrok-free.app
+2025-06-26 14:49:32,112 - pyngrok.process.ngrok - INFO - t=2025-06-26T14:49:32+0700 lvl=info msg=end pg=/api/tunnels id=941c0f09d86a603b status=201 dur=44.9139ms
+2025-06-26 14:49:32,191 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.101.7:5000
+2025-06-26 14:49:32,191 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-26 14:49:32,194 - werkzeug - INFO -  * Restarting with stat
+2025-06-26 14:49:32,750 - pyngrok.process.ngrok - INFO - t=2025-06-26T14:49:32+0700 lvl=info msg="update available" obj=updater
+2025-06-26 14:49:33,480 - app.database - INFO - Database initialized with URI: mysql+pymysql://root:@localhost:3306/llama_factory
+2025-06-26 14:49:33,480 - app.mail_config - INFO - Mail service initialized
+2025-06-26 14:49:36,388 - datasets - INFO - PyTorch version 2.7.0+cu118 available.
+2025-06-26 14:49:41,470 - app - INFO - Database tables created successfully
+2025-06-26 14:49:41,479 - werkzeug - WARNING -  * Debugger is active!
+2025-06-26 14:49:41,484 - werkzeug - INFO -  * Debugger PIN: 666-068-108

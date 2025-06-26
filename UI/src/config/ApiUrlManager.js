@@ -6,8 +6,8 @@
 class ApiUrlManager {
   constructor() {
     // Base URLs
-    this.NGROK_BASE = 'https://dcfb-104-198-10-171.ngrok-free.app/api';
-    this.NGROK_BASE_BE = 'https://3c16-171-247-78-59.ngrok-free.app/api';
+    this.NGROK_BASE = 'https://99da-34-170-85-255.ngrok-free.app/api';
+    this.NGROK_BASE_BE = 'https://efd9-171-247-78-59.ngrok-free.app/api';
     
     // Common headers for ngrok requests - Only safe headers to avoid CORS preflight
     this.NGROK_HEADERS = {
