@@ -9,16 +9,24 @@ class ApiUrlManager {
     this.NGROK_BASE = 'https://c5ba-34-60-83-102.ngrok-free.app/api';
     this.NGROK_BASE_BE = 'https://efd9-171-247-78-59.ngrok-free.app/api';
     
-    // Common headers for ngrok requests - Only safe headers to avoid CORS preflight
+    // Common headers for ngrok requests - CORS enabled for all origins
     this.NGROK_HEADERS = {
       'ngrok-skip-browser-warning': 'true',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning',
+      'Access-Control-Allow-Credentials': 'false'
     };
     
-    // Common headers for localhost requests - Only safe headers to avoid CORS preflight
+    // Common headers for localhost requests - CORS enabled for all origins
     this.LOCALHOST_HEADERS = {
       'ngrok-skip-browser-warning': 'true',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning',
+      'Access-Control-Allow-Credentials': 'false'
     };
   }
 
@@ -352,16 +360,20 @@ class ApiUrlManager {
   }
 
   /**
-   * Get CORS-safe headers for any endpoint
+   * Get CORS-safe headers for any endpoint - Open for all origins
    */
   getCorsHeaders(endpoint, additionalHeaders = {}) {
     const baseHeaders = this.getHeaders(endpoint);
     
     return {
       ...baseHeaders,
-      // Force CORS bypass headers
-      'Access-Control-Request-Method': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Request-Headers': 'Content-Type, Authorization, X-Requested-With',
+      // Force CORS bypass headers - Open for all origins
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning',
+      'Access-Control-Allow-Credentials': 'false',
+      'Access-Control-Request-Method': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
+      'Access-Control-Request-Headers': 'Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning',
       ...additionalHeaders
     };
   }
@@ -381,28 +393,48 @@ class ApiUrlManager {
   }
 
   /**
-   * Get URL with CORS bypass parameters
+   * Get URL with CORS bypass parameters - Open for all origins
    * This adds necessary parameters to bypass CORS restrictions
    */
   getProxiedUrl(endpoint) {
     const originalUrl = this.getUrl(endpoint);
     const separator = originalUrl.includes('?') ? '&' : '?';
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://chatbot-bank.vercel.app';
+    const origin = typeof window !== 'undefined' ? window.location.origin : '*';
     
-    return `${originalUrl}${separator}cors_bypass=true&origin=${encodeURIComponent(origin)}&_t=${Date.now()}`;
+    return `${originalUrl}${separator}cors_bypass=true&origin=${encodeURIComponent(origin)}&_t=${Date.now()}&access_control_allow_origin=*`;
   }
 
   /**
-   * Make a CORS-safe request with proper headers and error handling
+   * Get universal CORS headers that work with any origin
+   */
+  getUniversalCorsHeaders(additionalHeaders = {}) {
+    return {
+      'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning, Origin, Accept',
+      'Access-Control-Allow-Credentials': 'false',
+      'Access-Control-Max-Age': '86400',
+      ...additionalHeaders
+    };
+  }
+
+  /**
+   * Make a CORS-safe request with proper headers and error handling - Open for all origins
    */
   async makeCorsRequest(url, options = {}) {
     const isNgrok = url.includes('ngrok');
     const baseHeaders = isNgrok ? this.getNgrokHeaders() : this.getLocalhostHeaders();
     
-    // Clean headers - remove any unsafe headers
-    const safeHeaders = { ...baseHeaders };
-    delete safeHeaders['Origin'];
-    delete safeHeaders['Referer'];
+    // Enhanced headers for CORS bypass - Open for all origins
+    const corsHeaders = {
+      ...baseHeaders,
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning',
+      'Access-Control-Allow-Credentials': 'false'
+    };
     
     // Merge with provided options
     const requestOptions = {
@@ -410,7 +442,7 @@ class ApiUrlManager {
       credentials: 'omit',
       ...options,
       headers: {
-        ...safeHeaders,
+        ...corsHeaders,
         ...options.headers
       }
     };
@@ -422,10 +454,10 @@ class ApiUrlManager {
     }
 
     try {
-      console.log(`Making request to: ${url}`);
+      console.log(`Making CORS-enabled request to: ${url}`);
       console.log('Request options:', requestOptions);
       
-      // First attempt with CORS
+      // First attempt with CORS - Open for all origins
       const response = await fetch(url, requestOptions);
       
       if (response.ok) {
@@ -444,7 +476,11 @@ class ApiUrlManager {
       // Try with no-cors mode as fallback
       const noCorsResponse = await fetch(url, {
         ...requestOptions,
-        mode: 'no-cors'
+        mode: 'no-cors',
+        headers: {
+          ...corsHeaders,
+          ...options.headers
+        }
       });
       
       return noCorsResponse;
@@ -458,22 +494,64 @@ class ApiUrlManager {
   // ==================== CONVENIENCE METHODS ====================
   
   /**
+   * Make a universal CORS request that works with any origin
+   */
+  async makeUniversalRequest(url, options = {}) {
+    const universalHeaders = this.getUniversalCorsHeaders(options.headers);
+    
+    // Add ngrok bypass if needed
+    if (url.includes('ngrok') && !url.includes('ngrok-skip-browser-warning')) {
+      const separator = url.includes('?') ? '&' : '?';
+      url = `${url}${separator}ngrok-skip-browser-warning=true`;
+    }
+
+    const requestOptions = {
+      mode: 'cors',
+      credentials: 'omit',
+      ...options,
+      headers: universalHeaders
+    };
+
+    try {
+      console.log(`Making universal CORS request to: ${url}`);
+      console.log('Universal headers:', universalHeaders);
+      
+      const response = await fetch(url, requestOptions);
+      
+      if (response.ok || response.status === 0) {
+        return response;
+      }
+      
+      // Try with no-cors as fallback
+      console.warn(`CORS request failed, trying no-cors mode...`);
+      return await fetch(url, {
+        ...requestOptions,
+        mode: 'no-cors'
+      });
+      
+    } catch (error) {
+      console.error(`Universal request failed for ${url}:`, error);
+      throw error;
+    }
+  }
+  
+  /**
    * Perform GET request with automatic CORS handling
    */
   async get(endpoint, options = {}) {
     const url = this.getUrl(endpoint);
-    return this.makeCorsRequest(url, {
+    return this.makeUniversalRequest(url, {
       method: 'GET',
       ...options
     });
   }
 
   /**
-   * Perform POST request with automatic CORS handling
+   * Perform POST request with universal CORS handling
    */
   async post(endpoint, data = null, options = {}) {
     const url = this.getUrl(endpoint);
-    return this.makeCorsRequest(url, {
+    return this.makeUniversalRequest(url, {
       method: 'POST',
       body: data ? JSON.stringify(data) : null,
       ...options
@@ -481,11 +559,11 @@ class ApiUrlManager {
   }
 
   /**
-   * Perform PUT request with automatic CORS handling
+   * Perform PUT request with universal CORS handling
    */
   async put(endpoint, data = null, options = {}) {
     const url = this.getUrl(endpoint);
-    return this.makeCorsRequest(url, {
+    return this.makeUniversalRequest(url, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : null,
       ...options
@@ -493,22 +571,22 @@ class ApiUrlManager {
   }
 
   /**
-   * Perform DELETE request with automatic CORS handling
+   * Perform DELETE request with universal CORS handling
    */
   async delete(endpoint, options = {}) {
     const url = this.getUrl(endpoint);
-    return this.makeCorsRequest(url, {
+    return this.makeUniversalRequest(url, {
       method: 'DELETE',
       ...options
     });
   }
 
   /**
-   * Perform PATCH request with automatic CORS handling
+   * Perform PATCH request with universal CORS handling
    */
   async patch(endpoint, data = null, options = {}) {
     const url = this.getUrl(endpoint);
-    return this.makeCorsRequest(url, {
+    return this.makeUniversalRequest(url, {
       method: 'PATCH',
       body: data ? JSON.stringify(data) : null,
       ...options
@@ -516,6 +594,29 @@ class ApiUrlManager {
   }
 
   // ==================== DEBUG & TESTING METHODS ====================
+  
+  /**
+   * Enable CORS for all endpoints - Universal access
+   */
+  enableUniversalCors() {
+    console.log('Enabling universal CORS for all endpoints...');
+    
+    // Update headers to allow all origins
+    this.NGROK_HEADERS = this.getUniversalCorsHeaders();
+    this.LOCALHOST_HEADERS = this.getUniversalCorsHeaders();
+    
+    console.log('Universal CORS enabled for:');
+    console.log('- NGROK_BASE:', this.NGROK_BASE);
+    console.log('- NGROK_BASE_BE:', this.NGROK_BASE_BE);
+    console.log('- Headers:', this.NGROK_HEADERS);
+    
+    return {
+      ngrokBase: this.NGROK_BASE,
+      localhostBase: this.NGROK_BASE_BE,
+      headers: this.NGROK_HEADERS,
+      status: 'Universal CORS enabled for all origins'
+    };
+  }
   
   /**
    * Test connection to server endpoints
