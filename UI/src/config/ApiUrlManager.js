@@ -6,27 +6,19 @@
 class ApiUrlManager {
   constructor() {
     // Base URLs
-    this.NGROK_BASE = 'https://50a0-34-27-40-188.ngrok-free.app/api';
+    this.NGROK_BASE = 'https://40cb-34-27-40-188.ngrok-free.app/api';
     this.NGROK_BASE_BE = 'https://5b22-171-247-78-59.ngrok-free.app/api';
     
-    // Common headers for ngrok requests - CORS enabled for all origins
+    // Common headers for ngrok requests
     this.NGROK_HEADERS = {
       'ngrok-skip-browser-warning': 'true',
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning',
-      'Access-Control-Allow-Credentials': 'false'
+      'Content-Type': 'application/json'
     };
     
-    // Common headers for localhost requests - CORS enabled for all origins
+    // Common headers for localhost requests
     this.LOCALHOST_HEADERS = {
       'ngrok-skip-browser-warning': 'true',
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning',
-      'Access-Control-Allow-Credentials': 'false'
+      'Content-Type': 'application/json'
     };
   }
 
@@ -360,20 +352,13 @@ class ApiUrlManager {
   }
 
   /**
-   * Get CORS-safe headers for any endpoint - Open for all origins
+   * Get headers for any endpoint
    */
   getCorsHeaders(endpoint, additionalHeaders = {}) {
     const baseHeaders = this.getHeaders(endpoint);
     
     return {
       ...baseHeaders,
-      // Force CORS bypass headers - Open for all origins
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning',
-      'Access-Control-Allow-Credentials': 'false',
-      'Access-Control-Request-Method': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
-      'Access-Control-Request-Headers': 'Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning',
       ...additionalHeaders
     };
   }
@@ -405,36 +390,22 @@ class ApiUrlManager {
   }
 
   /**
-   * Get universal CORS headers that work with any origin
+   * Get universal headers that work with any endpoint
    */
   getUniversalCorsHeaders(additionalHeaders = {}) {
     return {
       'Content-Type': 'application/json',
       'ngrok-skip-browser-warning': 'true',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning, Origin, Accept',
-      'Access-Control-Allow-Credentials': 'false',
-      'Access-Control-Max-Age': '86400',
       ...additionalHeaders
     };
   }
 
   /**
-   * Make a CORS-safe request with proper headers and error handling - Open for all origins
+   * Make a request with proper headers and error handling
    */
   async makeCorsRequest(url, options = {}) {
     const isNgrok = url.includes('ngrok');
     const baseHeaders = isNgrok ? this.getNgrokHeaders() : this.getLocalhostHeaders();
-    
-    // Enhanced headers for CORS bypass - Open for all origins
-    const corsHeaders = {
-      ...baseHeaders,
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, ngrok-skip-browser-warning',
-      'Access-Control-Allow-Credentials': 'false'
-    };
     
     // Merge with provided options
     const requestOptions = {
@@ -442,7 +413,7 @@ class ApiUrlManager {
       credentials: 'omit',
       ...options,
       headers: {
-        ...corsHeaders,
+        ...baseHeaders,
         ...options.headers
       }
     };
@@ -478,7 +449,7 @@ class ApiUrlManager {
         ...requestOptions,
         mode: 'no-cors',
         headers: {
-          ...corsHeaders,
+          ...baseHeaders,
           ...options.headers
         }
       });
