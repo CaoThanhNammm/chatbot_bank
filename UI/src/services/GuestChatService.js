@@ -1,248 +1,225 @@
 /**
  * Guest Chat Service
- * Service for handling guest chat API calls
+ * Handles communication with guest chat API (no database storage)
  */
 
-import { CHAT_CONFIG } from '../config/environment';
+import axios from 'axios';
+import { API_CONSTANTS } from '../constants/api';
 
-const API_ENDPOINT = CHAT_CONFIG.GUEST_CHAT_ENDPOINT;
-
-/**
- * Send message to guest chat API with streaming support
- * @param {string} message - The message to send
- * @param {Function} onChunk - Optional callback for streaming chunks
- * @returns {Promise<Object>} - API response
- */
-export const sendGuestMessage = async (message, onChunk = null) => {
-  // Try multiple approaches to handle CORS
-  const approaches = [
-    () => sendWithCors(message, onChunk),
-    () => sendWithNoCors(message, onChunk)
-  ];
-
-  for (let i = 0; i < approaches.length; i++) {
-    try {
-      console.log(`Trying guest chat approach ${i + 1}...`);
-      const result = await approaches[i]();
-      if (result.success) {
-        console.log('Success with guest chat approach', i + 1);
-        return result;
+class GuestChatService {
+  constructor() {
+    // Create axios instance for guest API
+    this.axiosInstance = axios.create({
+      baseURL: '',
+      timeout: 30000,
+      headers: {
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true' // Skip ngrok browser warning
       }
-    } catch (error) {
-      console.log(`Guest chat approach ${i + 1} failed:`, error.message);
-      if (i === approaches.length - 1) {
-        // Last approach failed, return error
-        return {
-          success: false,
-          error: `All guest chat approaches failed. Last error: ${error.message}`
-        };
+    });
+
+    // Setup request interceptor
+    this.axiosInstance.interceptors.request.use(
+      (config) => {
+        console.log('Guest Chat API Request:', config);
+        return config;
+      },
+      (error) => {
+        console.error('Guest Chat API Request Error:', error);
+        return Promise.reject(error);
       }
-    }
-  }
-};
+    );
 
-/**
- * Primary CORS approach
- */
-const sendWithCors = async (message, onChunk) => {
-  const response = await fetch(API_ENDPOINT, {
-    method: 'POST',
-    mode: 'cors',
-    credentials: 'omit',
-    headers: {
-      'Content-Type': 'application/json',
-      'ngrok-skip-browser-warning': 'true',
-      'Accept': 'application/json',
-      'Access-Control-Request-Method': 'POST',
-      'Access-Control-Request-Headers': 'Content-Type,ngrok-skip-browser-warning'
-    },
-    body: JSON.stringify({
-      message: message
-    })
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    // Setup response interceptor
+    this.axiosInstance.interceptors.response.use(
+      (response) => {
+        console.log('Guest Chat API Response:', response);
+        return response;
+      },
+      (error) => {
+        console.error('Guest Chat API Response Error:', error);
+        return Promise.reject(error);
+      }
+    );
   }
 
-  // Handle streaming response if callback provided
-  if (onChunk && typeof onChunk === 'function') {
-    return await handleStreamingResponse(response, onChunk);
-  } else {
-    // Fallback: read entire response at once
-    const text = await response.text();
-    console.log('Raw API response:', text); // Debug log
+  /**
+   * Handle API response
+   */
+  handleResponse(response) {
+    const data = response.data;
     
-    try {
-      const data = JSON.parse(text);
-      console.log('Parsed API data:', data); // Debug log
-      
-      if (!data.success) {
-        throw new Error(data.error || 'API returned unsuccessful response');
-      }
-      
-      // Extract only the response content, not the entire JSON object
-      const responseContent = data.response || text;
-      console.log('Extracted response content:', responseContent); // Debug log
+    // Check if response has success field
+    if (data && typeof data.success === 'boolean') {
+      // Extract the actual chat response content
+      const chatResponse = data.response || data.message || data.data || '';
       
       return {
-        success: true,
-        response: responseContent
-      };
-    } catch (parseError) {
-      console.log('JSON parse error:', parseError); // Debug log
-      
-      // If it's not valid JSON, treat as raw text response
-      // Check if the text looks like a JSON object string
-      if (text.includes('"success": true') && text.includes('"response":')) {
-        try {
-          // Try to extract response from malformed JSON
-          const responseMatch = text.match(/"response":\s*"([^"]*?)"/);
-          if (responseMatch) {
-            const extractedResponse = responseMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
-            console.log('Extracted from malformed JSON:', extractedResponse); // Debug log
-            return {
-              success: true,
-              response: extractedResponse
-            };
-          }
-        } catch (extractError) {
-          console.warn('Failed to extract response from malformed JSON:', extractError);
-        }
-      }
-      
-      console.log('Returning raw text:', text); // Debug log
-      return {
-        success: true,
-        response: text
+        success: data.success,
+        response: chatResponse, // Extract the actual chat content
+        data: data, // Keep original data for debugging
+        error: data.success ? null : (data.message || 'Request failed'),
+        status: response.status
       };
     }
-  }
-};
-
-/**
- * Fallback no-cors approach
- */
-const sendWithNoCors = async (message, onChunk) => {
-  const response = await fetch(API_ENDPOINT, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: {
-      'Content-Type': 'application/json',
-      'ngrok-skip-browser-warning': 'true'
-    },
-    body: JSON.stringify({
-      message: message
-    })
-  });
-
-  // Note: no-cors mode doesn't allow reading response
-  return {
-    success: true,
-    response: "Request sent successfully (no-cors mode - response not readable)"
-  };
-};
-
-/**
- * Handle streaming response from server with optimized performance
- * @param {Response} response - Fetch response object
- * @param {Function} onChunk - Callback for each chunk
- * @returns {Promise<Object>} - Final response object
- */
-const handleStreamingResponse = async (response, onChunk) => {
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-  let fullResponse = '';
-  let isFirstChunk = true;
-  let chunkBuffer = ''; // Buffer for batching small chunks
-  let lastUpdate = Date.now();
-  const UPDATE_INTERVAL = 50; // Update UI every 50ms for smoother experience
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      
-      if (done) break;
-
-      // Decode the chunk
-      const chunk = decoder.decode(value, { stream: true });
-      buffer += chunk;
-
-      // Process complete lines from buffer
-      let lines = buffer.split('\n');
-      buffer = lines.pop() || ''; // Keep incomplete line in buffer
-
-      for (let line of lines) {
-        if (line.trim()) {
-          try {
-            // The API sends: {"success": true, "response": "content"}
-            // We need to extract the streaming content
-            if (isFirstChunk && line.includes('"success": true, "response": "')) {
-              // Extract content after the opening
-              const startIndex = line.indexOf('"response": "') + 13;
-              const content = line.substring(startIndex);
-              if (content && content !== '"') {
-                const cleanContent = content.replace(/\\n/g, '\n').replace(/\\"/g, '"');
-                chunkBuffer += cleanContent;
-                fullResponse += cleanContent;
-              }
-              isFirstChunk = false;
-            } else if (!isFirstChunk && line !== '"}') {
-              // This is a continuation chunk
-              const cleanContent = line.replace(/\\n/g, '\n').replace(/\\"/g, '"');
-              chunkBuffer += cleanContent;
-              fullResponse += cleanContent;
-            }
-          } catch (parseError) {
-            // If it's not JSON, treat as raw content
-            if (!isFirstChunk) {
-              chunkBuffer += line;
-              fullResponse += line;
-            }
-          }
-        }
-      }
-
-      // Batch updates for smoother UI - only update every UPDATE_INTERVAL ms
-      const now = Date.now();
-      if (chunkBuffer && (now - lastUpdate >= UPDATE_INTERVAL || done)) {
-        onChunk(chunkBuffer);
-        chunkBuffer = '';
-        lastUpdate = now;
-      }
-    }
-
-    // Process any remaining buffer
-    if (buffer.trim() && buffer.trim() !== '"}') {
-      const cleanContent = buffer.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/"}$/, '');
-      if (cleanContent) {
-        fullResponse += cleanContent;
-        chunkBuffer += cleanContent;
-      }
-    }
-
-    // Send any remaining buffered content
-    if (chunkBuffer) {
-      onChunk(chunkBuffer);
-    }
-
+    
+    // Fallback for successful response
+    const chatResponse = data?.response || data?.message || data || '';
     return {
       success: true,
-      response: fullResponse
+      response: chatResponse, // Extract the actual chat content
+      data: data, // Keep original data for debugging
+      error: null,
+      status: response.status
     };
-
-  } catch (error) {
-    console.error('Streaming error:', error);
-    return {
-      success: false,
-      error: error.message
-    };
-  } finally {
-    reader.releaseLock();
   }
-};
 
-export default {
-  sendGuestMessage
-};
+  /**
+   * Handle API errors
+   */
+  handleError(error) {
+    console.error('Guest Chat API Error:', error);
+    
+    if (error.response) {
+      // Server responded with error status
+      const data = error.response.data;
+      return {
+        success: false,
+        response: null, // No chat response on error
+        data: data, // Keep original error data for debugging
+        error: data?.message || data?.error || 'Server error occurred',
+        status: error.response.status
+      };
+    } else if (error.request) {
+      // Network error
+      return {
+        success: false,
+        response: null, // No chat response on error
+        data: null,
+        error: 'Network error - please check your connection',
+        status: 0
+      };
+    } else {
+      // Other error
+      return {
+        success: false,
+        response: null, // No chat response on error
+        data: null,
+        error: error.message || 'An unexpected error occurred',
+        status: 500
+      };
+    }
+  }
+
+  /**
+   * Send message to guest chat API (no database storage)
+   * @param {string} message - The message to send
+   * @returns {Promise<Object>} Response object with success, data, error, status
+   */
+  async sendMessage(message) {
+    try {
+      const response = await this.axiosInstance.post(
+        API_CONSTANTS.ENDPOINTS.CHAT.GUEST_CHAT,
+        {
+          message: message,
+          saveToDb: false // Explicitly indicate not to save to database
+        }
+      );
+      
+      return this.handleResponse(response);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Send message with custom options (no database storage)
+   * @param {string} message - The message to send
+   * @param {Object} options - Additional options
+   * @returns {Promise<Object>} Response object
+   */
+  async sendMessageWithOptions(message, options = {}) {
+    try {
+      const payload = {
+        message: message,
+        saveToDb: false, // Explicitly indicate not to save to database
+        ...options
+      };
+
+      const response = await this.axiosInstance.post(
+        API_CONSTANTS.ENDPOINTS.CHAT.GUEST_CHAT,
+        payload
+      );
+      
+      return this.handleResponse(response);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Test connection to guest API
+   * @returns {Promise<Object>} Response object
+   */
+  async testConnection() {
+    try {
+      const response = await this.sendMessage('test connection');
+      return {
+        success: true,
+        message: 'Guest connection successful',
+        data: response
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Guest connection failed',
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Send anonymous message (guest mode)
+   * @param {string} message - The message to send
+   * @returns {Promise<Object>} Response object
+   */
+  async sendAnonymousMessage(message) {
+    try {
+      const response = await this.axiosInstance.post(
+        API_CONSTANTS.ENDPOINTS.CHAT.GUEST_CHAT,
+        {
+          message: message,
+          anonymous: true,
+          saveToDb: false // No database storage for guest messages
+        }
+      );
+      
+      return this.handleResponse(response);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Send guest message (legacy method for backward compatibility)
+   * @param {string} message - The message to send
+   * @param {Function} onChunk - Optional callback for streaming chunks (not supported with axios)
+   * @returns {Promise<Object>} Response object
+   */
+  async sendGuestMessage(message, onChunk = null) {
+    // Note: Streaming with onChunk is not supported with axios in this implementation
+    // If streaming is needed, consider using fetch or implementing Server-Sent Events
+    if (onChunk) {
+      console.warn('Streaming with onChunk callback is not supported in axios implementation');
+    }
+    
+    return await this.sendAnonymousMessage(message);
+  }
+}
+
+// Create and export singleton instance
+const guestChatService = new GuestChatService();
+
+// Export both the service instance and the legacy function for backward compatibility
+export const sendGuestMessage = guestChatService.sendGuestMessage.bind(guestChatService);
+export default guestChatService;

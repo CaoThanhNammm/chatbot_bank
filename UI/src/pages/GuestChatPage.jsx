@@ -4,6 +4,7 @@ import { IoMenuOutline, IoCloseOutline, IoLogInOutline } from 'react-icons/io5';
 import { Button, ChatHeader, ChatWindow, ChatInput, SettingsModal } from '../components';
 import SidePanel from '../components/Chat/SidePanel';
 import { conversationManager } from '../utils/conversationManager';
+import { useStreamingMessage } from '../hooks/useStreamingMessage';
 import { 
   saveCurrentConversation, 
   getGuestConversations, 
@@ -68,6 +69,9 @@ const GuestChatPage = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [sessionId, setSessionId] = useState(null);
 
+  // Use streaming message hook for optimized performance like ChatPage
+  const { startStreaming, updateStreamingContent, finishStreaming } = useStreamingMessage();
+
   // Initialize guest session
   useEffect(() => {
     // First try to get session ID from current conversation
@@ -100,51 +104,46 @@ const GuestChatPage = () => {
   }, [messages, sessionId]);
 
   const handleSendMessage = useCallback(async (messageText) => {
+    if (!messageText.trim()) return;
+
+    // Add user message optimistically to UI
     const userMessage = {
       id: Date.now(),
       text: messageText,
       isBot: false,
       timestamp: new Date()
     };
-    
+
     setMessages(prev => [...prev, userMessage]);
     setIsTyping(true);
-    
-    // Prepare for streaming response
-    let botResponseText = '';
+
+    // Declare variables for error handling
     let botMessageId = Date.now() + 1;
-    
-    // Add empty bot message for streaming
-    const botMessage = {
-      id: botMessageId,
-      text: '',
-      isBot: true,
-      timestamp: new Date(),
-      isStreaming: true
-    };
-    setMessages(prev => [...prev, botMessage]);
-    
+    let botResponseText = '';
+
     try {
+      // Add empty bot message to UI for streaming
+      const botMessage = {
+        id: botMessageId,
+        text: '',
+        isBot: true,
+        timestamp: new Date(),
+        isStreaming: true
+      };
+      setMessages(prev => [...prev, botMessage]);
+      
+      // Start streaming with optimized hook
+      startStreaming(botMessageId);
+
       // Use conversation manager with streaming support
       const result = await conversationManager.sendMessage(
         messageText, 
         sessionId, 
         true, // isGuestMode
         (chunk) => {
-          // Update bot message with new chunk
+          // Update bot message with new chunk using the streaming hook
+          updateStreamingContent(chunk, setMessages);
           botResponseText += chunk;
-          // Use functional update to avoid stale closure
-          setMessages(prev => {
-            const lastMessage = prev[prev.length - 1];
-            if (lastMessage && lastMessage.id === botMessageId) {
-              // Only update if it's the last message and it's the bot message we're streaming
-              return [
-                ...prev.slice(0, -1),
-                { ...lastMessage, text: botResponseText, isStreaming: true }
-              ];
-            }
-            return prev;
-          });
         }
       );
       
@@ -157,14 +156,8 @@ const GuestChatPage = () => {
         botResponseText = result.botMessage.text;
       }
       
-      // Mark streaming as finished
-      setMessages(prev => 
-        prev.map(msg => 
-          msg.id === botMessageId 
-            ? { ...msg, text: botResponseText, isStreaming: false }
-            : msg
-        )
-      );
+      // Mark streaming as finished - formatting will be done in finishStreaming
+      finishStreaming(setMessages, botResponseText);
       
     } catch (error) {
       console.error('Chat error:', error);
@@ -181,10 +174,10 @@ const GuestChatPage = () => {
       };
       
       setMessages(prev => [...prev, errorResponse]);
+    } finally {
+      setIsTyping(false);
     }
-    
-    setIsTyping(false);
-  }, [sessionId]);
+  }, [sessionId, startStreaming, updateStreamingContent, finishStreaming]);
 
   const handlePromptSelect = useCallback((prompt) => {
     handleSendMessage(prompt);

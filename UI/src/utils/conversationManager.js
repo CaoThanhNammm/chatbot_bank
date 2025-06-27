@@ -42,12 +42,14 @@ class ConversationManager {
         // Use the new guest chat API with streaming support
         try {
           if (onChunk && typeof onChunk === 'function') {
-            // Streaming mode - return early and let the callback handle chunks
+            // Streaming mode - the callback handles all chunks, we just get the final response
             const apiResponse = await sendGuestMessage(messageText, onChunk);
             console.log('Streaming API response:', apiResponse); // Debug log
+            
             if (apiResponse.success) {
+              // In streaming mode, the response contains the complete text after streaming
+              // GuestChatService already handles response extraction, so use it directly
               responseText = apiResponse.response;
-              console.log('Streaming response text:', responseText); // Debug log
             } else {
               throw new Error(apiResponse.error);
             }
@@ -55,17 +57,27 @@ class ConversationManager {
             // Non-streaming mode
             const apiResponse = await sendGuestMessage(messageText);
             console.log('Non-streaming API response:', apiResponse); // Debug log
+            
             if (apiResponse.success) {
+              // GuestChatService already handles response extraction, so use it directly
               responseText = apiResponse.response;
-              console.log('Non-streaming response text:', responseText); // Debug log
+              console.log('Final response text:', responseText); // Debug log
             } else {
               throw new Error(apiResponse.error);
             }
           }
         } catch (error) {
           console.error('Guest chat API error:', error);
-          // Fallback to general response if API fails
-          responseText = this.getGuestFallbackResponse(messageText);
+          // Use the same banking logic as authenticated users for better experience
+          const bankQuery = this.detectBankQuery(messageText);
+          
+          if (bankQuery) {
+            // Use banking fallback response for bank-related queries
+            responseText = this.getBankingFallbackResponse(messageText);
+          } else {
+            // Use general response for non-banking queries
+            responseText = this.getGeneralResponse(messageText);
+          }
         }
       } else {
         // Original logic for authenticated users
@@ -90,21 +102,8 @@ class ConversationManager {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
-      // Ensure responseText is a string, not an object
-      let finalResponseText = responseText;
-      if (typeof responseText === 'object') {
-        console.log('Response is object, extracting text:', responseText);
-        // If responseText is an object, try to extract the actual text
-        if (responseText.response) {
-          finalResponseText = responseText.response;
-        } else if (responseText.text) {
-          finalResponseText = responseText.text;
-        } else {
-          // If it's a JSON object, stringify it as fallback
-          finalResponseText = JSON.stringify(responseText);
-        }
-      }
-      
+      // Ensure responseText is properly extracted
+      const finalResponseText = responseText;
       console.log('Final response text:', finalResponseText); // Debug log
 
       // Create bot message object
@@ -277,6 +276,68 @@ class ConversationManager {
     
     // Default response for other queries
     return "Tôi hiểu bạn đang hỏi về \"" + message + "\". Tôi đang học hỏi để trả lời tốt hơn. Bạn có thể hỏi tôi về các dịch vụ ngân hàng như kiểm tra số dư, chuyển khoản, lãi suất tiết kiệm, hoặc thông tin thẻ tín dụng.";
+  }
+
+
+  /**
+   * Extract clean response text from API response
+   * @param {string|Object} response - The API response
+   * @returns {string} - Clean response text
+   */
+  extractResponseText(response) {
+    console.log('Extracting response text from:', typeof response, response); // Debug log
+    
+    // If response is already a string, check if it needs processing
+    if (typeof response === 'string') {
+      // Check if it's a JSON string that needs parsing
+      if (response.includes('"success":') && response.includes('"response":')) {
+        try {
+          const parsed = JSON.parse(response);
+          console.log('Parsed JSON response:', parsed); // Debug log
+          return parsed.response || response;
+        } catch (error) {
+          console.warn('Failed to parse JSON response, trying to extract manually:', error);
+          
+          // Try to extract response manually from malformed JSON
+          const responseMatch = response.match(/"response":\s*"([^"]*?)"/);
+          if (responseMatch) {
+            const extractedResponse = responseMatch[1]
+              .replace(/\\n/g, '\n')
+              .replace(/\\"/g, '"')
+              .replace(/\\t/g, '\t');
+            console.log('Manually extracted response:', extractedResponse); // Debug log
+            return extractedResponse;
+          }
+          
+          return response;
+        }
+      }
+      
+      // If it looks like a raw JSON object string, try to clean it
+      if (response.startsWith('{"success": true, "response": "') && response.endsWith('"}')) {
+        const content = response.slice(32, -2); // Remove {"success": true, "response": " and "}
+        const cleanContent = content
+          .replace(/\\n/g, '\n')
+          .replace(/\\"/g, '"')
+          .replace(/\\t/g, '\t');
+        console.log('Cleaned JSON string response:', cleanContent); // Debug log
+        return cleanContent;
+      }
+      
+      return response;
+    }
+    
+    // If response is an object, extract the response field
+    if (typeof response === 'object' && response !== null) {
+      const extracted = response.response || JSON.stringify(response);
+      console.log('Extracted from object:', extracted); // Debug log
+      return extracted;
+    }
+    
+    // Fallback to string conversion
+    const fallback = String(response);
+    console.log('Fallback string conversion:', fallback); // Debug log
+    return fallback;
   }
 
   /**
