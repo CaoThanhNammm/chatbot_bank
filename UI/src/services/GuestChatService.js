@@ -71,17 +71,47 @@ const sendWithCors = async (message, onChunk) => {
   } else {
     // Fallback: read entire response at once
     const text = await response.text();
+    console.log('Raw API response:', text); // Debug log
+    
     try {
       const data = JSON.parse(text);
+      console.log('Parsed API data:', data); // Debug log
+      
       if (!data.success) {
         throw new Error(data.error || 'API returned unsuccessful response');
       }
+      
+      // Extract only the response content, not the entire JSON object
+      const responseContent = data.response || text;
+      console.log('Extracted response content:', responseContent); // Debug log
+      
       return {
         success: true,
-        response: data.response
+        response: responseContent
       };
     } catch (parseError) {
-      // If it's not valid JSON, treat as streaming response and collect all chunks
+      console.log('JSON parse error:', parseError); // Debug log
+      
+      // If it's not valid JSON, treat as raw text response
+      // Check if the text looks like a JSON object string
+      if (text.includes('"success": true') && text.includes('"response":')) {
+        try {
+          // Try to extract response from malformed JSON
+          const responseMatch = text.match(/"response":\s*"([^"]*?)"/);
+          if (responseMatch) {
+            const extractedResponse = responseMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
+            console.log('Extracted from malformed JSON:', extractedResponse); // Debug log
+            return {
+              success: true,
+              response: extractedResponse
+            };
+          }
+        } catch (extractError) {
+          console.warn('Failed to extract response from malformed JSON:', extractError);
+        }
+      }
+      
+      console.log('Returning raw text:', text); // Debug log
       return {
         success: true,
         response: text

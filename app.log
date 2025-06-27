@@ -1952,3 +1952,75 @@
 2025-06-27 19:26:15,393 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:26:15] "OPTIONS /api/conversations/34ee5613-78b2-4885-8696-64203426da80/messages HTTP/1.1" 200 -
 2025-06-27 19:26:15,452 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:26:15+0700 lvl=info msg="join connections" obj=join id=1264f1fdaef9 l=127.0.0.1:5000 r=171.247.78.59:1635
 2025-06-27 19:26:15,457 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:26:15] "POST /api/conversations/34ee5613-78b2-4885-8696-64203426da80/messages HTTP/1.1" 200 -
+2025-06-27 19:29:35,627 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:29:35+0700 lvl=info msg="join connections" obj=join id=c9f6614eafd2 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:29:35,629 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:29:35] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-27 19:29:35,699 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:29:35+0700 lvl=info msg="join connections" obj=join id=70e34ac45d62 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:29:35,705 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:29:35] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-27 19:29:37,202 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:29:37+0700 lvl=info msg="join connections" obj=join id=2ce932e20340 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:29:37,204 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:29:37] "OPTIONS /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 19:29:37,279 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:29:37+0700 lvl=info msg="join connections" obj=join id=fbedc64c386d l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:29:37,342 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:29:37] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 19:29:40,248 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:29:40+0700 lvl=info msg="join connections" obj=join id=87bc39391ea6 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:29:40,250 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:29:40] "OPTIONS /api/conversations/34ee5613-78b2-4885-8696-64203426da80/messages HTTP/1.1" 200 -
+2025-06-27 19:29:40,327 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:29:40+0700 lvl=info msg="join connections" obj=join id=e7d10a4355e1 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:29:40,332 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:29:40] "GET /api/conversations/34ee5613-78b2-4885-8696-64203426da80/messages HTTP/1.1" 200 -
+2025-06-27 19:30:00,513 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:30:00+0700 lvl=info msg="join connections" obj=join id=35b42231401c l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:30:00,514 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:30:00] "OPTIONS /api/conversations/34ee5613-78b2-4885-8696-64203426da80/messages HTTP/1.1" 200 -
+2025-06-27 19:30:00,750 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:30:00+0700 lvl=info msg="join connections" obj=join id=94565f0ddb90 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:30:00,763 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:30:00] "POST /api/conversations/34ee5613-78b2-4885-8696-64203426da80/messages HTTP/1.1" 200 -
+2025-06-27 19:30:07,795 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:30:07+0700 lvl=info msg="join connections" obj=join id=d6fd8d18499f l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:30:07,796 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:30:07] "OPTIONS /api/conversations/34ee5613-78b2-4885-8696-64203426da80/messages HTTP/1.1" 200 -
+2025-06-27 19:30:07,859 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:30:07+0700 lvl=info msg="join connections" obj=join id=c1997b24e70e l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:30:07,864 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:30:07] "POST /api/conversations/34ee5613-78b2-4885-8696-64203426da80/messages HTTP/1.1" 200 -
+2025-06-27 19:31:16,229 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:31:16+0700 lvl=info msg="join connections" obj=join id=1564703a134f l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:31:16,231 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:31:16] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-27 19:31:16,339 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:31:16+0700 lvl=info msg="join connections" obj=join id=8707b2b3d8c8 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:31:16,345 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:31:16] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-27 19:31:16,910 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:31:16+0700 lvl=info msg="join connections" obj=join id=29bc3fe3a31e l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:31:16,911 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:31:16] "OPTIONS /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 19:31:16,995 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:31:16+0700 lvl=info msg="join connections" obj=join id=5bfd4cc4c4bf l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:31:17,061 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:31:17] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 19:31:19,116 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:31:19+0700 lvl=info msg="join connections" obj=join id=bbd41a4a28cf l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:31:19,117 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:31:19] "OPTIONS /api/conversations/34ee5613-78b2-4885-8696-64203426da80/messages HTTP/1.1" 200 -
+2025-06-27 19:31:19,176 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:31:19+0700 lvl=info msg="join connections" obj=join id=579b91757b88 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:31:19,180 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:31:19] "GET /api/conversations/34ee5613-78b2-4885-8696-64203426da80/messages HTTP/1.1" 200 -
+2025-06-27 19:33:15,446 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:33:15+0700 lvl=info msg="join connections" obj=join id=1b26c248f444 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:33:15,449 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:33:15] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-27 19:33:15,508 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:33:15+0700 lvl=info msg="join connections" obj=join id=c9cfcb356931 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:33:15,512 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:33:15] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-27 19:33:16,622 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:33:16+0700 lvl=info msg="join connections" obj=join id=5509e1d766e7 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:33:16,624 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:33:16] "OPTIONS /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 19:33:16,699 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:33:16+0700 lvl=info msg="join connections" obj=join id=dd287731923f l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:33:16,788 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:33:16] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 19:33:18,741 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:33:18+0700 lvl=info msg="join connections" obj=join id=0fc666264838 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:33:18,742 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:33:18] "OPTIONS /api/conversations/34ee5613-78b2-4885-8696-64203426da80/messages HTTP/1.1" 200 -
+2025-06-27 19:33:18,817 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:33:18+0700 lvl=info msg="join connections" obj=join id=c015ef9fba96 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:33:18,823 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:33:18] "GET /api/conversations/34ee5613-78b2-4885-8696-64203426da80/messages HTTP/1.1" 200 -
+2025-06-27 19:33:52,042 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:33:52+0700 lvl=info msg="join connections" obj=join id=5b9bad94acec l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:33:52,045 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:33:52] "OPTIONS /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 19:33:52,130 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:33:52+0700 lvl=info msg="join connections" obj=join id=5d0dbdf3c30f l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:33:52,215 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:33:52] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 19:33:56,640 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:33:56+0700 lvl=info msg="join connections" obj=join id=ad9001eb5cdf l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:33:56,641 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:33:56] "OPTIONS /api/conversations HTTP/1.1" 200 -
+2025-06-27 19:33:56,721 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:33:56+0700 lvl=info msg="join connections" obj=join id=a9471bb20709 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:33:56,735 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:33:56] "POST /api/conversations HTTP/1.1" 200 -
+2025-06-27 19:33:56,846 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:33:56+0700 lvl=info msg="join connections" obj=join id=3748322d4dfd l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:33:56,848 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:33:56] "OPTIONS /api/conversations/e7fbdfbc-8d4e-4dd0-b120-1b04302ec672/messages HTTP/1.1" 200 -
+2025-06-27 19:33:56,962 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:33:56+0700 lvl=info msg="join connections" obj=join id=36956065e1f3 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:33:56,990 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:33:56] "POST /api/conversations/e7fbdfbc-8d4e-4dd0-b120-1b04302ec672/messages HTTP/1.1" 200 -
+2025-06-27 19:33:57,076 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:33:57+0700 lvl=info msg="join connections" obj=join id=bf5ac59e9bca l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:33:57,186 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:33:57] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 19:34:03,608 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:34:03+0700 lvl=info msg="join connections" obj=join id=02f6a6fdc222 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:34:03,609 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:34:03] "OPTIONS /api/conversations/e7fbdfbc-8d4e-4dd0-b120-1b04302ec672/messages HTTP/1.1" 200 -
+2025-06-27 19:34:03,672 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:34:03+0700 lvl=info msg="join connections" obj=join id=81df08ab6054 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:34:03,679 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:34:03] "POST /api/conversations/e7fbdfbc-8d4e-4dd0-b120-1b04302ec672/messages HTTP/1.1" 200 -
+2025-06-27 19:34:51,975 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:34:51+0700 lvl=info msg="join connections" obj=join id=575bee03090d l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:34:51,977 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:34:51] "OPTIONS /api/conversations/e7fbdfbc-8d4e-4dd0-b120-1b04302ec672/messages HTTP/1.1" 200 -
+2025-06-27 19:34:52,061 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:34:52+0700 lvl=info msg="join connections" obj=join id=9d3eb7bd0c9a l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:34:52,078 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:34:52] "POST /api/conversations/e7fbdfbc-8d4e-4dd0-b120-1b04302ec672/messages HTTP/1.1" 200 -
+2025-06-27 19:34:59,224 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:34:59+0700 lvl=info msg="join connections" obj=join id=87dc30779c02 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:34:59,226 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:34:59] "OPTIONS /api/conversations/e7fbdfbc-8d4e-4dd0-b120-1b04302ec672/messages HTTP/1.1" 200 -
+2025-06-27 19:34:59,308 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:34:59+0700 lvl=info msg="join connections" obj=join id=4f48c0c624f1 l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:34:59,330 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:34:59] "POST /api/conversations/e7fbdfbc-8d4e-4dd0-b120-1b04302ec672/messages HTTP/1.1" 200 -
+2025-06-27 19:35:03,442 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:35:03+0700 lvl=info msg="join connections" obj=join id=7315f9eb9fda l=127.0.0.1:5000 r=171.247.78.59:1635
+2025-06-27 19:35:03,443 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 19:35:03] "[33mOPTIONS /api/logout HTTP/1.1[0m" 404 -

@@ -44,16 +44,20 @@ class ConversationManager {
           if (onChunk && typeof onChunk === 'function') {
             // Streaming mode - return early and let the callback handle chunks
             const apiResponse = await sendGuestMessage(messageText, onChunk);
+            console.log('Streaming API response:', apiResponse); // Debug log
             if (apiResponse.success) {
               responseText = apiResponse.response;
+              console.log('Streaming response text:', responseText); // Debug log
             } else {
               throw new Error(apiResponse.error);
             }
           } else {
             // Non-streaming mode
             const apiResponse = await sendGuestMessage(messageText);
+            console.log('Non-streaming API response:', apiResponse); // Debug log
             if (apiResponse.success) {
               responseText = apiResponse.response;
+              console.log('Non-streaming response text:', responseText); // Debug log
             } else {
               throw new Error(apiResponse.error);
             }
@@ -86,10 +90,27 @@ class ConversationManager {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
+      // Ensure responseText is a string, not an object
+      let finalResponseText = responseText;
+      if (typeof responseText === 'object') {
+        console.log('Response is object, extracting text:', responseText);
+        // If responseText is an object, try to extract the actual text
+        if (responseText.response) {
+          finalResponseText = responseText.response;
+        } else if (responseText.text) {
+          finalResponseText = responseText.text;
+        } else {
+          // If it's a JSON object, stringify it as fallback
+          finalResponseText = JSON.stringify(responseText);
+        }
+      }
+      
+      console.log('Final response text:', finalResponseText); // Debug log
+
       // Create bot message object
       const botMessage = {
         id: Date.now(),
-        text: responseText,
+        text: finalResponseText,
         isBot: true,
         timestamp: new Date()
       };

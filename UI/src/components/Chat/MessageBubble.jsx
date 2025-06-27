@@ -20,98 +20,7 @@ const MessageBubble = memo(({ message, isBot, timestamp, isStreaming = false }) 
   };
 
   const formatMessage = (text) => {
-    // Enhanced markdown-like formatting with better bullet point and line break handling
-    const formatLine = (line, lineIndex, allLines) => {
-      // Check if this line is a bullet point (starts with • followed by optional space)
-      const bulletMatch = line.match(/^(\s*)•\s*(.+)$/);
-      if (bulletMatch) {
-        const [, indent, content] = bulletMatch;
-        const indentLevel = Math.floor(indent.length / 2); // 2 spaces = 1 indent level
-        const marginLeft = indentLevel * 16; // 16px per indent level
-        
-        return (
-          <div 
-            key={`bullet-${lineIndex}`} 
-            className="flex items-start my-2"
-            style={{ marginLeft: `${marginLeft}px` }}
-          >
-            <span className="text-red-600 mr-2 mt-0.5 flex-shrink-0 font-bold">•</span>
-            <span className="flex-1">{formatInlineText(content)}</span>
-          </div>
-        );
-      }
-      
-      // Check if this line is a markdown bullet point (starts with * followed by optional space)
-      const markdownBulletMatch = line.match(/^(\s*)\*\s*(.+)$/);
-      if (markdownBulletMatch) {
-        const [, indent, content] = markdownBulletMatch;
-        const indentLevel = Math.floor(indent.length / 2); // 2 spaces = 1 indent level
-        const marginLeft = indentLevel * 16; // 16px per indent level
-        
-        return (
-          <div 
-            key={`bullet-${lineIndex}`} 
-            className="flex items-start my-2"
-            style={{ marginLeft: `${marginLeft}px` }}
-          >
-            <span className="text-red-600 mr-2 mt-0.5 flex-shrink-0 font-bold">•</span>
-            <span className="flex-1">{formatInlineText(content)}</span>
-          </div>
-        );
-      }
-      
-      // Check if this line is a numbered list (starts with + followed by optional space)
-      const numberedMatch = line.match(/^(\s*)\+\s*(.+)$/);
-      if (numberedMatch) {
-        const [, indent, content] = numberedMatch;
-        const indentLevel = Math.floor(indent.length / 2);
-        const marginLeft = indentLevel * 16;
-        
-        // Count previous numbered items at the same level to get the number
-        let itemNumber = 1;
-        for (let i = lineIndex - 1; i >= 0; i--) {
-          const prevLine = allLines[i];
-          const prevMatch = prevLine.match(/^(\s*)\+\s*(.+)$/);
-          if (prevMatch) {
-            const prevIndent = Math.floor(prevMatch[1].length / 2);
-            if (prevIndent === indentLevel) {
-              itemNumber++;
-            } else if (prevIndent < indentLevel) {
-              break;
-            }
-          } else if (prevLine.trim() === '') {
-            continue;
-          } else {
-            break;
-          }
-        }
-        
-        return (
-          <div 
-            key={`numbered-${lineIndex}`} 
-            className="flex items-start my-2"
-            style={{ marginLeft: `${marginLeft}px` }}
-          >
-            <span className="text-red-600 mr-2 mt-0.5 flex-shrink-0 font-bold">{itemNumber}.</span>
-            <span className="flex-1">{formatInlineText(content)}</span>
-          </div>
-        );
-      }
-      
-      // Check for special patterns that should create line breaks
-      const hasSpecialPattern = line.match(/👉|🚀|📄|📑|📈|🏦|📞|🏡|🚚|📝|📊|🕒|🌞|🌐|💻/);
-      if (hasSpecialPattern && lineIndex > 0) {
-        return (
-          <div key={`special-${lineIndex}`} className="mt-3">
-            {formatInlineText(line)}
-          </div>
-        );
-      }
-      
-      // Regular line formatting
-      return formatInlineText(line);
-    };
-    
+    // Simple function to handle URLs and markdown links only, preserve raw text otherwise
     const formatInlineText = (text) => {
       // First, protect URLs and markdown links from being modified
       const urlProtectionMap = new Map();
@@ -134,48 +43,12 @@ const MessageBubble = memo(({ message, isBot, timestamp, isStreaming = false }) 
         return placeholder;
       });
       
-      // Now clean up text - but avoid the problematic global replacements
-      let cleanText = protectedText
-        // Fix broken emoji first
-        .replace(/� �️?/g, ' ')
-        .replace(/� �/g, ' ')
-        .replace('�', ' ')
-        // Only replace standalone * + - that are not part of formatting, and not in protected URLs
-        // Remove the problematic global replacements that were breaking URLs
-        // .replace('*', ' ')  // REMOVED - this was breaking URLs
-        // .replace('+', '\n') // REMOVED - this was breaking URLs  
-        // .replace('-', '\n') // REMOVED - this was breaking URLs
-        // Fix incomplete bold formatting patterns
-        .replace(/:\*\*\s*([^*\n]+?)(?=\.|$)/g, ': **$1**')
-        // Fix cases like "text**bold**text" -> "text **bold** text"
-        .replace(/(\w)\*\*([^*]+)\*\*(\w)/g, '$1 **$2** $3')
-        // Fix cases like "text*italic*text" -> "text *italic* text"  
-        .replace(/(\w)\*([^*]+)\*(\w)/g, '$1 *$2* $3')
-        // Remove orphaned *** that don't have proper pairs
-        .replace(/\*{3,}/g, '**')
-        // Remove orphaned ** that don't have closing pairs
-        .replace(/\*\*\s*$/g, '')
-        .replace(/^\s*\*\*$/g, '')
-        // Remove orphaned * at the end
-        .replace(/\*\s*$/g, '')
-        .replace(/^\s*\*$/g, '')
-        // Handle emoji arrows followed by text
-        .replace(/👉\s*/g, '👉 ')
-        // Handle other emojis that should have proper spacing
-        .replace(/(🚀|📄|📑|📈|🏡|💵|📆|🏦|📞|🚚|📝|📊|🕒|🌞|🌐|💻)\s*/g, '$1 ');
-      
-      // Define formatting patterns with priority order (markdown links and URLs first)
+      // Define formatting patterns - only URLs and markdown links
       const patterns = [
         // Markdown links pattern - highest priority
         { regex: /__PROTECTED_MARKDOWN_LINK_(\d+)__/g, tag: 'markdown', className: 'text-blue-600 hover:text-blue-800 underline' },
         // URL pattern - second priority
         { regex: /__PROTECTED_URL_(\d+)__/g, tag: 'link', className: 'text-blue-600 hover:text-blue-800 underline break-all' },
-        { regex: /\*\*\*(.*?)\*\*\*/g, tag: 'strongem', className: 'font-bold italic text-red-800' },  // ***bold italic***
-        { regex: /\*\*(.*?)\*\*/g, tag: 'strong', className: 'font-bold text-red-800' },              // **bold**
-        { regex: /__(.*?)__/g, tag: 'u', className: 'underline' },                       // __underline__
-        { regex: /\*([^*\n]+)\*/g, tag: 'em', className: 'italic text-red-700' },                          // *italic*
-        { regex: /~~(.*?)~~/g, tag: 'del', className: 'line-through opacity-75' },       // ~~strikethrough~~
-        { regex: /`(.*?)`/g, tag: 'code', className: 'bg-red-100 px-1 py-0.5 rounded text-xs font-mono' }, // `code`
       ];
       
       // Find all matches without overlaps
@@ -185,7 +58,7 @@ const MessageBubble = memo(({ message, isBot, timestamp, isStreaming = false }) 
         let match;
         const regex = new RegExp(pattern.regex.source, 'g');
         
-        while ((match = regex.exec(cleanText)) !== null) {
+        while ((match = regex.exec(protectedText)) !== null) {
           // Check if this match overlaps with existing matches
           const start = match.index;
           const end = match.index + match[0].length;
@@ -217,7 +90,7 @@ const MessageBubble = memo(({ message, isBot, timestamp, isStreaming = false }) 
       // Build formatted content
       if (matches.length === 0) {
         // Even if no matches, we still need to restore protected URLs/links
-        let finalText = cleanText;
+        let finalText = protectedText;
         const result = [];
         let currentPos = 0;
         
@@ -283,7 +156,7 @@ const MessageBubble = memo(({ message, isBot, timestamp, isStreaming = false }) 
       matches.forEach((match, index) => {
         // Add text before this match
         if (match.start > currentIndex) {
-          result.push(cleanText.slice(currentIndex, match.start));
+          result.push(protectedText.slice(currentIndex, match.start));
         }
         
         // Add the formatted match
@@ -336,28 +209,6 @@ const MessageBubble = memo(({ message, isBot, timestamp, isStreaming = false }) 
               result.push(match.fullMatch);
             }
             break;
-          case 'strongem':
-            result.push(
-              <strong key={key} className={match.className}>
-                <em>{match.content}</em>
-              </strong>
-            );
-            break;
-          case 'strong':
-            result.push(<strong key={key} className={match.className}>{match.content}</strong>);
-            break;
-          case 'em':
-            result.push(<em key={key} className={match.className}>{match.content}</em>);
-            break;
-          case 'u':
-            result.push(<u key={key} className={match.className}>{match.content}</u>);
-            break;
-          case 'del':
-            result.push(<del key={key} className={match.className}>{match.content}</del>);
-            break;
-          case 'code':
-            result.push(<code key={key} className={match.className}>{match.content}</code>);
-            break;
           default:
             result.push(match.content);
         }
@@ -366,181 +217,15 @@ const MessageBubble = memo(({ message, isBot, timestamp, isStreaming = false }) 
       });
       
       // Add remaining text
-      if (currentIndex < cleanText.length) {
-        let remainingText = cleanText.slice(currentIndex);
-        
-        // Replace any remaining protected placeholders in the remaining text
-        urlProtectionMap.forEach((data, placeholder) => {
-          if (remainingText.includes(placeholder)) {
-            if (data.type === 'markdown') {
-              remainingText = remainingText.replace(placeholder, 
-                `<a href="${data.url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline">${data.text}</a>`
-              );
-            } else if (data.type === 'url') {
-              remainingText = remainingText.replace(placeholder,
-                `<a href="${data.url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline break-all">${data.url}</a>`
-              );
-            }
-          }
-        });
-        
-        // If we have HTML in remaining text, we need to parse it
-        if (remainingText.includes('<a ')) {
-          result.push(<span key="remaining" dangerouslySetInnerHTML={{ __html: remainingText }} />);
-        } else {
-          result.push(remainingText);
-        }
+      if (currentIndex < protectedText.length) {
+        result.push(protectedText.slice(currentIndex));
       }
       
       return result;
     };
     
-    // Pre-process text to handle better line breaks and fix common formatting issues
-    let processedText = text
-      // First, handle the most problematic patterns
-      // Fix cases where text flows directly after emoji without space
-      .replace(/(📑|🏡|🚚|📈|📝|📄|📊|📞|🏦|🕒|🌞|🌐|💻|🚀)([A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỲỴỶỸ])/g, '$1 $2')
-      // Fix cases where sentences end and emoji starts without proper spacing
-      .replace(/([.!?:])([📑🏡🚚📈📝📄📊📞🏦🕒🌞🌐💻🚀])/g, '$1 $2')
-      // Fix broken emoji representations (� �) - replace with proper spacing
-      .replace(/� �️?/g, '� ')
-      .replace(/� �/g, '�📑 ')
-      // Fix cases where broken emoji appears at start of line after bullet
-      .replace(/^•\s*� �️?/gm, '• 🕒 ')
-      .replace(/^•\s*� �/gm, '• 📑 ')
-      // Fix cases where company name flows directly into other text
-      .replace(/Agribank([A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỲỴỶỸ])/g, 'Agribank $1')
-      // Fix cases where text flows together without spaces
-      .replace(/([a-zàáâãèéêìíòóôõùúăđĩũơưăạảấầẩẫậắằẳẵặẹẻẽềềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹ])([A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỲỴỶỸ])/g, '$1 $2')
-      // Fix bullet points that are merged with formatting (e.g., "•*text*" -> "• *text*")
-      .replace(/•\*([^*]+)\*/g, '• *$1*')
-      .replace(/•\*\*([^*]+)\*\*/g, '• **$1**')
-      // Fix bullet points with emoji directly attached (e.g., "•*🕒️" -> "• 🕒️")
-      .replace(/•\*(🕒|🌞|🌐|💻|🚀|📑|🏡|🚚|📈|📝|📄|📊|📞|🏦)/g, '• $1')
-      // Fix incomplete bold formatting (e.g., "text:** more text" -> "text: **more text**")
-      .replace(/([^*]):\*\*\s*([^*\n]+?)([.!?])/g, '$1: **$2**$3')
-      // Fix orphaned ** at end of lines (remove them)
-      .replace(/\*\*\s*$/gm, '')
-      // Fix orphaned ** at start of lines
-      .replace(/^•\*\*\s*$/gm, '')
-      .replace(/^\*\*\s*$/gm, '')
-      // Fix orphaned ** in middle of text (remove them)
-      .replace(/\s+\*\*\s+/g, ' ')
-      // Fix cases like "text**. " -> "text. "
-      .replace(/\*\*\s*([.!?])/g, '$1')
-      // Fix cases like "text).** Text" -> "text). Text"
-      .replace(/\)\.\*\*\s+/g, '). ')
-      // Fix cases like "text.**" -> "text."
-      .replace(/\.\*\*(?!\w)/g, '.')
-      // Handle standalone bullet points followed by content on next line
-      .replace(/^•\s*\n([^\n•])/gm, '• $1')
-      // Handle bullet points followed by emoji content
-      .replace(/^•\s*\n(📑|🏡|🚚|📈|📝|📄|📊|📞|🕒|🌞|🌐|💻|🚀)/gm, '• $1')
-      // Handle bullet points followed by broken emoji content
-      .replace(/^•\s*\n(� �️?)/gm, '• 🕒 ')
-      // Remove empty bullet points that are truly empty
-      .replace(/^•\s*\n\s*$/gm, '')
-      // Fix cases where bullet points have no space after them
-      .replace(/^•([^\s])/gm, '• $1')
-      // Fix cases where emoji content flows together without proper spacing
-      .replace(/(📑|🏡|🚚|📈|📝|📄|📊|📞)([A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỲỴỶỸ])/g, '$1 $2')
-      // Handle specific problematic patterns from the example
-      .replace(/📝 Hồ sơ vay:([A-Z])/g, '📝 Hồ sơ vay: $1')
-      .replace(/📞 Yêu cầu hỗ trợ:([A-Z])/g, '📞 Yêu cầu hỗ trợ: $1')
-      // Fix specific patterns from the examples
-      .replace(/🕒️ Thời gian làm việc:/g, '🕒️ Thời gian làm việc:')
-      .replace(/🕒️ Giờ làm việc:/g, '🕒️ Giờ làm việc:')
-      .replace(/🌞️ Ngừng hoạt động:/g, '🌞️ Ngừng hoạt động:')
-      // Fix dashes that should be bullet points
-      .replace(/- 🕒️/g, '• 🕒️')
-      .replace(/- 🌞️/g, '• 🌞️')
-      .replace(/- 📑/g, '• 📑')
-      .replace(/- 🏡/g, '• 🏡')
-      // Fix spacing issues around colons
-      .replace(/([^:\s]):([^\s])/g, '$1: $2')
-      // Fix text that gets merged together (add space before uppercase letters that follow lowercase)
-      .replace(/([a-z])([A-Z])/g, '$1 $2')
-      // Add line breaks before emoji arrows if they're not already on new lines
-      .replace(/([^\n\s])👉/g, '$1\n👉')
-      // Add line breaks before other important emojis
-      .replace(/([^\n\s])(🚀|📄|📑|📈|🏡|💵|📆|🏦|📞|🚚|📝|📊|🕒|🌞|🌐|💻)/g, '$1\n$2')
-      // Handle cases where bullet points are not properly separated
-      .replace(/([.!?])(\*[^*])/g, '$1\n$2')
-      // Handle cases where text flows directly into bullet points
-      .replace(/([a-zA-Z0-9])(\*\s*[A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỲỴỶỸ])/g, '$1\n$2')
-      // Fix cases where sentences end and new bullet points start
-      .replace(/([.!?])•/g, '$1\n•')
-      // Handle cases where emoji appears right after punctuation without space
-      .replace(/([.!?])([📑🏡🚚📈📝📄📊📞🏦🕒🌞🌐💻🚀])/g, '$1 $2')
-      // Handle cases where multiple emojis appear together
-      .replace(/([📑🏡🚚📈📝📄📊📞🏦🕒🌞🌐💻🚀])\s*([📑🏡🚚📈📝📄📊📞🏦🕒🌞🌐💻🚀])/g, '$1 $2')
-      // Fix website URLs that got broken
-      .replace(/\[Website chính thức của Agribank\]\(http: \/\/www\.agribank\.com\.vn\)/g, '[Website chính thức của Agribank](http://www.agribank.com.vn)')
-      // Fix URLs with broken spacing (e.g., "https: //www.google.com" -> "https://www.google.com")
-      .replace(/(https?): \/\//g, '$1://')
-      // Fix URLs wrapped in parentheses with spaces (e.g., "(https: //www.google.com)" -> "https://www.google.com")
-      .replace(/\(\s*(https?): \/\/([^)]+)\s*\)/g, '$1://$2')
-      .replace(/www\.agribank\.com\.vn\*\*/g, 'www.agribank.com.vn')
-      // Fix phone numbers with formatting issues
-      .replace(/1900 55 88 18\*\*/g, '1900 55 88 18')
-      // Clean up multiple consecutive line breaks
-      .replace(/\n{3,}/g, '\n\n')
-      // Final cleanup - ensure proper spacing around colons in emoji contexts
-      .replace(/(📑|🏡|🚚|📈|📝|📄|📊|📞|🏦|🕒|🌞|🌐|💻|🚀)\s*([^:\s])/g, '$1 $2')
-      // Final pass to clean up any remaining formatting issues
-      .replace(/\*\*+/g, '') // Remove any remaining ** patterns
-      .replace(/\s{2,}/g, ' ') // Replace multiple spaces with single space
-      .trim();
-    
-    // Split text into lines and process each line
-    const lines = processedText.split('\n');
-    const processedLines = [];
-    
-    // Debug logging in development
-    if (process.env.NODE_ENV === 'development' && text.includes('📑')) {
-      console.log('Processing message with emoji:', {
-        original: text,
-        processed: processedText,
-        lines: lines
-      });
-    }
-    
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      
-      // Skip empty lines but add some spacing
-      if (line === '') {
-        if (i > 0 && i < lines.length - 1) {
-          processedLines.push(<div key={`empty-${i}`} className="h-2"></div>);
-        }
-        continue;
-      }
-      
-      // Skip standalone bullet points (just • with no content)
-      if (line === '•' || line === '*' || line === '+') {
-        continue;
-      }
-      
-      const formattedLine = formatLine(line, i, lines);
-      
-      // Check if this is a bullet/numbered list item or has special emoji
-      const isBulletPoint = line.match(/^(\s*)[*•+]\s*(.+)$/);
-      const hasSpecialEmoji = line.match(/👉|🚀|📄|📑|📈|🏦|📞|🏡|🚚|📝|📊|🕒|🌞|🌐|💻/);
-      
-      if (isBulletPoint || hasSpecialEmoji) {
-        processedLines.push(formattedLine);
-      } else {
-        // Regular line - add with line break if not the last line and next line isn't empty
-        processedLines.push(
-          <React.Fragment key={i}>
-            {formattedLine}
-            {i < lines.length - 1 && lines[i + 1].trim() !== '' && <br />}
-          </React.Fragment>
-        );
-      }
-    }
-    
-    return processedLines;
+    // Simply return the formatted text with URLs and markdown links processed
+    return formatInlineText(text);
   };
   
   return (
