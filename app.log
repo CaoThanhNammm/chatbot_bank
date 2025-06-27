@@ -1326,3 +1326,20 @@
 2025-06-27 08:26:31,109 - app.database - INFO - Database initialized with URI: mysql+pymysql://root:@localhost:3306/llama_factory
 2025-06-27 08:26:31,109 - app.mail_config - INFO - Mail service initialized
 2025-06-27 08:26:35,024 - datasets - INFO - PyTorch version 2.7.0+cu118 available.
+2025-06-27 08:26:43,169 - app - INFO - Database tables created successfully
+2025-06-27 08:26:43,181 - werkzeug - WARNING -  * Debugger is active!
+2025-06-27 08:26:43,189 - werkzeug - INFO -  * Debugger PIN: 666-068-108
+2025-06-27 08:37:47,963 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:37:47+0700 lvl=info msg="join connections" obj=join id=97d6b1de2520 l=127.0.0.1:5000 r=171.247.78.59:65363
+2025-06-27 08:37:47,966 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 08:37:47] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-27 08:37:48,020 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:37:48+0700 lvl=info msg="join connections" obj=join id=a8563d7f990b l=127.0.0.1:5000 r=171.247.78.59:65363
+2025-06-27 08:37:48,022 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 08:37:48] "[31m[1mGET /api/auth/me HTTP/1.1[0m" 401 -
+2025-06-27 08:37:52,675 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:37:52+0700 lvl=info msg="join connections" obj=join id=f13afc887501 l=127.0.0.1:5000 r=171.247.78.59:65363
+2025-06-27 08:37:52,679 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 08:37:52] "[33mOPTIONS /api/logout HTTP/1.1[0m" 404 -
+2025-06-27 08:38:02,749 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:38:02+0700 lvl=info msg="join connections" obj=join id=2dec231442bb l=127.0.0.1:5000 r=171.247.78.59:65363
+2025-06-27 08:38:02,752 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 08:38:02] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+2025-06-27 08:38:02,820 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:38:02+0700 lvl=info msg="join connections" obj=join id=b763da7f8896 l=127.0.0.1:5000 r=171.247.78.59:65363
+2025-06-27 08:38:03,062 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 08:38:03] "POST /api/auth/login HTTP/1.1" 200 -
+2025-06-27 08:38:06,253 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:38:06+0700 lvl=info msg="join connections" obj=join id=2eed3d9b37c2 l=127.0.0.1:5000 r=171.247.78.59:65363
+2025-06-27 08:38:06,254 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 08:38:06] "OPTIONS /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 08:38:06,371 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:38:06+0700 lvl=info msg="join connections" obj=join id=3aedb4b9b521 l=127.0.0.1:5000 r=171.247.78.59:65384
+2025-06-27 08:38:06,422 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 08:38:06] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
