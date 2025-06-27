@@ -1610,3 +1610,183 @@
 2025-06-27 15:16:45,488 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:16:45] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
 2025-06-27 15:22:02,507 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:22:02] "OPTIONS /api/auth/me HTTP/1.1" 200 -
 2025-06-27 15:22:02,586 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:22:02] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-27 15:25:50,782 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:25:50] "OPTIONS /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 15:25:50,957 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:25:50] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 15:25:59,181 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:25:59] "OPTIONS /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 15:25:59,397 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:25:59] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 15:26:02,117 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:26:02] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 15:26:08,867 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:26:08] "OPTIONS /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 15:26:09,061 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:26:09] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 15:26:14,879 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:26:14] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-27 15:26:14,946 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:26:14] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-27 15:26:16,426 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:26:16] "OPTIONS /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 15:26:16,617 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:26:16] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 15:26:21,168 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:26:21] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 15:30:36,804 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:30:36] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-27 15:30:36,877 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:30:36] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-27 15:35:26,049 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:35:26] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-27 15:35:26,135 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:35:26] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-27 15:36:08,602 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:36:08] "OPTIONS /api/conversations/5f63de40-655c-4a12-bf16-8b023405a07c/messages HTTP/1.1" 200 -
+2025-06-27 15:36:08,777 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:36:08] "POST /api/conversations/5f63de40-655c-4a12-bf16-8b023405a07c/messages HTTP/1.1" 200 -
+2025-06-27 15:36:11,168 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:36:11] "POST /api/conversations/5f63de40-655c-4a12-bf16-8b023405a07c/messages HTTP/1.1" 200 -
+2025-06-27 15:37:10,101 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:37:10] "OPTIONS /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 15:37:10,221 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:37:10] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 15:37:34,466 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:37:34] "OPTIONS /api/conversations HTTP/1.1" 200 -
+2025-06-27 15:37:34,549 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:37:34] "POST /api/conversations HTTP/1.1" 200 -
+2025-06-27 15:37:34,636 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:37:34] "OPTIONS /api/conversations/8db2fb1b-1931-4019-ae2f-ef475b234fde/messages HTTP/1.1" 200 -
+2025-06-27 15:37:34,720 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:37:34] "POST /api/conversations/8db2fb1b-1931-4019-ae2f-ef475b234fde/messages HTTP/1.1" 200 -
+2025-06-27 15:37:34,846 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:37:34] "OPTIONS /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 15:37:34,956 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:37:34] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 15:37:41,335 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:37:41] "OPTIONS /api/conversations/8db2fb1b-1931-4019-ae2f-ef475b234fde/messages HTTP/1.1" 200 -
+2025-06-27 15:37:41,443 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:37:41] "POST /api/conversations/8db2fb1b-1931-4019-ae2f-ef475b234fde/messages HTTP/1.1" 200 -
+2025-06-27 15:37:55,814 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:37:55] "OPTIONS /api/conversations/8db2fb1b-1931-4019-ae2f-ef475b234fde/messages HTTP/1.1" 200 -
+2025-06-27 15:37:55,886 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:37:55] "POST /api/conversations/8db2fb1b-1931-4019-ae2f-ef475b234fde/messages HTTP/1.1" 200 -
+2025-06-27 15:38:01,923 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:38:01] "OPTIONS /api/conversations/8db2fb1b-1931-4019-ae2f-ef475b234fde/messages HTTP/1.1" 200 -
+2025-06-27 15:38:01,994 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:38:01] "POST /api/conversations/8db2fb1b-1931-4019-ae2f-ef475b234fde/messages HTTP/1.1" 200 -
+2025-06-27 15:38:27,147 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:38:27] "OPTIONS /api/conversations/8db2fb1b-1931-4019-ae2f-ef475b234fde/messages HTTP/1.1" 200 -
+2025-06-27 15:38:27,237 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:38:27] "POST /api/conversations/8db2fb1b-1931-4019-ae2f-ef475b234fde/messages HTTP/1.1" 200 -
+2025-06-27 15:38:36,464 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:38:36] "OPTIONS /api/conversations/8db2fb1b-1931-4019-ae2f-ef475b234fde/messages HTTP/1.1" 200 -
+2025-06-27 15:38:36,523 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:38:36] "POST /api/conversations/8db2fb1b-1931-4019-ae2f-ef475b234fde/messages HTTP/1.1" 200 -
+2025-06-27 15:38:54,693 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:38:54] "OPTIONS /api/conversations/8db2fb1b-1931-4019-ae2f-ef475b234fde/messages HTTP/1.1" 200 -
+2025-06-27 15:38:54,761 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:38:54] "POST /api/conversations/8db2fb1b-1931-4019-ae2f-ef475b234fde/messages HTTP/1.1" 200 -
+2025-06-27 15:39:02,051 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:39:02] "OPTIONS /api/conversations/8db2fb1b-1931-4019-ae2f-ef475b234fde/messages HTTP/1.1" 200 -
+2025-06-27 15:39:02,138 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:39:02] "POST /api/conversations/8db2fb1b-1931-4019-ae2f-ef475b234fde/messages HTTP/1.1" 200 -
+2025-06-27 15:39:08,590 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:39:08] "OPTIONS /api/conversations/5f63de40-655c-4a12-bf16-8b023405a07c/messages HTTP/1.1" 200 -
+2025-06-27 15:39:08,692 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:39:08] "POST /api/conversations/5f63de40-655c-4a12-bf16-8b023405a07c/messages HTTP/1.1" 200 -
+2025-06-27 15:39:10,864 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:39:10] "POST /api/conversations/5f63de40-655c-4a12-bf16-8b023405a07c/messages HTTP/1.1" 200 -
+2025-06-27 15:39:40,033 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:39:40] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-27 15:39:40,130 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:39:40] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-27 15:39:41,221 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:39:41] "OPTIONS /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 15:39:41,454 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:39:41] "GET /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 15:39:49,070 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:39:49] "OPTIONS /api/conversations HTTP/1.1" 200 -
+2025-06-27 15:39:49,192 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:39:49] "POST /api/conversations HTTP/1.1" 200 -
+2025-06-27 15:39:49,299 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:39:49] "OPTIONS /api/conversations/f99d95c1-4195-45c4-b6cd-fb15ad8dbe2b/messages HTTP/1.1" 200 -
+2025-06-27 15:39:49,406 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:39:49] "POST /api/conversations/f99d95c1-4195-45c4-b6cd-fb15ad8dbe2b/messages HTTP/1.1" 200 -
+2025-06-27 15:39:49,496 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:39:49] "OPTIONS /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 15:39:49,598 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:39:49] "GET /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 15:39:55,040 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:39:55] "OPTIONS /api/conversations/f99d95c1-4195-45c4-b6cd-fb15ad8dbe2b/messages HTTP/1.1" 200 -
+2025-06-27 15:39:55,247 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 15:39:55] "POST /api/conversations/f99d95c1-4195-45c4-b6cd-fb15ad8dbe2b/messages HTTP/1.1" 200 -
+2025-06-27 16:29:34,802 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:29:34] "OPTIONS /api/conversations/f99d95c1-4195-45c4-b6cd-fb15ad8dbe2b/messages HTTP/1.1" 200 -
+2025-06-27 16:29:34,895 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:29:34] "POST /api/conversations/f99d95c1-4195-45c4-b6cd-fb15ad8dbe2b/messages HTTP/1.1" 200 -
+2025-06-27 16:29:40,614 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:29:40] "OPTIONS /api/conversations/f99d95c1-4195-45c4-b6cd-fb15ad8dbe2b/messages HTTP/1.1" 200 -
+2025-06-27 16:29:40,772 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:29:40] "POST /api/conversations/f99d95c1-4195-45c4-b6cd-fb15ad8dbe2b/messages HTTP/1.1" 200 -
+2025-06-27 16:31:39,239 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:31:39] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+2025-06-27 16:31:39,515 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:31:39] "POST /api/auth/login HTTP/1.1" 200 -
+2025-06-27 16:31:41,895 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:31:41] "OPTIONS /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 16:31:42,068 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:31:42] "GET /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 16:31:55,837 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:31:55] "OPTIONS /api/conversations HTTP/1.1" 200 -
+2025-06-27 16:31:55,925 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:31:55] "POST /api/conversations HTTP/1.1" 200 -
+2025-06-27 16:31:56,009 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:31:56] "OPTIONS /api/conversations/04838308-8c36-40aa-aa96-70b6a96a79ac/messages HTTP/1.1" 200 -
+2025-06-27 16:31:56,091 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:31:56] "POST /api/conversations/04838308-8c36-40aa-aa96-70b6a96a79ac/messages HTTP/1.1" 200 -
+2025-06-27 16:31:56,247 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:31:56] "OPTIONS /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 16:31:56,359 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:31:56] "GET /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 16:32:07,664 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:32:07] "OPTIONS /api/conversations/04838308-8c36-40aa-aa96-70b6a96a79ac/messages HTTP/1.1" 200 -
+2025-06-27 16:32:07,763 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:32:07] "POST /api/conversations/04838308-8c36-40aa-aa96-70b6a96a79ac/messages HTTP/1.1" 200 -
+2025-06-27 16:37:25,883 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:37:25] "[33mOPTIONS /api/logout HTTP/1.1[0m" 404 -
+2025-06-27 16:40:54,315 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:40:54] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+2025-06-27 16:40:54,489 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:40:54] "POST /api/auth/login HTTP/1.1" 200 -
+2025-06-27 16:41:00,597 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:41:00] "OPTIONS /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 16:41:00,875 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:41:00] "GET /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 16:41:11,571 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:41:11] "OPTIONS /api/conversations HTTP/1.1" 200 -
+2025-06-27 16:41:11,673 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:41:11] "POST /api/conversations HTTP/1.1" 200 -
+2025-06-27 16:41:11,795 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:41:11] "OPTIONS /api/conversations/865a844a-e1db-4234-b21d-c1f0d949cca8/messages HTTP/1.1" 200 -
+2025-06-27 16:41:11,890 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:41:11] "POST /api/conversations/865a844a-e1db-4234-b21d-c1f0d949cca8/messages HTTP/1.1" 200 -
+2025-06-27 16:41:12,013 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:41:12] "OPTIONS /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 16:41:12,121 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:41:12] "GET /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 16:41:17,390 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:41:17] "OPTIONS /api/conversations/865a844a-e1db-4234-b21d-c1f0d949cca8/messages HTTP/1.1" 200 -
+2025-06-27 16:41:17,477 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:41:17] "POST /api/conversations/865a844a-e1db-4234-b21d-c1f0d949cca8/messages HTTP/1.1" 200 -
+2025-06-27 16:41:28,092 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:41:28] "OPTIONS /api/conversations/865a844a-e1db-4234-b21d-c1f0d949cca8/messages HTTP/1.1" 200 -
+2025-06-27 16:41:28,180 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:41:28] "POST /api/conversations/865a844a-e1db-4234-b21d-c1f0d949cca8/messages HTTP/1.1" 200 -
+2025-06-27 16:41:33,490 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:41:33] "OPTIONS /api/conversations/865a844a-e1db-4234-b21d-c1f0d949cca8/messages HTTP/1.1" 200 -
+2025-06-27 16:41:33,583 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:41:33] "POST /api/conversations/865a844a-e1db-4234-b21d-c1f0d949cca8/messages HTTP/1.1" 200 -
+2025-06-27 16:47:21,190 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:47:21] "OPTIONS /api/conversations/865a844a-e1db-4234-b21d-c1f0d949cca8/messages HTTP/1.1" 200 -
+2025-06-27 16:47:21,307 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:47:21] "POST /api/conversations/865a844a-e1db-4234-b21d-c1f0d949cca8/messages HTTP/1.1" 200 -
+2025-06-27 16:47:30,215 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:47:30] "OPTIONS /api/conversations/865a844a-e1db-4234-b21d-c1f0d949cca8/messages HTTP/1.1" 200 -
+2025-06-27 16:47:30,329 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:47:30] "POST /api/conversations/865a844a-e1db-4234-b21d-c1f0d949cca8/messages HTTP/1.1" 200 -
+2025-06-27 16:51:29,299 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:51:29] "OPTIONS /api/admin/users HTTP/1.1" 200 -
+2025-06-27 16:51:29,397 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 16:51:29] "GET /api/admin/users HTTP/1.1" 200 -
+2025-06-27 17:13:43,375 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:13:43] "OPTIONS /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 17:13:43,509 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:13:43] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 17:18:32,138 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:18:32] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-27 17:18:32,226 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:18:32] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-27 17:18:33,793 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:18:33] "[33mOPTIONS /api/logout HTTP/1.1[0m" 404 -
+2025-06-27 17:18:48,921 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:18:48] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+2025-06-27 17:18:49,105 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:18:49] "POST /api/auth/login HTTP/1.1" 200 -
+2025-06-27 17:18:51,778 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:18:51] "OPTIONS /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 17:18:52,005 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:18:52] "GET /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 17:19:04,525 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:19:04] "OPTIONS /api/conversations HTTP/1.1" 200 -
+2025-06-27 17:19:04,613 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:19:04] "POST /api/conversations HTTP/1.1" 200 -
+2025-06-27 17:19:04,702 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:19:04] "OPTIONS /api/conversations/372e36df-8c60-43f6-b871-c8a023f584ba/messages HTTP/1.1" 200 -
+2025-06-27 17:19:04,804 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:19:04] "POST /api/conversations/372e36df-8c60-43f6-b871-c8a023f584ba/messages HTTP/1.1" 200 -
+2025-06-27 17:19:04,900 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:19:04] "OPTIONS /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 17:19:04,994 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:19:04] "GET /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 17:19:35,072 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:19:35] "OPTIONS /api/conversations/372e36df-8c60-43f6-b871-c8a023f584ba/messages HTTP/1.1" 200 -
+2025-06-27 17:19:35,169 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:19:35] "POST /api/conversations/372e36df-8c60-43f6-b871-c8a023f584ba/messages HTTP/1.1" 200 -
+2025-06-27 17:20:24,647 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:20:24] "OPTIONS /api/conversations/372e36df-8c60-43f6-b871-c8a023f584ba/messages HTTP/1.1" 200 -
+2025-06-27 17:20:24,747 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:20:24] "POST /api/conversations/372e36df-8c60-43f6-b871-c8a023f584ba/messages HTTP/1.1" 200 -
+2025-06-27 17:20:53,368 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:20:53] "OPTIONS /api/conversations/372e36df-8c60-43f6-b871-c8a023f584ba/messages HTTP/1.1" 200 -
+2025-06-27 17:20:53,455 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:20:53] "POST /api/conversations/372e36df-8c60-43f6-b871-c8a023f584ba/messages HTTP/1.1" 200 -
+2025-06-27 17:24:51,910 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:24:51] "OPTIONS /api/conversations/372e36df-8c60-43f6-b871-c8a023f584ba/messages HTTP/1.1" 200 -
+2025-06-27 17:24:52,000 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:24:51] "POST /api/conversations/372e36df-8c60-43f6-b871-c8a023f584ba/messages HTTP/1.1" 200 -
+2025-06-27 17:25:11,232 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:25:11] "OPTIONS /api/conversations/372e36df-8c60-43f6-b871-c8a023f584ba/messages HTTP/1.1" 200 -
+2025-06-27 17:25:11,328 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:25:11] "POST /api/conversations/372e36df-8c60-43f6-b871-c8a023f584ba/messages HTTP/1.1" 200 -
+2025-06-27 17:25:40,661 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:25:40] "OPTIONS /api/conversations/372e36df-8c60-43f6-b871-c8a023f584ba/messages HTTP/1.1" 200 -
+2025-06-27 17:25:40,755 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:25:40] "POST /api/conversations/372e36df-8c60-43f6-b871-c8a023f584ba/messages HTTP/1.1" 200 -
+2025-06-27 17:25:59,342 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:25:59] "OPTIONS /api/conversations/372e36df-8c60-43f6-b871-c8a023f584ba/messages HTTP/1.1" 200 -
+2025-06-27 17:25:59,443 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:25:59] "POST /api/conversations/372e36df-8c60-43f6-b871-c8a023f584ba/messages HTTP/1.1" 200 -
+2025-06-27 17:38:34,982 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:38:34] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-27 17:38:35,060 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:38:35] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-27 17:39:38,096 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:39:38] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-27 17:39:38,186 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:39:38] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-27 17:39:40,827 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:39:40] "OPTIONS /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 17:39:41,027 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:39:41] "GET /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 17:39:52,737 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:39:52] "OPTIONS /api/conversations HTTP/1.1" 200 -
+2025-06-27 17:39:52,831 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:39:52] "POST /api/conversations HTTP/1.1" 200 -
+2025-06-27 17:39:52,925 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:39:52] "OPTIONS /api/conversations/b2b6d357-880a-48fe-83e8-26ed1b3a07c6/messages HTTP/1.1" 200 -
+2025-06-27 17:39:53,027 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:39:53] "POST /api/conversations/b2b6d357-880a-48fe-83e8-26ed1b3a07c6/messages HTTP/1.1" 200 -
+2025-06-27 17:39:53,132 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:39:53] "OPTIONS /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 17:39:53,225 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:39:53] "GET /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 17:40:03,441 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:40:03] "OPTIONS /api/conversations/b2b6d357-880a-48fe-83e8-26ed1b3a07c6/messages HTTP/1.1" 200 -
+2025-06-27 17:40:03,545 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:40:03] "POST /api/conversations/b2b6d357-880a-48fe-83e8-26ed1b3a07c6/messages HTTP/1.1" 200 -
+2025-06-27 17:40:22,018 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:40:22] "OPTIONS /api/conversations/b2b6d357-880a-48fe-83e8-26ed1b3a07c6/messages HTTP/1.1" 200 -
+2025-06-27 17:40:22,111 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:40:22] "POST /api/conversations/b2b6d357-880a-48fe-83e8-26ed1b3a07c6/messages HTTP/1.1" 200 -
+2025-06-27 17:40:33,727 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:40:33] "OPTIONS /api/conversations/b2b6d357-880a-48fe-83e8-26ed1b3a07c6/messages HTTP/1.1" 200 -
+2025-06-27 17:40:33,821 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:40:33] "POST /api/conversations/b2b6d357-880a-48fe-83e8-26ed1b3a07c6/messages HTTP/1.1" 200 -
+2025-06-27 17:40:54,862 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:40:54] "OPTIONS /api/conversations/b2b6d357-880a-48fe-83e8-26ed1b3a07c6/messages HTTP/1.1" 200 -
+2025-06-27 17:40:54,954 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:40:54] "POST /api/conversations/b2b6d357-880a-48fe-83e8-26ed1b3a07c6/messages HTTP/1.1" 200 -
+2025-06-27 17:41:03,526 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:41:03] "OPTIONS /api/conversations/b2b6d357-880a-48fe-83e8-26ed1b3a07c6/messages HTTP/1.1" 200 -
+2025-06-27 17:41:03,639 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 17:41:03] "POST /api/conversations/b2b6d357-880a-48fe-83e8-26ed1b3a07c6/messages HTTP/1.1" 200 -
+2025-06-27 19:04:31,264 - app.database - INFO - Database initialized with URI: mysql+pymysql://root:@localhost:3306/llama_factory
+2025-06-27 19:04:31,264 - app.mail_config - INFO - Mail service initialized
+2025-06-27 19:04:40,180 - datasets - INFO - PyTorch version 2.7.0+cu118 available.
+2025-06-27 19:05:15,592 - app - INFO - Database tables created successfully
+2025-06-27 19:05:22,781 - pyngrok.process - INFO - Updating authtoken for default "config_path" of "ngrok_path": C:\Users\Nam\AppData\Local\ngrok\ngrok.exe
+2025-06-27 19:05:23,765 - pyngrok.ngrok - INFO - Opening tunnel named: http-5000-1c7f74c3-2e25-4707-a717-7919af89bbf3
+2025-06-27 19:05:23,809 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:05:23+0700 lvl=info msg="no configuration paths supplied"
+2025-06-27 19:05:23,809 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:05:23+0700 lvl=info msg="using configuration at default config path" path=C:\\Users\\Nam\\AppData\\Local/ngrok/ngrok.yml
+2025-06-27 19:05:23,810 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:05:23+0700 lvl=info msg="open config file" path=C:\\Users\\Nam\\AppData\\Local\\ngrok\\ngrok.yml err=nil
+2025-06-27 19:05:23,812 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:05:23+0700 lvl=info msg="starting web service" obj=web addr=127.0.0.1:4040 allow_hosts=[]
+2025-06-27 19:05:24,058 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:05:24+0700 lvl=info msg="client session established" obj=tunnels.session
+2025-06-27 19:05:24,059 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:05:24+0700 lvl=info msg="tunnel session started" obj=tunnels.session
+2025-06-27 19:05:24,095 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:05:24+0700 lvl=info msg=start pg=/api/tunnels id=7ebc96c165193a10
+2025-06-27 19:05:24,095 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:05:24+0700 lvl=info msg=end pg=/api/tunnels id=7ebc96c165193a10 status=200 dur=504.4µs
+2025-06-27 19:05:24,096 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:05:24+0700 lvl=info msg=start pg=/api/tunnels id=27bfaf68f8593f71
+2025-06-27 19:05:24,096 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:05:24+0700 lvl=info msg=end pg=/api/tunnels id=27bfaf68f8593f71 status=200 dur=0s
+2025-06-27 19:05:24,097 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:05:24+0700 lvl=info msg=start pg=/api/tunnels id=4dc7368d9719dc71
+2025-06-27 19:05:24,098 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:05:24+0700 lvl=info msg=end pg=/api/tunnels id=4dc7368d9719dc71 status=200 dur=0s
+2025-06-27 19:05:24,098 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:05:24+0700 lvl=info msg=start pg=/api/tunnels id=c4dbe5e9ccfa7913
+2025-06-27 19:05:24,138 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:05:24+0700 lvl=info msg="started tunnel" obj=tunnels name=http-5000-1c7f74c3-2e25-4707-a717-7919af89bbf3 addr=http://localhost:5000 url=https://67d9-171-247-78-59.ngrok-free.app
+2025-06-27 19:05:24,138 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:05:24+0700 lvl=info msg=end pg=/api/tunnels id=c4dbe5e9ccfa7913 status=201 dur=39.553ms
+2025-06-27 19:05:24,809 - pyngrok.process.ngrok - INFO - t=2025-06-27T19:05:24+0700 lvl=info msg="update available" obj=updater
+2025-06-27 19:05:25,457 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.101.7:5000
+2025-06-27 19:05:25,457 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-27 19:05:25,459 - werkzeug - INFO -  * Restarting with stat
+2025-06-27 19:05:27,046 - app.database - INFO - Database initialized with URI: mysql+pymysql://root:@localhost:3306/llama_factory
+2025-06-27 19:05:27,046 - app.mail_config - INFO - Mail service initialized
+2025-06-27 19:05:31,190 - datasets - INFO - PyTorch version 2.7.0+cu118 available.
+2025-06-27 19:05:38,283 - app - INFO - Database tables created successfully
+2025-06-27 19:05:38,292 - werkzeug - WARNING -  * Debugger is active!
+2025-06-27 19:05:38,298 - werkzeug - INFO -  * Debugger PIN: 666-068-108

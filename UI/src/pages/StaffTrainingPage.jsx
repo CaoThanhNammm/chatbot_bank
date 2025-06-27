@@ -30,7 +30,7 @@ const Tooltip = ({ children, text }) => {
 };
 
 const StaffTrainingPage = () => {
-  // Fine-tuning form state
+  // Fine-tuning form state with proper data types
   const [formData, setFormData] = useState({
     datasetFile: null,
     stage: 'sft',
@@ -45,7 +45,7 @@ const StaffTrainingPage = () => {
     lrSchedulerType: 'cosine',
     loggingSteps: 5,
     warmupRatio: 0.1,
-    saveSteps: 100,
+    saveSteps: 1000,
     learningRate: 0.00005,
     numTrainEpochs: 3.0,
     maxSamples: 500,
@@ -177,12 +177,38 @@ const StaffTrainingPage = () => {
     }
   };
 
-  // Handle form input changes
+  // Handle form input changes with proper type conversion
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
+    
+    let processedValue;
+    
+    if (type === 'checkbox') {
+      processedValue = checked;
+    } else if (type === 'number') {
+      // Convert string to number for numeric inputs
+      if (value === '' || value === null) {
+        processedValue = 0;
+      } else {
+        // Handle different numeric types
+        if (name === 'learningRate' || name === 'warmupRatio' || name === 'numTrainEpochs' || name === 'maxGradNorm' || name === 'loraplusLrRatio') {
+          processedValue = parseFloat(value);
+        } else {
+          processedValue = parseInt(value, 10);
+        }
+        
+        // Validate the number
+        if (isNaN(processedValue)) {
+          processedValue = 0;
+        }
+      }
+    } else {
+      processedValue = value;
+    }
+    
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: processedValue
     }));
   };
 
@@ -224,54 +250,307 @@ const StaffTrainingPage = () => {
         }
       }
 
-      // Create JSON payload for API request
-      const requestData = {
-        stage: formData.stage,
-        do_train: formData.doTrain,
-        model_name_or_path: formData.modelNameOrPath,
-        dataset: datasetContent,
-        template: formData.template,
-        finetuning_type: formData.finetuningType,
-        lora_target: formData.loraTarget,
-        output_dir: formData.outputDir,
-        per_device_train_batch_size: formData.perDeviceTrainBatchSize,
-        gradient_accumulation_steps: formData.gradientAccumulationSteps,
-        lr_scheduler_type: formData.lrSchedulerType,
-        logging_steps: formData.loggingSteps,
-        warmup_ratio: formData.warmupRatio,
-        save_steps: formData.saveSteps,
-        learning_rate: formData.learningRate,
-        num_train_epochs: formData.numTrainEpochs,
-        max_samples: formData.maxSamples,
-        max_grad_norm: formData.maxGradNorm,
-        loraplus_lr_ratio: formData.loraplusLrRatio,
-        fp16: formData.fp16,
-        report_to: formData.reportTo
+      // Validate numeric parameters before sending with specific ranges for LLaMA-Factory
+      const validateNumericParam = (value, defaultValue, min = 0, max = null) => {
+        const num = Number(value);
+        if (isNaN(num) || num < min || (max !== null && num > max)) {
+          console.warn(`Parameter value ${value} is invalid, using default ${defaultValue}`);
+          return defaultValue;
+        }
+        return num;
       };
 
-      console.log('Sending fine-tuning request with data:', requestData);
+      // Backend-specific parameter validation and correction
+      const validateBackendCompatibility = (params) => {
+        // Fix save_steps default mismatch (UI: 100, Backend: 1000)
+        if (params.save_steps === 100) {
+          params.save_steps = 1000; // Match backend default
+          console.log('Adjusted save_steps to match backend default: 1000');
+        }
+
+        // Fix learning_rate format (Backend expects 5e-5, not 0.00005)
+        if (params.learning_rate === 0.00005) {
+          params.learning_rate = 5e-5; // Use scientific notation
+          console.log('Adjusted learning_rate to scientific notation: 5e-5');
+        }
+
+        // Ensure output_dir doesn't have conflicting path separators
+        if (params.output_dir && params.output_dir.includes('\\')) {
+          params.output_dir = params.output_dir.replace(/\\/g, '/');
+          console.log('Fixed output_dir path separators');
+        }
+
+        // Validate lr_scheduler_type values
+        const validSchedulers = ['cosine', 'linear', 'constant', 'polynomial', 'cosine_with_restarts'];
+        if (!validSchedulers.includes(params.lr_scheduler_type)) {
+          params.lr_scheduler_type = 'cosine';
+          console.warn('Invalid lr_scheduler_type, using default: cosine');
+        }
+
+        // Validate template values for LLaMA-3
+        const validTemplates = ['llama3', 'llama2', 'alpaca', 'vicuna', 'chatglm3'];
+        if (!validTemplates.includes(params.template)) {
+          params.template = 'llama3';
+          console.warn('Invalid template, using default: llama3');
+        }
+
+        // Validate finetuning_type
+        const validFinetuningTypes = ['lora', 'qlora', 'full'];
+        if (!validFinetuningTypes.includes(params.finetuning_type)) {
+          params.finetuning_type = 'lora';
+          console.warn('Invalid finetuning_type, using default: lora');
+        }
+
+        // Ensure batch size and gradient accumulation don't cause memory issues
+        const effectiveBatchSize = params.per_device_train_batch_size * params.gradient_accumulation_steps;
+        if (effectiveBatchSize > 32) {
+          console.warn(`Effective batch size (${effectiveBatchSize}) is very high, may cause memory issues`);
+        }
+
+        // Validate epoch and steps relationship
+        if (params.save_steps > (params.max_samples / params.per_device_train_batch_size)) {
+          console.warn('save_steps is larger than total training steps, model may not save checkpoints');
+        }
+
+        return params;
+      };
+
+      // Create JSON payload for API request with proper type conversion and validation
+      let requestData = {
+        stage: String(formData.stage),
+        do_train: Boolean(formData.doTrain),
+        model_name_or_path: String(formData.modelNameOrPath),
+        dataset: datasetContent,
+        template: String(formData.template),
+        finetuning_type: String(formData.finetuningType),
+        lora_target: String(formData.loraTarget),
+        output_dir: String(formData.outputDir),
+        per_device_train_batch_size: validateNumericParam(formData.perDeviceTrainBatchSize, 2, 1, 32),
+        gradient_accumulation_steps: validateNumericParam(formData.gradientAccumulationSteps, 4, 1, 128),
+        lr_scheduler_type: String(formData.lrSchedulerType),
+        logging_steps: validateNumericParam(formData.loggingSteps, 5, 1, 1000),
+        warmup_ratio: validateNumericParam(formData.warmupRatio, 0.1, 0, 1.0),
+        save_steps: validateNumericParam(formData.saveSteps, 100, 1, 10000),
+        learning_rate: validateNumericParam(formData.learningRate, 0.00005, 0.000001, 0.01),
+        num_train_epochs: validateNumericParam(formData.numTrainEpochs, 3.0, 0.1, 100),
+        max_samples: validateNumericParam(formData.maxSamples, 500, 1, 100000),
+        max_grad_norm: validateNumericParam(formData.maxGradNorm, 1.0, 0.1, 10.0),
+        loraplus_lr_ratio: validateNumericParam(formData.loraplusLrRatio, 16.0, 1.0, 100.0),
+        fp16: Boolean(formData.fp16),
+        report_to: String(formData.reportTo)
+      };
+
+      // Apply backend-specific compatibility fixes
+      requestData = validateBackendCompatibility(requestData);
+
+      // Log the original form data and processed request data for debugging
+      console.log('Original form data:', formData);
+      console.log('Processed request data being sent to API:', requestData);
+      
+      // Validate that all numeric parameters are actually numbers
+      const numericParams = [
+        'per_device_train_batch_size', 'gradient_accumulation_steps', 'logging_steps',
+        'save_steps', 'max_samples', 'learning_rate', 'num_train_epochs',
+        'warmup_ratio', 'max_grad_norm', 'loraplus_lr_ratio'
+      ];
+      
+      numericParams.forEach(param => {
+        if (typeof requestData[param] !== 'number' || isNaN(requestData[param])) {
+          console.error(`Parameter ${param} is not a valid number:`, requestData[param]);
+        }
+      });
+
+      // Additional validation for LLaMA-Factory specific requirements
+      if (requestData.learning_rate <= 0) {
+        console.error('Learning rate must be positive');
+        setTrainingError('Learning rate phải lớn hơn 0');
+        return;
+      }
+
+      if (requestData.num_train_epochs <= 0) {
+        console.error('Number of epochs must be positive');
+        setTrainingError('Số epochs phải lớn hơn 0');
+        return;
+      }
+
+      if (requestData.per_device_train_batch_size <= 0) {
+        console.error('Batch size must be positive');
+        setTrainingError('Batch size phải lớn hơn 0');
+        return;
+      }
+
+      // Warn about potentially problematic combinations
+      if (requestData.learning_rate > 0.001) {
+        console.warn('Learning rate is quite high, this might cause training instability');
+      }
+
+      if (requestData.per_device_train_batch_size > 8 && requestData.gradient_accumulation_steps > 8) {
+        console.warn('High batch size and gradient accumulation might cause memory issues');
+      }
+
+      // Additional LLaMA-Factory specific validations
+      
+      // Validate LoRA target format
+      if (requestData.lora_target && requestData.lora_target !== 'all') {
+        // Ensure lora_target is properly formatted for LLaMA-Factory
+        const validLoraTargets = ['all', 'q_proj', 'v_proj', 'k_proj', 'o_proj', 'gate_proj', 'up_proj', 'down_proj'];
+        const targets = requestData.lora_target.split(',').map(t => t.trim());
+        const invalidTargets = targets.filter(t => !validLoraTargets.includes(t));
+        
+        if (invalidTargets.length > 0) {
+          console.warn(`Invalid LoRA targets found: ${invalidTargets.join(', ')}, using 'all'`);
+          requestData.lora_target = 'all';
+        }
+      }
+
+      // Validate model path format
+      if (requestData.model_name_or_path && !requestData.model_name_or_path.includes('/')) {
+        console.warn('Model path might be invalid, ensure it follows HuggingFace format (e.g., username/model-name)');
+      }
+
+      // Ensure dataset is properly formatted
+      if (!requestData.dataset || (Array.isArray(requestData.dataset) && requestData.dataset.length === 0)) {
+        setTrainingError('Dataset không hợp lệ hoặc rỗng');
+        return;
+      }
+
+      // Validate dataset format for LLaMA-Factory
+      if (Array.isArray(requestData.dataset)) {
+        const requiredFields = ['instruction', 'input', 'output'];
+        const sampleItem = requestData.dataset[0];
+        
+        if (!sampleItem || !requiredFields.every(field => field in sampleItem)) {
+          console.warn('Dataset format might not be compatible with LLaMA-Factory');
+          console.log('Expected fields:', requiredFields);
+          console.log('Sample item fields:', sampleItem ? Object.keys(sampleItem) : 'No sample item');
+        }
+      }
+
+      // Final parameter conflict resolution
+      const resolveParameterConflicts = (params) => {
+        // Fix common parameter conflicts that cause LLaMA-Factory to fail
+        
+        // If save_steps is too large compared to total steps, adjust it
+        const estimatedTotalSteps = Math.ceil(params.max_samples / params.per_device_train_batch_size) * params.num_train_epochs;
+        if (params.save_steps > estimatedTotalSteps) {
+          params.save_steps = Math.max(Math.floor(estimatedTotalSteps / 4), 100);
+          console.log(`Adjusted save_steps to ${params.save_steps} based on estimated total steps: ${estimatedTotalSteps}`);
+        }
+
+        // Ensure logging_steps is not larger than save_steps
+        if (params.logging_steps > params.save_steps) {
+          params.logging_steps = Math.min(params.save_steps, 10);
+          console.log(`Adjusted logging_steps to ${params.logging_steps} to be <= save_steps`);
+        }
+
+        // For very small datasets, adjust parameters
+        if (params.max_samples < 100) {
+          if (params.save_steps > 50) {
+            params.save_steps = 50;
+            console.log('Adjusted save_steps for small dataset');
+          }
+          if (params.num_train_epochs > 5) {
+            params.num_train_epochs = 5;
+            console.log('Adjusted num_train_epochs for small dataset');
+          }
+        }
+
+        // Ensure warmup_ratio makes sense with the number of steps
+        if (params.warmup_ratio > 0.5) {
+          params.warmup_ratio = 0.1;
+          console.log('Adjusted warmup_ratio to prevent excessive warmup');
+        }
+
+        return params;
+      };
+
+      // Apply final conflict resolution
+      requestData = resolveParameterConflicts(requestData);
+
+      // Final validation before sending
+      const finalValidation = (data) => {
+        const errors = [];
+        
+        // Check required fields
+        if (!data.model_name_or_path) errors.push('Model name is required');
+        if (!data.dataset) errors.push('Dataset is required');
+        if (!data.output_dir) errors.push('Output directory is required');
+        
+        // Check numeric fields are actually numbers
+        const numericFields = [
+          'per_device_train_batch_size', 'gradient_accumulation_steps', 
+          'logging_steps', 'save_steps', 'learning_rate', 'num_train_epochs',
+          'max_samples', 'warmup_ratio', 'max_grad_norm', 'loraplus_lr_ratio'
+        ];
+        
+        numericFields.forEach(field => {
+          if (typeof data[field] !== 'number' || isNaN(data[field])) {
+            errors.push(`${field} must be a valid number`);
+          }
+        });
+        
+        // Check boolean fields
+        if (typeof data.do_train !== 'boolean') errors.push('do_train must be boolean');
+        if (typeof data.fp16 !== 'boolean') errors.push('fp16 must be boolean');
+        
+        return errors;
+      };
+
+      const validationErrors = finalValidation(requestData);
+      if (validationErrors.length > 0) {
+        console.error('Validation errors:', validationErrors);
+        setTrainingError(`Lỗi validation: ${validationErrors.join(', ')}`);
+        return;
+      }
 
       // Show initial progress while sending request
       setTrainingProgress(10);
 
-      // Call to ngrok API endpoint using axios
+      // Call to ngrok API endpoint using axios with enhanced error handling
       const response = await axios.post(apiUrlManager.getFineTuningUrl(), requestData, {
-        headers: apiUrlManager.getNgrokHeaders()
+        headers: apiUrlManager.getNgrokHeaders(),
+        timeout: 30000, // 30 second timeout for initial request
+        validateStatus: function (status) {
+          // Accept both success and error status codes to handle them properly
+          return status >= 200 && status < 600;
+        }
       });
 
       const result = response.data;
       console.log('Fine-tuning API response:', result);
+      console.log('Response status:', response.status);
+      
+      // Handle different response status codes
+      if (response.status >= 400) {
+        console.error('Server returned error status:', response.status);
+        const errorMessage = result.message || result.error || `Server error: ${response.status}`;
+        setTrainingError(`Lỗi server (${response.status}): ${errorMessage}`);
+        setIsTraining(false);
+        setTrainingProgress(0);
+        return;
+      }
       
       setTrainingProgress(100);
       setIsTraining(false);
       setTrainingResult(result);
       
-      // Check if the API returned success based on the backend structure
-      // Backend returns: (success, message, task_id) which becomes JSON response
-      if (result.success === true || (result[0] === true && result[2])) {
-        const taskId = result.task_id || result[2];
-        const message = result.message || result[1];
+      // Enhanced response validation
+      const isSuccess = result.success === true || 
+                       (Array.isArray(result) && result[0] === true) ||
+                       (result.task_id && result.message);
+      
+      if (isSuccess) {
+        const taskId = result.task_id || (Array.isArray(result) ? result[2] : null);
+        const message = result.message || (Array.isArray(result) ? result[1] : 'Task started successfully');
+        
+        if (!taskId) {
+          console.error('No task ID received from server');
+          setTrainingError('Server không trả về task ID. Vui lòng kiểm tra server logs.');
+          return;
+        }
+        
         setSuccessMessage(`Huấn luyện mô hình đã bắt đầu thành công! ${message}`);
+        
         // Add to training files list
         const newFile = {
           id: Date.now(),
@@ -285,12 +564,17 @@ const StaffTrainingPage = () => {
           taskId: taskId
         };
         setTrainingFiles(prev => [newFile, ...prev]);
+        
         // Refresh the tasks list to show the new task
         setTimeout(() => {
           fetchFineTuningTasks();
         }, 1000);
       } else {
-        const errorMessage = result.message || result[1] || 'Có lỗi xảy ra trong quá trình khởi tạo huấn luyện';
+        const errorMessage = result.message || 
+                           (Array.isArray(result) ? result[1] : null) || 
+                           result.error ||
+                           'Có lỗi xảy ra trong quá trình khởi tạo huấn luyện';
+        console.error('Training failed:', errorMessage);
         setTrainingError(errorMessage);
       }
     } catch (error) {
@@ -679,6 +963,8 @@ const StaffTrainingPage = () => {
                       value={formData.loraplusLrRatio}
                       onChange={handleInputChange}
                       step="0.1"
+                      min="1"
+                      max="100"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     />
                   </div>
@@ -701,6 +987,8 @@ const StaffTrainingPage = () => {
                       name="perDeviceTrainBatchSize"
                       value={formData.perDeviceTrainBatchSize}
                       onChange={handleInputChange}
+                      min="1"
+                      max="32"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     />
                   </div>
@@ -717,6 +1005,8 @@ const StaffTrainingPage = () => {
                       name="gradientAccumulationSteps"
                       value={formData.gradientAccumulationSteps}
                       onChange={handleInputChange}
+                      min="1"
+                      max="128"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     />
                   </div>
@@ -734,6 +1024,8 @@ const StaffTrainingPage = () => {
                       value={formData.learningRate}
                       onChange={handleInputChange}
                       step="0.00001"
+                      min="0.000001"
+                      max="0.01"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     />
                   </div>
@@ -751,6 +1043,8 @@ const StaffTrainingPage = () => {
                       value={formData.numTrainEpochs}
                       onChange={handleInputChange}
                       step="0.1"
+                      min="0.1"
+                      max="100"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     />
                   </div>
@@ -767,6 +1061,8 @@ const StaffTrainingPage = () => {
                       name="maxSamples"
                       value={formData.maxSamples}
                       onChange={handleInputChange}
+                      min="1"
+                      max="100000"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     />
                   </div>
@@ -784,6 +1080,8 @@ const StaffTrainingPage = () => {
                       value={formData.warmupRatio}
                       onChange={handleInputChange}
                       step="0.01"
+                      min="0"
+                      max="1"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     />
                   </div>
@@ -825,6 +1123,8 @@ const StaffTrainingPage = () => {
                       name="loggingSteps"
                       value={formData.loggingSteps}
                       onChange={handleInputChange}
+                      min="1"
+                      max="1000"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     />
                   </div>
@@ -841,6 +1141,8 @@ const StaffTrainingPage = () => {
                       name="saveSteps"
                       value={formData.saveSteps}
                       onChange={handleInputChange}
+                      min="1"
+                      max="10000"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     />
                   </div>
@@ -858,6 +1160,8 @@ const StaffTrainingPage = () => {
                       value={formData.maxGradNorm}
                       onChange={handleInputChange}
                       step="0.1"
+                      min="0.1"
+                      max="10"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     />
                   </div>
