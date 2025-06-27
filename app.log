@@ -1343,3 +1343,56 @@
 2025-06-27 08:38:06,254 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 08:38:06] "OPTIONS /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
 2025-06-27 08:38:06,371 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:38:06+0700 lvl=info msg="join connections" obj=join id=3aedb4b9b521 l=127.0.0.1:5000 r=171.247.78.59:65384
 2025-06-27 08:38:06,422 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 08:38:06] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 08:55:14,609 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:55:14+0700 lvl=info msg="join connections" obj=join id=aa8811c14ffd l=127.0.0.1:5000 r=171.247.78.59:49650
+2025-06-27 08:55:14,616 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 08:55:14] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-27 08:55:14,679 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:55:14+0700 lvl=info msg="join connections" obj=join id=f74b6b18ba05 l=127.0.0.1:5000 r=171.247.78.59:49650
+2025-06-27 08:55:14,688 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 08:55:14] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-27 08:55:17,539 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:55:17+0700 lvl=info msg="join connections" obj=join id=a1e0c51f38a2 l=127.0.0.1:5000 r=171.247.78.59:49650
+2025-06-27 08:55:17,541 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 08:55:17] "[33mOPTIONS /api/logout HTTP/1.1[0m" 404 -
+2025-06-27 08:55:26,614 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:55:26+0700 lvl=info msg="join connections" obj=join id=eb97bedc492d l=127.0.0.1:5000 r=171.247.78.59:49650
+2025-06-27 08:55:26,614 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 08:55:26] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+2025-06-27 08:55:26,677 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:55:26+0700 lvl=info msg="join connections" obj=join id=08d068b56a66 l=127.0.0.1:5000 r=171.247.78.59:49650
+2025-06-27 08:55:26,792 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 08:55:26] "POST /api/auth/login HTTP/1.1" 200 -
+2025-06-27 08:55:28,328 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:55:28+0700 lvl=info msg="join connections" obj=join id=f38698197cff l=127.0.0.1:5000 r=171.247.78.59:49650
+2025-06-27 08:55:28,328 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 08:55:28] "OPTIONS /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 08:55:28,458 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:55:28+0700 lvl=info msg="join connections" obj=join id=4d61cacbd554 l=127.0.0.1:5000 r=171.247.78.59:60861
+2025-06-27 08:55:28,504 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 08:55:28] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 09:22:27,540 - app.database - INFO - Database initialized with URI: mysql+pymysql://root:@localhost:3306/llama_factory
+2025-06-27 09:22:27,541 - app.mail_config - INFO - Mail service initialized
+2025-06-27 09:22:39,113 - datasets - INFO - PyTorch version 2.7.0+cu118 available.
+2025-06-27 09:23:24,093 - app - INFO - Database tables created successfully
+2025-06-27 09:23:26,244 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.101.7:5000
+2025-06-27 09:23:26,244 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-27 09:23:26,249 - werkzeug - INFO -  * Restarting with stat
+2025-06-27 09:23:28,636 - app.database - INFO - Database initialized with URI: mysql+pymysql://root:@localhost:3306/llama_factory
+2025-06-27 09:23:28,636 - app.mail_config - INFO - Mail service initialized
+2025-06-27 09:23:34,658 - datasets - INFO - PyTorch version 2.7.0+cu118 available.
+2025-06-27 09:23:45,266 - app - INFO - Database tables created successfully
+2025-06-27 09:23:45,284 - werkzeug - WARNING -  * Debugger is active!
+2025-06-27 09:23:45,298 - werkzeug - INFO -  * Debugger PIN: 666-068-108
+2025-06-27 09:26:20,123 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 09:26:20] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+2025-06-27 09:26:20,320 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 09:26:20] "POST /api/auth/login HTTP/1.1" 200 -
+2025-06-27 09:26:22,133 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 09:26:22] "OPTIONS /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 09:26:22,303 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 09:26:22] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 10:54:49,297 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 10:54:49] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-27 10:54:49,589 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 10:54:49] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-27 11:01:11,310 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 11:01:11] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-27 11:01:11,394 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 11:01:11] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-27 11:03:52,678 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 11:03:52] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-27 11:03:53,568 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 11:03:53] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-27 11:03:54,890 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 11:03:54] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-27 11:03:57,759 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 11:03:57] "[33mOPTIONS /api/logout HTTP/1.1[0m" 404 -
+2025-06-27 11:04:44,570 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 11:04:44] "OPTIONS /api/auth/register HTTP/1.1" 200 -
+2025-06-27 11:04:45,404 - app.ngrok_utils - INFO - Using ngrok URL from environment: https://5b22-171-247-78-59.ngrok-free.app
+2025-06-27 11:04:48,900 - app - INFO - Activation email sent successfully to namcrd001@gmail.com
+2025-06-27 11:04:48,901 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 11:04:48] "[35m[1mPOST /api/auth/register HTTP/1.1[0m" 201 -
+2025-06-27 11:05:33,542 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 11:05:33] "GET /api/auth/activate?token=6b7iW3OnVpzaTnF32r9eRkFfpxQu4wX7bHTzZxr2PYyQpHXnnTx28iSSgH6RD4VJ HTTP/1.1" 200 -
+2025-06-27 11:05:33,701 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 11:05:33] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-06-27 11:05:50,813 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 11:05:50] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+2025-06-27 11:05:55,127 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 11:05:55] "POST /api/auth/login HTTP/1.1" 200 -
+2025-06-27 11:08:53,112 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 11:08:53] "OPTIONS /api/conversations?user_id=cd3b04cc-b4ca-4ffb-bdb2-f78cf65feaa6 HTTP/1.1" 200 -
+2025-06-27 11:09:19,766 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 11:09:19] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-27 11:09:19,866 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 11:09:19] "GET /api/auth/me HTTP/1.1" 200 -
