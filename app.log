@@ -1239,3 +1239,59 @@
 2025-06-26 21:41:19,623 - werkzeug - INFO - 127.0.0.1 - - [26/Jun/2025 21:41:19] "OPTIONS /api/auth/me HTTP/1.1" 200 -
 2025-06-26 21:41:19,700 - pyngrok.process.ngrok - INFO - t=2025-06-26T21:41:19+0700 lvl=info msg="join connections" obj=join id=6becd5d9057a l=127.0.0.1:5000 r=171.247.78.59:50430
 2025-06-26 21:41:19,704 - werkzeug - INFO - 127.0.0.1 - - [26/Jun/2025 21:41:19] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-26 21:44:44,953 - pyngrok.process.ngrok - INFO - t=2025-06-26T21:44:44+0700 lvl=info msg="join connections" obj=join id=ffcc9a4fd024 l=127.0.0.1:5000 r=171.247.78.59:50703
+2025-06-26 21:44:44,955 - werkzeug - INFO - 127.0.0.1 - - [26/Jun/2025 21:44:44] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-26 21:44:45,039 - pyngrok.process.ngrok - INFO - t=2025-06-26T21:44:45+0700 lvl=info msg="join connections" obj=join id=679f54b6ad75 l=127.0.0.1:5000 r=171.247.78.59:50703
+2025-06-26 21:44:45,042 - werkzeug - INFO - 127.0.0.1 - - [26/Jun/2025 21:44:45] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-26 21:45:21,503 - pyngrok.process.ngrok - INFO - t=2025-06-26T21:45:21+0700 lvl=info msg="join connections" obj=join id=4bca4d1b8000 l=127.0.0.1:5000 r=171.247.78.59:50740
+2025-06-26 21:45:21,506 - werkzeug - INFO - 127.0.0.1 - - [26/Jun/2025 21:45:21] "OPTIONS /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-26 21:45:21,633 - pyngrok.process.ngrok - INFO - t=2025-06-26T21:45:21+0700 lvl=info msg="join connections" obj=join id=0d1d52e56885 l=127.0.0.1:5000 r=171.247.78.59:50746
+2025-06-26 21:45:21,667 - werkzeug - INFO - 127.0.0.1 - - [26/Jun/2025 21:45:21] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-26 21:46:43,282 - pyngrok.process.ngrok - INFO - t=2025-06-26T21:46:43+0700 lvl=info msg="join connections" obj=join id=ad13e7fed599 l=127.0.0.1:5000 r=171.247.78.59:50746
+2025-06-26 21:46:43,284 - werkzeug - INFO - 127.0.0.1 - - [26/Jun/2025 21:46:43] "OPTIONS /api/auth/me HTTP/1.1" 200 -
+2025-06-26 21:46:43,348 - pyngrok.process.ngrok - INFO - t=2025-06-26T21:46:43+0700 lvl=info msg="join connections" obj=join id=e0f0a6615ade l=127.0.0.1:5000 r=171.247.78.59:50746
+2025-06-26 21:46:43,353 - werkzeug - INFO - 127.0.0.1 - - [26/Jun/2025 21:46:43] "GET /api/auth/me HTTP/1.1" 200 -
+2025-06-26 21:46:44,039 - pyngrok.process.ngrok - INFO - t=2025-06-26T21:46:44+0700 lvl=info msg="join connections" obj=join id=ac3d673c0353 l=127.0.0.1:5000 r=171.247.78.59:50746
+2025-06-26 21:46:44,040 - werkzeug - INFO - 127.0.0.1 - - [26/Jun/2025 21:46:44] "OPTIONS /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-26 21:46:44,171 - pyngrok.process.ngrok - INFO - t=2025-06-26T21:46:44+0700 lvl=info msg="join connections" obj=join id=6f9496e69fdf l=127.0.0.1:5000 r=171.247.78.59:50878
+2025-06-26 21:46:44,207 - werkzeug - INFO - 127.0.0.1 - - [26/Jun/2025 21:46:44] "GET /api/conversations?user_id=3ee47395-8e38-456f-a950-b963a234709c HTTP/1.1" 200 -
+2025-06-27 00:39:59,420 - pyngrok.process.ngrok - INFO - t=2025-06-27T00:39:59+0700 lvl=info msg="received stop request" obj=app stopReq="{err:<nil> restart:false}"
+2025-06-27 08:22:08,472 - app.database - INFO - Database initialized with URI: mysql+pymysql://root:@localhost:3306/llama_factory
+2025-06-27 08:22:08,473 - app.mail_config - INFO - Mail service initialized
+2025-06-27 08:22:19,106 - datasets - INFO - PyTorch version 2.7.0+cu118 available.
+2025-06-27 08:22:53,215 - app - INFO - Database tables created successfully
+2025-06-27 08:23:00,464 - pyngrok.process - INFO - Updating authtoken for default "config_path" of "ngrok_path": C:\Users\Nam\AppData\Local\ngrok\ngrok.exe
+2025-06-27 08:23:01,314 - pyngrok.ngrok - INFO - Opening tunnel named: http-5000-605cf075-8780-4c14-9d1c-1d1a943fda76
+2025-06-27 08:23:01,349 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:23:01+0700 lvl=info msg="no configuration paths supplied"
+2025-06-27 08:23:01,350 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:23:01+0700 lvl=info msg="using configuration at default config path" path=C:\\Users\\Nam\\AppData\\Local/ngrok/ngrok.yml
+2025-06-27 08:23:01,350 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:23:01+0700 lvl=info msg="open config file" path=C:\\Users\\Nam\\AppData\\Local\\ngrok\\ngrok.yml err=nil
+2025-06-27 08:23:01,352 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:23:01+0700 lvl=info msg="starting web service" obj=web addr=127.0.0.1:4040 allow_hosts=[]
+2025-06-27 08:23:01,542 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:23:01+0700 lvl=info msg="client session established" obj=tunnels.session
+2025-06-27 08:23:01,542 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:23:01+0700 lvl=info msg="tunnel session started" obj=tunnels.session
+2025-06-27 08:23:01,574 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:23:01+0700 lvl=info msg=start pg=/api/tunnels id=e8dbbbab889e286f
+2025-06-27 08:23:01,574 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:23:01+0700 lvl=info msg=end pg=/api/tunnels id=e8dbbbab889e286f status=200 dur=0s
+2025-06-27 08:23:01,574 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:23:01+0700 lvl=info msg=start pg=/api/tunnels id=5d27e89bc5eb41b1
+2025-06-27 08:23:01,574 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:23:01+0700 lvl=info msg=end pg=/api/tunnels id=5d27e89bc5eb41b1 status=200 dur=0s
+2025-06-27 08:23:01,575 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:23:01+0700 lvl=info msg=start pg=/api/tunnels id=f35085c2d08a689b
+2025-06-27 08:23:01,575 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:23:01+0700 lvl=info msg=end pg=/api/tunnels id=f35085c2d08a689b status=200 dur=0s
+2025-06-27 08:23:01,576 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:23:01+0700 lvl=info msg=start pg=/api/tunnels id=0006f9510eea187e
+2025-06-27 08:23:01,621 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:23:01+0700 lvl=info msg="started tunnel" obj=tunnels name=http-5000-605cf075-8780-4c14-9d1c-1d1a943fda76 addr=http://localhost:5000 url=https://e77d-171-247-78-59.ngrok-free.app
+2025-06-27 08:23:01,621 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:23:01+0700 lvl=info msg=end pg=/api/tunnels id=0006f9510eea187e status=201 dur=44.4792ms
+2025-06-27 08:23:02,975 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.101.7:5000
+2025-06-27 08:23:02,975 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-27 08:23:02,978 - werkzeug - INFO -  * Restarting with stat
+2025-06-27 08:23:04,294 - app.database - INFO - Database initialized with URI: mysql+pymysql://root:@localhost:3306/llama_factory
+2025-06-27 08:23:04,294 - app.mail_config - INFO - Mail service initialized
+2025-06-27 08:23:06,352 - pyngrok.process.ngrok - WARNING - t=2025-06-27T08:23:06+0700 lvl=warn msg="failed to check for update" obj=updater err="Post \"https://update.equinox.io/check\": context deadline exceeded"
+2025-06-27 08:23:08,737 - datasets - INFO - PyTorch version 2.7.0+cu118 available.
+2025-06-27 08:23:14,318 - app - INFO - Database tables created successfully
+2025-06-27 08:23:14,327 - werkzeug - WARNING -  * Debugger is active!
+2025-06-27 08:23:14,334 - werkzeug - INFO -  * Debugger PIN: 666-068-108
+2025-06-27 08:26:02,973 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:26:02+0700 lvl=info msg="received stop request" obj=app stopReq="{err:<nil> restart:false}"
+2025-06-27 08:26:02,974 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:26:02+0700 lvl=info msg="session closing" obj=tunnels.session err=nil
+2025-06-27 08:26:02,974 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:26:02+0700 lvl=info msg="accept failed" obj=tunnels.session obj=csess id=6707ca48da68 err="reconnecting session closed"
+2025-06-27 08:26:02,974 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:26:02+0700 lvl=info msg="no more state changes" obj=tunnels.session
+2025-06-27 08:26:02,974 - pyngrok.process.ngrok - INFO - t=2025-06-27T08:26:02+0700 lvl=info msg="failed to accept connection: Listener closed" obj=tunnels.session clientid=e7256de0021eda3c008ff66f340c78f7
